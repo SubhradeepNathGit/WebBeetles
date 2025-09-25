@@ -127,10 +127,10 @@ const CoursesSection = () => {
                 className="w-full px-4 py-2.5 bg-gray-800 text-white rounded-full border border-gray-700 focus:outline-none focus:border-purple-500 transition-colors text-sm"
               />
             </div>
-            <button className="px-5 py-2.5 ml-2 bg-purple-700 text-white rounded-full hover:bg-purple-600 transition-colors flex items-center gap-2">
+            {/* <button className="px-5 py-2.5 ml-2 bg-purple-700 text-white rounded-full hover:bg-purple-600 transition-colors flex items-center gap-2">
               <Search size={18} />
               <span className="hidden font-semibold sm:inline text-sm">Search</span>
-            </button>
+            </button> */}
           </div>
         </div>
 

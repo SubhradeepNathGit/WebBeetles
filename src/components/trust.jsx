@@ -17,18 +17,18 @@ const LogoCarousel = () => {
     <section className="relative w-full bg-black overflow-hidden">
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Heading */}
-       <div className="text-center mb-8 sm:mb-12">
-  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
-    <span className="text-white">We are </span>
-    <span className="text-purple-700">Trusted </span>
-    <span className="text-white">by</span>
-  </h2>
-</div>
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
+            <span className="text-white">We are </span>
+            <span className="text-purple-700">Trusted </span>
+            <span className="text-white">by</span>
+          </h2>
+        </div>
 
 
         {/* Carousel Container */}
         <div className="relative h-16 sm:h-20 overflow-hidden">
-          <div 
+          <div
             className="flex items-center animate-scroll"
             style={{
               width: `${infiniteLogos.length * 200}px`, // Approximate width calculation
@@ -52,7 +52,7 @@ const LogoCarousel = () => {
       </div>
 
       {/* Custom CSS Animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes scroll {
           0% {
             transform: translateX(0);

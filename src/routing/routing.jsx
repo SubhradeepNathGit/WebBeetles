@@ -10,13 +10,14 @@ import ScrollToTop from "../layout/scrollonTop";
 import Home from "../pages/Home";
 import Signin from "../pages/auth/login/Signin";
 import Signup from "../pages/auth/register/Signup";
-// import Error_404 from "../pages/cms/Error_404";
+import Error404 from "../pages/Error404";
 
 // Layout wrapper (must be used inside Router!)
 const Layout = ({ children }) => {
   const location = useLocation();
 
-  const hideLayoutRoutes = ["/user-signin", "/user-signup"];
+  // routes that should NOT show navbar + footer
+  const hideLayoutRoutes = ["/user-signin", "/user-signup", "/404"];
   const hideLayout = hideLayoutRoutes.includes(location.pathname);
 
   return (
@@ -32,19 +33,24 @@ const Routing = () => {
   return (
     <>
       <ScrollToTop />
-      <Layout>
-        <Routes>
-          {/* Main Pages */}
-          <Route path="/" element={<Home />} />
+      <Routes>
+        {/* Main Pages with Layout */}
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Home />
+            </Layout>
+          }
+        />
 
-          {/* Auth Pages */}
-          <Route path="/user-signin" element={<Signin />} />
-          <Route path="/user-signup" element={<Signup />} />
+        {/* Auth Pages (no navbar/footer) */}
+        <Route path="/user-signin" element={<Signin />} />
+        <Route path="/user-signup" element={<Signup />} />
 
-          {/* 404 Page */}
-          {/* <Route path="*" element={<Error_404 />} /> */}
-        </Routes>
-      </Layout>
+        {/* 404 Page (no navbar/footer) */}
+        <Route path="*" element={<Error404 />} />
+      </Routes>
     </>
   );
 };

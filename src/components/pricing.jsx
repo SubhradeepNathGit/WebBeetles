@@ -117,111 +117,116 @@ const PricingSection = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10 max-w-6xl mx-auto">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={`relative h-full transition-all duration-700 ${
-                visibleCards.includes(index) ? "animate-flip-in" : "opacity-0"
-              }`}
-              style={{
-                transformStyle: "preserve-3d",
-                animation: visibleCards.includes(index)
-                  ? `flipIn 0.8s ease-out ${index * 0.2}s both`
-                  : "none",
-              }}
-            >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10 max-w-6xl">
+          {plans.map((plan, index) => {
+            let orderClasses = "";
+            if (plan.name === "STARTER") {
+              orderClasses = "order-1 md:order-1 lg:order-1";
+            } else if (plan.name === "PRO") {
+              orderClasses = "order-3 md:order-2 lg:order-3 mt-4 md:mt-0";
+            } else if (plan.name === "EXPERT") {
+              orderClasses = "order-2 md:order-3 lg:order-2 mt-2 lg:mt-0";
+            }
+
+            return (
               <div
-                className={`relative rounded-2xl p-6 sm:p-8 h-full border transition-all duration-300 flex flex-col
-                  ${
-                    plan.isHighlighted
+                key={index}
+                className={`relative h-full transition-all duration-700
+                ${visibleCards.includes(index) ? "animate-flip-in" : "opacity-0"}
+                ${orderClasses}
+              `}
+              >
+                <div
+                  className={`relative rounded-2xl p-6 sm:p-8 h-full border transition-all duration-300 flex flex-col
+                  ${plan.isHighlighted
                       ? "bg-gradient-to-b from-purple-500/30 via-purple-700/20 to-purple-900/10 border-purple-400 shadow-md shadow-purple-500/40 backdrop-blur-lg scale-105"
                       : hoveredCard === index
-                      ? "bg-gray-900 border-gray-700 shadow-lg shadow-purple-500/20 scale-105"
-                      : "bg-gray-900/70 border-gray-800 hover:bg-gray-900"
-                  }`}
-                onMouseEnter={() => setHoveredCard(index)}
-                onMouseLeave={() => setHoveredCard(null)}
-              >
-                {/* Savings Badge */}
-                <div className="absolute -top-3 right-4 sm:right-6">
-                  <div className="bg-purple-700 text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-medium">
-                    {plan.savings}
+                        ? "bg-gray-900 border-gray-700 shadow-lg shadow-purple-500/20 scale-105"
+                        : "bg-gray-900/70 border-gray-800 hover:bg-gray-900"
+                    }`}
+                  onMouseEnter={() => setHoveredCard(index)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                >
+                  {/* Savings Badge */}
+                  <div className="absolute -top-3 right-4 sm:right-6">
+                    <div className="bg-purple-700 text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-medium">
+                      {plan.savings}
+                    </div>
                   </div>
-                </div>
 
-                {/* Plan Name */}
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-gray-400 text-xs sm:text-sm md:text-base mb-6">
-                  {plan.subtitle}
-                </p>
+                  {/* Plan Name */}
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">{plan.name}</h3>
+                  <p className="text-gray-400 text-xs sm:text-sm md:text-base mb-6">
+                    {plan.subtitle}
+                  </p>
 
-                {/* Price */}
-                <div className="mb-6 sm:mb-8">
-                  <div className="flex items-baseline">
-                    <span className="text-3xl sm:text-4xl md:text-5xl font-bold">
-                      ₹{plan.priceINR.toLocaleString("en-IN")}
-                    </span>
-                    <span className="text-gray-400 ml-1 text-sm sm:text-base">
-                      {plan.period}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Features */}
-                <div className="space-y-2 sm:space-y-3 md:space-y-4 mb-6 sm:mb-8 flex-grow">
-                  {plan.features.map((feature, i) => (
-                    <div key={i} className="flex items-start">
-                      <CheckIcon />
-                      <span className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed">
-                        {feature}
+                  {/* Price */}
+                  <div className="mb-6 sm:mb-8">
+                    <div className="flex items-baseline">
+                      <span className="text-3xl sm:text-4xl md:text-5xl font-bold">
+                        ₹{plan.priceINR.toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-gray-400 ml-1 text-sm sm:text-base">
+                        {plan.period}
                       </span>
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                {/* CTA Button */}
-                <button
-                  className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center text-sm sm:text-base
-                    ${
-                      plan.isHighlighted
+                  {/* Features */}
+                  <div className="space-y-2 sm:space-y-3 md:space-y-4 mb-6 sm:mb-8 flex-grow">
+                    {plan.features.map((feature, i) => (
+                      <div key={i} className="flex items-start">
+                        <CheckIcon />
+                        <span className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed">
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <button
+                    className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center text-sm sm:text-base
+                    ${plan.isHighlighted
                         ? "bg-gradient-to-r from-purple-500/60 to-purple-700/40 backdrop-blur-md border border-purple-300 text-white hover:from-purple-500 hover:to-purple-700/60"
                         : "bg-purple-500 text-white hover:bg-purple-700"
-                    }`}
-                >
-                  Choose Package
-                  <ArrowIcon />
-                </button>
+                      }`}
+                  >
+                    Choose Package
+                    <ArrowIcon />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Flip Animation */}
-      <style jsx>{`
-        @keyframes flipIn {
-          0% {
-            transform: perspective(400px) rotateY(-90deg);
-            opacity: 0;
-          }
-          40% {
-            transform: perspective(400px) rotateY(-10deg);
-          }
-          70% {
-            transform: perspective(400px) rotateY(10deg);
-          }
-          100% {
-            transform: perspective(400px) rotateY(0deg);
-            opacity: 1;
-          }
+      <style>{`
+      @keyframes flipIn {
+        0% {
+          transform: perspective(400px) rotateY(-90deg);
+          opacity: 0;
         }
-        .animate-flip-in {
-          animation: flipIn 0.8s ease-out both;
+        40% {
+          transform: perspective(400px) rotateY(-10deg);
         }
-      `}</style>
+        70% {
+          transform: perspective(400px) rotateY(10deg);
+        }
+        100% {
+          transform: perspective(400px) rotateY(0deg);
+          opacity: 1;
+        }
+      }
+      .animate-flip-in {
+        animation: flipIn 0.8s ease-out both;
+      }
+    `}</style>
     </div>
   );
+
 };
 
 export default PricingSection;
