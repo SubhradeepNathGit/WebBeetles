@@ -44,7 +44,7 @@ const categories = [
   },
 ];
 
-const CategoriesSection = () => {
+const CategoryList = () => {
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -176,30 +176,9 @@ const CategoriesSection = () => {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Browse All */}
-        <motion.div
-          variants={headerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          className="flex justify-center lg:justify-end mt-10 lg:mt-12"
-        >
-          <Link to='/category'
-            className="bg-purple-700 hover:bg-purple-600 transition-all duration-300 px-6 py-3 rounded-full 
-              font-semibold flex items-center gap-2 transform hover:scale-105 active:scale-95 text-sm sm:text-base"
-          >
-            Browse All
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round"
-                strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
-          </Link>
-        </motion.div>
       </div>
     </section>
   );
 };
 
-export default CategoriesSection;
+export default CategoryList;

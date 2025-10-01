@@ -60,7 +60,7 @@ const Navbar = () => {
                 to="/about"
                 className="relative text-white font-medium text-base xl:text-lg after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:w-full"
               >
-                About Us
+                About
               </Link>
 
               {/* Courses Dropdown */}
@@ -105,13 +105,16 @@ const Navbar = () => {
 
             {/* Tablet Menu */}
             <div className="hidden md:flex lg:hidden items-center space-x-4">
-              {["Home", "About", "Courses", "Contact"].map((item) => (
+              {[{ id: 1, title: "Home", url: "/" },
+                { id: 2, title: "About", url: "/about" },
+                { id: 3, title: "Explore", url: "/category" },
+                { id: 4, title: "Contact", url: "/contact" }].map((item) => (
                 <Link
-                  key={item}
-                  to={`/${item.toLowerCase()}`}
+                  key={item.id}
+                  to={item.url}
                   className="relative text-white font-medium text-sm after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:w-full"
                 >
-                  {item}
+                  {item.title}
                 </Link>
               ))}
             </div>
@@ -119,7 +122,7 @@ const Navbar = () => {
             {/* Get Started Button (Desktop + Tablet) */}
             <div className="hidden md:block">
               <Link
-                to="/user-signin"
+                to="/signin"
                 className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-full font-semibold hover:bg-white/40 transition-all duration-300 transform hover:scale-105 text-sm lg:text-base"
               >
                 Get Started
@@ -183,19 +186,20 @@ const Navbar = () => {
             {/* Drawer Content */}
             <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-1">
-                {["Homepage", "About Us"].map((item) => (
+                {[{ id: 1, title: "Home", url: "/" },
+                { id: 2, title: "About Us", url: "/about" }].map((item) => (
                   <Link
-                    key={item}
-                    to={`/${item.toLowerCase().replace(" ", "-")}`}
+                    key={item.id}
+                    to={item.url}
                     className="block text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg"
                     onClick={handleNavClick}
                   >
-                    {item}
+                    {item.title}
                   </Link>
                 ))}
 
                 {/* Mobile Courses Dropdown */}
-                <div>
+                {/* <div>
                   <button
                     onClick={() => toggleDropdown("courses")}
                     className="flex items-center justify-between w-full text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg"
@@ -234,7 +238,7 @@ const Navbar = () => {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </div> */}
 
                 {/* Mobile Pages Dropdown */}
                 <div>
@@ -242,7 +246,7 @@ const Navbar = () => {
                     onClick={() => toggleDropdown("pages")}
                     className="flex items-center justify-between w-full text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg"
                   >
-                    Pages
+                    Explore
                     <motion.div
                       animate={{ rotate: activeDropdown === "pages" ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
@@ -276,19 +280,22 @@ const Navbar = () => {
                   </AnimatePresence>
                 </div>
 
-                <Link
-                  to="/contact"
-                  className="block text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg"
-                  onClick={handleNavClick}
-                >
-                  Contact Us
-                </Link>
+                {[{ id: 1, title: "Blog", url: "/" },
+                { id: 2, title: "Contact Us", url: "/" }].map((item) => (
+                  <Link
+                    key={item.id}
+                    to={item.url}
+                    className="block text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg"
+                    onClick={handleNavClick}>
+                    {item.title}
+                  </Link>
+                ))}
               </div>
 
               {/* Get Started Button */}
               <div className="mt-8">
                 <Link
-                  to="/user-signin"
+                  to="/signin"
                   className="block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-4 rounded-xl font-semibold text-center transition-all duration-300 transform hover:scale-105 shadow-lg"
                   onClick={handleNavClick}
                 >

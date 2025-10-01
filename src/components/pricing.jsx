@@ -202,7 +202,7 @@ const PricingSection = () => {
       </div>
 
       {/* Flip Animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes flipIn {
           0% {
             transform: perspective(400px) rotateY(-90deg);

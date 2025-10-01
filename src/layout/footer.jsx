@@ -2,6 +2,7 @@
 import { Globe, MapPin, Phone } from "lucide-react";
 
 import { FaFacebook, FaXTwitter, FaWhatsapp, FaInstagram } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 
 const Footer = () => {
@@ -16,25 +17,25 @@ const Footer = () => {
             <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Quick Links:</h3>
             <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="/" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Home
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="/course" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Courses
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="/about" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   About
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -44,24 +45,24 @@ const Footer = () => {
             <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Features</h3>
             <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Online Courses
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Interactive Lessons
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Expert Instructors
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Certification
-                </a>
+                </Link>
               </li>
 
             </ul>
@@ -72,24 +73,24 @@ const Footer = () => {
             <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Resource</h3>
             <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Terms and Conditions
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Help Center (FAQ)
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Learning Guides
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
+                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
                   Community Forum
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -101,40 +102,36 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
               <li>
-                <a
-                  href="#"
+                <Link to=""
                   className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
                 >
                   <FaFacebook className="w-5 h-5 text-blue-600" />
                   <span className="text-sm sm:text-base">Facebook</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link to=""
                   className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
                 >
                   <FaXTwitter className="w-5 h-5 text-white" />
                   <span className="text-sm sm:text-base">Twitter (X)</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link to=""
                   className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
                 >
                   <FaInstagram className="w-5 h-5 text-pink-500" />
                   <span className="text-sm sm:text-base">Instagram</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link to=""
                   className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
                 >
                   <FaWhatsapp className="w-5 h-5 text-green-600" />
                   <span className="text-sm sm:text-base">WhatsApp</span>
-                </a>
+                </Link>
               </li>
 
             </ul>
@@ -146,10 +143,10 @@ const Footer = () => {
             <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Contact Us</h3>
             <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
               <li>
-                <a href="#" className="flex items-start gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1 group">
+                <Link to="" className="flex items-start gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1 group">
                   <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mt-0.5 flex-shrink-0 group-hover:text-purple-400" />
                   <span className="leading-tight text-sm sm:text-base break-all">www.webbeetles.com</span>
-                </a>
+                </Link>
               </li>
               <li>
                 <div className="flex items-start gap-2 sm:gap-3 text-gray-400 py-1">
@@ -158,10 +155,10 @@ const Footer = () => {
                 </div>
               </li>
               <li>
-                <a href="tel:0761-8523-398" className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1 group">
+                <Link to="tel:0761-8523-398" className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1 group">
                   <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 flex-shrink-0 group-hover:text-purple-400" />
                   <span className="text-sm sm:text-base">+91-9098909890</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -176,12 +173,12 @@ const Footer = () => {
               Copyright © 2025 WebBeetles
             </div>
             <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm order-1 sm:order-2">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 whitespace-nowrap">
+              <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 whitespace-nowrap">
                 Terms of Service
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 whitespace-nowrap">
+              </Link>
+              <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 whitespace-nowrap">
                 Privacy Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>

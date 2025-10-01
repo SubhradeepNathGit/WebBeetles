@@ -90,8 +90,7 @@ const Signup = () => {
                     value: /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-zA-Z.]{2,}$/,
                     message: 'Invalid email'
                   }
-                })}
-              />
+                })}/>
               <p className="text-xs text-red-400 mb-2 mt-1">{errors.email?.message}</p>
 
               {/* Role  */}
@@ -101,8 +100,7 @@ const Signup = () => {
                   className="w-full appearance-none rounded-full px-6 py-2 lg:py-3 text-sm text-gray-800 bg-white outline-0 mb-0 pr-10"
                   {...register("role", {
                     required: "Required*",
-                  })}
-                >
+                  })}>
                   <option value="">Select Role</option>
                   <option value="student">Student</option>
                   <option value="instructor">Instructor</option>
@@ -128,7 +126,7 @@ const Signup = () => {
                     pattern: {
                       value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/,
                       message:
-                        'Password must be 8+ chars with uppercase, lowercase, number, and special char'
+                        'Password must be 8+ characters with uppercase, lowercase, number, and special char'
                     }
                   })}
                 />
@@ -143,17 +141,15 @@ const Signup = () => {
               <p className="text-xs text-red-400 mb-2 mt-1">{errors.password?.message}</p>
 
               {/* Submit */}
-              <button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full text-base font-semibold mt-2"
-              >
+              <button type="submit"
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full text-base font-semibold mt-2">
                 Continue
               </button>
             </form>
 
             <p className="text-center text-white/80 mt-3 text-sm">
               Already have an account?{" "}
-              <Link to="/user-signin" className="text-blue-300 font-bold hover:text-[#b97fff]">
+              <Link to="/signin" className="text-blue-300 font-bold hover:text-[#b97fff]">
                 Log in
               </Link>
             </p>

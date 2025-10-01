@@ -106,7 +106,7 @@ const Signin = () => {
                 {errors.password && <p className='text-xs text-red-400 mt-1'>{errors.password?.message}</p>}
               </div>
 
-              <Link to="" className="block text-center text-sm lg:text-base text-white hover:text-[#87CEEB] transition-colors">
+              <Link to="/forget-password" className="block text-center text-sm lg:text-base text-white hover:text-[#87CEEB] transition-colors">
                 Forgot your password?
               </Link>
 
@@ -122,7 +122,7 @@ const Signin = () => {
             </div>
 
             <div className="space-y-3">
-              <Link to="/user-signup" className="block w-full text-center border-2 border-[#b97fff] text-[#b97fff] hover:bg-[#b97fff] hover:text-white py-2 lg:py-3 rounded-full text-base lg:text-lg font-semibold transition-all">
+              <Link to="/signup" className="block w-full text-center border-2 border-[#b97fff] text-[#b97fff] hover:bg-[#b97fff] hover:text-white py-2 lg:py-3 rounded-full text-base lg:text-lg font-semibold transition-all">
                 Register
               </Link>
             </div>

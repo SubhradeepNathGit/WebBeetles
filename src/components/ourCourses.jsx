@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const CoursesSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -86,7 +87,16 @@ const CoursesSection = () => {
       originalPrice: "₹2,699",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop&crop=center"
     }
-  ];
+  ]
+
+    const headerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  }
 
   // Filter courses based on search term
   const filteredCourses = courses.filter(course =>
@@ -219,6 +229,22 @@ const CoursesSection = () => {
             </motion.div>
           )}
         </motion.div>
+        {/* Browse All */}
+                <motion.div
+                  variants={headerVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  className="flex justify-center lg:justify-end mt-10 lg:mt-12">
+                  <Link to='/course'
+                    className="bg-purple-700 hover:bg-purple-600 transition-all duration-300 px-6 py-3 rounded-full 
+                      font-semibold flex items-center gap-2 transform hover:scale-105 active:scale-95 text-sm sm:text-base text-white">
+                    Browse All
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                  </Link>
+                </motion.div>
       </div>
     </div>
   );
