@@ -29,7 +29,7 @@ const endPoint_addCourse = 'api/courses/create-course';
 const endPoint_updateCourse = 'api/courses/update-course';
 const endPoint_deleteCourse = 'api/courses/delete-course';
 const endPoint_courseRating = 'api/courses';
-const endPoint_categoryWiseCourse = 'api/courses/category';
+const endPoint_categoryWiseCourse = 'api/categories/courses';
 
 // payment 
 const endPoint_payment_create = 'api/payments/purchase';

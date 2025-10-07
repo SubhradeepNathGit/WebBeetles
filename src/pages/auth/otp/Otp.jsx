@@ -19,9 +19,9 @@ const Otp = () => {
 
     const email = location.state?.email;
 
-     const showMail = (email) => {
+    const showMail = (email) => {
         const first = email[0];
-        const midStart = Math.floor(email.length / 2) - 1; 
+        const midStart = Math.floor(email.length / 2) - 1;
         const middle = email.slice(midStart, midStart + 3);
         const last = email[email.length - 1];
         return `${first}*****${middle}****${last}`;

@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion } from 'framer-motion';
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { allCourse } from "../../redux/slice/couseSlice";
 import { HiCurrencyRupee } from "react-icons/hi";
+import { categoryWiseCourse } from "../../redux/slice/couseSlice";
 
 const RelatedCourse = ({ categoryName }) => {
     const [isVisible, setIsVisible] = useState(false),
@@ -30,9 +30,9 @@ const RelatedCourse = ({ categoryName }) => {
 
     useEffect(() => {
         if (!isCourseLoading) {
-            dispatch(allCourse())
+            dispatch(categoryWiseCourse(categoryName))
                 .then((res) => {
-                    // console.log("Course fetching response", res);
+                    // console.log("Category wise course fetching response", res);
                 })
                 .catch((err) => {
                     alert("Oops... Something went wrong!");
@@ -41,7 +41,7 @@ const RelatedCourse = ({ categoryName }) => {
         }
     }, [dispatch]);
 
-    // console.log('Course Data', getCourseData);
+    // console.log('Category wise course Data', getCourseData);
 
     const headerVariants = {
         hidden: { opacity: 0, y: 50 },

@@ -155,7 +155,7 @@ const Navbar = () => {
                   {/* Dropdown Menu (visible on hover) */}
                   <div className="absolute right-0 mt-2 w-40 bg-white/10 backdrop-blur-md rounded-lg shadow-lg py-2 text-white font-medium text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                     <Link
-                      to="/profile"
+                      to="/dashboard"
                       className="block px-4 py-2 hover:bg-white/20 transition-all duration-200"
                     >
                       Dashboard

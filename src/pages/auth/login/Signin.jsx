@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaFacebook, FaInstagram, FaLinkedinIn, FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
@@ -14,9 +14,18 @@ const Signin = () => {
     { register, handleSubmit, formState } = form,
     { errors } = formState,
     dispatch = useDispatch(),
-    navigator = useNavigate(),
+    navigate = useNavigate(),
     [show, setShow] = useState(false),
+    { isAuth } = useSelector(state => state.checkAuth),
     { isAuthLoading } = useSelector(state => state.userAuth);
+
+    useEffect(() => {
+      console.log('123');
+      
+    if (isAuth) {
+      navigate("/",{ replace: true }); 
+    }
+  }, [isAuth, navigate]);
 
   const loginDataHandler = (data) => {
     // console.log('Login form data', data);
@@ -33,7 +42,8 @@ const Signin = () => {
         if (res.meta.requestStatus === "fulfilled") {
           toastifyAlert.success(res.payload.message);
           sessionStorage.setItem('user_token', res.payload.token);
-          navigator(res.payload.user.role === 'Instructor' ? '/instructor-dashboard' : '/dashboard');
+          // navigate(res.payload.user.role === 'Instructor' ? '/instructor-dashboard' : '/dashboard');
+          navigate('/dashboard');
         }
         else {
           // getSweetAlert('Oops...', 'Something went wrong!', 'error');

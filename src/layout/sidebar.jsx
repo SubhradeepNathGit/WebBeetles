@@ -1,21 +1,52 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { LogOut, BookOpen, Home, User, BarChart3, ChevronLeft, GraduationCap } from "lucide-react";
+import { logoutUser } from "../redux/slice/authSlice/checkAuth";
+import toastifyAlert from "../util/toastify";
+import { userProfile } from "../redux/slice/userSlice";
+import getSweetAlert from "../util/sweetAlert";
 
 const DashboardSidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  
+  const [isCollapsed, setIsCollapsed] = useState(false),
+    dispatch = useDispatch(),
+    navigate = useNavigate(),
+    { isAuth } = useSelector(state => state.checkAuth),
+    { isUserLoading, getUserData, isUserError } = useSelector(state => state.user);
+
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(userProfile())
+        .then(res => {
+          // console.log('Response for fetching user profile', res);
+        })
+        .catch((err) => {
+          getSweetAlert('Oops...', 'Something went wrong!', 'error');
+          console.log("Error occurred", err);
+        });
+    }
+  }, [isAuth, dispatch]);
+
+  // console.log('Logged user data', getUserData);
+
+    const showMail = (email) => {
+        const first = email.slice(0,3);
+        const midStart = Math.floor(email.length / 2) - 1; 
+        const middle = email.slice(midStart, midStart + 3);
+        const last = email.slice(email.length - 6,email.length);
+        return `${first}*****${middle}****${last}`;
+    };
+
   // Safely access user from Redux state
   const user = useSelector((state) => state.auth?.user);
-  const role = user?.role || "user";
-  const userName = user?.name || user?.fullName || "User";
-  const userEmail = user?.email || "";
-  const userPhoto = user?.photo || user?.avatar || user?.profileImage || null;
+  const role = getUserData.user?.role || "User";
+  const userName = getUserData.user?.name || user?.fullName || "User";
+  const userEmail = getUserData.user?.email || "";
+  const userPhoto = getUserData.user?.profileImage || null;
 
   // Sidebar menu items
   const userMenu = [
-    {name: "Dashboard", icon: <Home size={20} />, path: "/dashboard/user/home" },
+    { name: "Dashboard", icon: <Home size={20} />, path: "/dashboard/user/home" },
     { name: "Home", icon: <Home size={20} />, path: "/" },
     { name: "All Courses", icon: <BookOpen size={20} />, path: "/course" },
     { name: "My Courses", icon: <BookOpen size={20} />, path: "/dashboard/user/my-courses" },
@@ -24,20 +55,25 @@ const DashboardSidebar = () => {
   ];
 
   const instructorMenu = [
-    {name: "Dashboard", icon: <Home size={20} />, path: "/dashboard/user/home" },
+    { name: "Dashboard", icon: <Home size={20} />, path: "/dashboard/user/home" },
     { name: "Home", icon: <Home size={20} />, path: "/" },
     { name: "All Courses", icon: <BookOpen size={20} />, path: "/course" },
     { name: "Home", icon: <Home size={20} />, path: "/dashboard/instructor/home" },
     { name: "My Courses", icon: <BookOpen size={20} />, path: "/dashboard/instructor/my-courses" },
   ];
 
-  const sidebarMenu = role === "instructor" ? instructorMenu : userMenu;
+  const sidebarMenu = role === "Instructor" ? instructorMenu : userMenu;
+
+  const userLogout = () => {
+    dispatch(logoutUser())
+    toastifyAlert.success("Logged out");
+    navigate('/');
+  }
 
   return (
-    <aside 
-      className={`${
-        isCollapsed ? "w-20" : "w-72"
-      } bg-gradient-to-br from-purple-700 to-black/30 text-white min-h-screen flex flex-col shadow-2xl backdrop-blur-md border-r border-purple-500/20 transition-all duration-300 ease-in-out relative`}
+    <aside
+      className={`${isCollapsed ? "w-20" : "w-72"
+        } bg-gradient-to-br from-purple-700 to-black/30 text-white min-h-screen flex flex-col shadow-2xl backdrop-blur-md border-r border-purple-500/20 transition-all duration-300 ease-in-out relative`}
     >
       {/* Toggle Button */}
       <button
@@ -45,11 +81,10 @@ const DashboardSidebar = () => {
         className="absolute right-4 top-6 bg-white/10 hover:bg-white/20 rounded-lg p-2 backdrop-blur-sm border border-white/20 transition-all duration-200 z-10 group"
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
-        <ChevronLeft 
-          size={18} 
-          className={`text-white transition-transform duration-300 ${
-            isCollapsed ? "rotate-180" : ""
-          }`}
+        <ChevronLeft
+          size={18}
+          className={`text-white transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""
+            }`}
         />
       </button>
 
@@ -65,7 +100,7 @@ const DashboardSidebar = () => {
                 WebBeetles
               </h2>
               <p className="text-xs text-purple-200/80 truncate">
-                {role === "instructor" ? "Instructor Panel" : "Student Portal"}
+                {role === "Instructor" ? "Instructor Panel" : "Student Portal"}
               </p>
             </div>
           )}
@@ -77,8 +112,8 @@ const DashboardSidebar = () => {
         <div className="px-4 py-4 border-b border-white/10">
           <div className="flex items-center gap-4 px-4 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
             {userPhoto ? (
-              <img 
-                src={userPhoto} 
+              <img
+                src={`http://localhost:3005${userPhoto}`}
                 alt={userName}
                 className="w-14 h-14 rounded-full object-cover shadow-lg flex-shrink-0 ring-2 ring-purple-400/40"
                 onError={(e) => {
@@ -88,16 +123,17 @@ const DashboardSidebar = () => {
                 }}
               />
             ) : null}
-            <div 
+            <div
               className={`w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0 ${userPhoto ? 'hidden' : 'flex'}`}
             >
-              {userName.charAt(0).toUpperCase()}
+              {/* {userName.charAt(0).toUpperCase()} */}
+              <img src={`http://localhost:3005${userPhoto}`} className="w-13 h-13 rounded-full" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-base font-bold text-white truncate mb-0.5">{userName}</p>
-              <p className="text-xs text-purple-200/80 truncate mb-2">{userEmail}</p>
+              <p className="text-xs text-purple-200/80 truncate mb-2">{showMail(userEmail)}</p>
               <span className="inline-flex items-center px-2.5 py-1 bg-purple-500/40 rounded-full text-xs font-semibold text-white border border-purple-400/40 shadow-sm">
-                {role === "instructor" ? "Instructor" : "Student"}
+                {role === "Instructor" ? "Instructor" : "Student"}
               </span>
             </div>
           </div>
@@ -111,10 +147,9 @@ const DashboardSidebar = () => {
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center ${isCollapsed ? "justify-center" : "gap-4"} px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${
-                isActive
-                  ? "bg-white/15 text-white shadow-lg border border-white/20 backdrop-blur-md"
-                  : "text-purple-100 hover:bg-white/10 hover:text-white hover:border hover:border-white/10 backdrop-blur-sm"
+              `flex items-center ${isCollapsed ? "justify-center" : "gap-4"} px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${isActive
+                ? "bg-white/15 text-white shadow-lg border border-white/20 backdrop-blur-md"
+                : "text-purple-100 hover:bg-white/10 hover:text-white hover:border hover:border-white/10 backdrop-blur-sm"
               }`
             }
             title={isCollapsed ? item.name : ""}
@@ -138,7 +173,7 @@ const DashboardSidebar = () => {
 
       {/* Footer */}
       <div className="p-4 border-t border-white/10">
-        <button 
+        <button onClick={() => userLogout()}
           className={`w-full flex items-center ${isCollapsed ? "justify-center" : "justify-center gap-3"} bg-white/10 backdrop-blur-md border border-white/20 hover:bg-red-500/20 hover:border-red-400/50 py-3.5 rounded-xl transition-all duration-200 text-sm font-semibold text-white shadow-md hover:shadow-lg group`}
           title={isCollapsed ? "Logout" : ""}
         >

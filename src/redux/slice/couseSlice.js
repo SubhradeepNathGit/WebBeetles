@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axiosInstance/axiosInstance";
-import { endPoint_allCourse, endPoint_sepeficCourse } from "../../api/apiUrl/apiUrl";
+import { endPoint_allCourse, endPoint_categoryWiseCourse, endPoint_sepeficCourse } from "../../api/apiUrl/apiUrl";
 
 // all course action
 export const allCourse = createAsyncThunk('courseSlice/allCourse',
@@ -12,11 +12,23 @@ export const allCourse = createAsyncThunk('courseSlice/allCourse',
     }
 )
 
+// category wise course action
+export const categoryWiseCourse = createAsyncThunk('courseSlice/categoryWiseCourse',
+    async (cat_slag) => {
+        // console.log('Receive data in category wise course slice', cat_slag);
+
+        const res = await axiosInstance.get(`${endPoint_categoryWiseCourse}/${cat_slag}`);
+        // console.log('Response for fetching category wise course', res);
+
+        return res.data;
+    }
+)
+
 // // specific course action
 // export const specificCourse = createAsyncThunk('courseSlice/specificCourse',
 //     async (data) => {
 //         console.log('Receive data for specific course',data);
-        
+
 //         const res = await axiosInstance.get(`${endPoint_sepeficCourse}/${data}`);
 //         console.log('Response for fetching specific course', res);
 
@@ -45,6 +57,21 @@ export const courseSlice = createSlice({
             state.isCourseError = null;
         })
         builder.addCase(allCourse.rejected, (state, action) => {
+            state.isCourseLoading = false;
+            state.getCourseData = [];
+            state.isCourseError = action.error?.message;
+        })
+
+        // category wise course reducer
+        builder.addCase(categoryWiseCourse.pending, (state, action) => {
+            state.isCourseLoading = true;
+        })
+        builder.addCase(categoryWiseCourse.fulfilled, (state, action) => {
+            state.isCourseLoading = false;
+            state.getCourseData = action.payload;
+            state.isCourseError = null;
+        })
+        builder.addCase(categoryWiseCourse.rejected, (state, action) => {
             state.isCourseLoading = false;
             state.getCourseData = [];
             state.isCourseError = action.error?.message;

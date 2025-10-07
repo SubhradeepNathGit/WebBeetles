@@ -2,6 +2,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import DashboardSidebar from "../layout/sidebar";
+import AddCourse from "../components/dashboard/instructors/AddCourse";
 
 const DashboardLayout = () => {
   return (
@@ -13,6 +14,7 @@ const DashboardLayout = () => {
       <main className="flex-1 overflow-y-auto px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <Outlet /> {/* All nested dashboard pages will render here */}
+          <AddCourse />
         </div>
       </main>
     </div>
