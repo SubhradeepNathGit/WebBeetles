@@ -131,7 +131,7 @@ const Otp = () => {
                             <p className="text-white text-sm lg:text-base text-center">
                                 OTP has been sent via Email to
                             </p>
-                            <p className="text-white text-base lg:text-lg text-center font-bold mb-4">
+                            <p className="text-white text-base lg:text-md text-center font-semibold mb-4">
                                 {showMail(email)}
                             </p>
 
