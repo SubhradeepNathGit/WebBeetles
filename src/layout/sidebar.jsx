@@ -1,41 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Home, BookOpen, User, BarChart3, ChevronLeft, GraduationCap, LogOut } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { LogOut, BookOpen, Home, User, BarChart3, ChevronLeft, GraduationCap } from "lucide-react";
-import { logoutUser } from "../redux/slice/authSlice/checkAuth";
-import toastifyAlert from "../util/toastify";
+import { useNavigate } from "react-router-dom";
 import { userProfile } from "../redux/slice/userSlice";
 import getSweetAlert from "../util/sweetAlert";
+import { logoutUser } from "../redux/slice/authSlice/checkAuth";
+import toastifyAlert from "../util/toastify";
 
-const DashboardSidebar = () => {
+const DashboardSidebar = ({ setActivePage, activePage }) => {
   const [isCollapsed, setIsCollapsed] = useState(false),
     dispatch = useDispatch(),
     navigate = useNavigate(),
-    { isAuth } = useSelector(state => state.checkAuth),
     { isUserLoading, getUserData, isUserError } = useSelector(state => state.user);
 
   useEffect(() => {
-    if (isAuth) {
-      dispatch(userProfile())
-        .then(res => {
-          // console.log('Response for fetching user profile', res);
-        })
-        .catch((err) => {
-          getSweetAlert('Oops...', 'Something went wrong!', 'error');
-          console.log("Error occurred", err);
-        });
-    }
-  }, [isAuth, dispatch]);
+    dispatch(userProfile())
+      .then(res => {
+        // console.log('Response for fetching user profile', res);
+      })
+      .catch((err) => {
+        getSweetAlert('Oops...', 'Something went wrong!', 'error');
+        console.log("Error occurred", err);
+      });
+  }, [dispatch]);
 
   // console.log('Logged user data', getUserData);
 
-    const showMail = (email) => {
-        const first = email.slice(0,3);
-        const midStart = Math.floor(email.length / 2) - 1; 
-        const middle = email.slice(midStart, midStart + 3);
-        const last = email.slice(email.length - 6,email.length);
-        return `${first}*****${middle}****${last}`;
-    };
+  const showMail = (email) => {
+    const first = email.slice(0, 3);
+    const midStart = Math.floor(email.length / 2) - 1;
+    const middle = email.slice(midStart, midStart + 3);
+    const last = email.slice(email.length - 6, email.length);
+    return `${first}*****${middle}****${last}`;
+  };
 
   // Safely access user from Redux state
   const user = useSelector((state) => state.auth?.user);
@@ -46,20 +43,20 @@ const DashboardSidebar = () => {
 
   // Sidebar menu items
   const userMenu = [
-    { name: "Dashboard", icon: <Home size={20} />, path: "/dashboard/user/home" },
-    { name: "Home", icon: <Home size={20} />, path: "/" },
-    { name: "All Courses", icon: <BookOpen size={20} />, path: "/course" },
-    { name: "My Courses", icon: <BookOpen size={20} />, path: "/dashboard/user/my-courses" },
-    { name: "Request Instructor", icon: <User size={20} />, path: "/dashboard/user/request-instructor" },
-    { name: "Request Status", icon: <BarChart3 size={20} />, path: "/dashboard/user/request-status" },
+    { name: "Dashboard", icon: <Home size={20} />, key: 'user-dashboard' },
+    { name: "Home", icon: <Home size={20} />, key: 'home' },
+    { name: "All Courses", icon: <BookOpen size={20} />, key: 'allCourses' },
+    { name: "My Courses", icon: <BookOpen size={20} />, key: 'user-myCourses' },
+    { name: "Request Instructor", icon: <User size={20} />, key: 'requestInstructor' },
+    { name: "Request Status", icon: <BarChart3 size={20} />, key: 'requestStatus' },
   ];
 
   const instructorMenu = [
-    { name: "Dashboard", icon: <Home size={20} />, path: "/dashboard/user/home" },
-    { name: "Home", icon: <Home size={20} />, path: "/" },
-    { name: "All Courses", icon: <BookOpen size={20} />, path: "/course" },
-    { name: "Home", icon: <Home size={20} />, path: "/dashboard/instructor/home" },
-    { name: "My Courses", icon: <BookOpen size={20} />, path: "/dashboard/instructor/my-courses" },
+    { name: "Dashboard", icon: <Home size={20} />, key: 'instructor-dashboard' },
+    { name: "Home", icon: <Home size={20} />, key: 'home' },
+    { name: "All Courses", icon: <BookOpen size={20} />, key: 'allCourses' },
+    { name: "My Courses", icon: <BookOpen size={20} />, key: 'instructor-myCourses' },
+    { name: "Add Courses", icon: <BookOpen size={20} />, key: 'add-myCourses' },
   ];
 
   const sidebarMenu = role === "Instructor" ? instructorMenu : userMenu;
@@ -70,22 +67,20 @@ const DashboardSidebar = () => {
     navigate('/');
   }
 
+  // Handle menu item click to change the active page
+  const handleMenuClick = (key) => {
+    setActivePage(key);
+  };
+
   return (
-    <aside
-      className={`${isCollapsed ? "w-20" : "w-72"
-        } bg-gradient-to-br from-purple-700 to-black/30 text-white min-h-screen flex flex-col shadow-2xl backdrop-blur-md border-r border-purple-500/20 transition-all duration-300 ease-in-out relative`}
-    >
-      {/* Toggle Button */}
+    <aside className={`${isCollapsed ? "w-20" : "w-72"} bg-gradient-to-br from-purple-700 to-black/30 text-white min-h-screen flex flex-col shadow-2xl backdrop-blur-md border-r border-purple-500/20 transition-all duration-300 ease-in-out relative`}>
+      {/* Collapse/Expand Sidebar Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="absolute right-4 top-6 bg-white/10 hover:bg-white/20 rounded-lg p-2 backdrop-blur-sm border border-white/20 transition-all duration-200 z-10 group"
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
-        <ChevronLeft
-          size={18}
-          className={`text-white transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""
-            }`}
-        />
+        <ChevronLeft size={18} className={`text-white transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`} />
       </button>
 
       {/* Sidebar Header */}
@@ -143,31 +138,16 @@ const DashboardSidebar = () => {
       {/* Sidebar Navigation */}
       <nav className="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
         {sidebarMenu.map((item) => (
-          <NavLink
+          <div
             key={item.name}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center ${isCollapsed ? "justify-center" : "gap-4"} px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${isActive
-                ? "bg-white/15 text-white shadow-lg border border-white/20 backdrop-blur-md"
-                : "text-purple-100 hover:bg-white/10 hover:text-white hover:border hover:border-white/10 backdrop-blur-sm"
-              }`
-            }
-            title={isCollapsed ? item.name : ""}
+            onClick={() => handleMenuClick(item.key)}
+            className={`flex items-center ${isCollapsed ? "justify-center" : "gap-4"} px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${activePage === item.key ? "bg-white/15 text-white shadow-lg border border-white/20 backdrop-blur-md" : "text-purple-100 hover:bg-white/10 hover:text-white"}`}
           >
-            {({ isActive }) => (
-              <>
-                <span className={`flex-shrink-0 ${isActive ? "scale-110" : "group-hover:scale-110"} transition-transform duration-200`}>
-                  {item.icon}
-                </span>
-                {!isCollapsed && (
-                  <span className="flex-1">{item.name}</span>
-                )}
-                {isActive && !isCollapsed && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-300 shadow-sm shadow-purple-300/50"></span>
-                )}
-              </>
-            )}
-          </NavLink>
+            <span className={`flex-shrink-0 ${activePage === item.key ? "scale-110" : "group-hover:scale-110"} transition-transform duration-200`}>
+              {item.icon}
+            </span>
+            {!isCollapsed && <span className="flex-1">{item.name}</span>}
+          </div>
         ))}
       </nav>
 

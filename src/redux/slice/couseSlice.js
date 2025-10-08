@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axiosInstance/axiosInstance";
-import { endPoint_allCourse, endPoint_categoryWiseCourse, endPoint_sepeficCourse } from "../../api/apiUrl/apiUrl";
+import { endPoint_addCourse, endPoint_allCourse, endPoint_categoryWiseCourse, endPoint_sepeficCourse } from "../../api/apiUrl/apiUrl";
 
 // all course action
 export const allCourse = createAsyncThunk('courseSlice/allCourse',
@@ -19,6 +19,18 @@ export const categoryWiseCourse = createAsyncThunk('courseSlice/categoryWiseCour
 
         const res = await axiosInstance.get(`${endPoint_categoryWiseCourse}/${cat_slag}`);
         // console.log('Response for fetching category wise course', res);
+
+        return res.data;
+    }
+)
+
+// add course action
+export const createCourse = createAsyncThunk('courseSlice/createCourse',
+    async (data) => {
+        console.log('Receive data in add course slice', data);
+
+        const res = await axiosInstance.post(endPoint_addCourse, data);
+        console.log('Response for adding course', res);
 
         return res.data;
     }
@@ -72,6 +84,21 @@ export const courseSlice = createSlice({
             state.isCourseError = null;
         })
         builder.addCase(categoryWiseCourse.rejected, (state, action) => {
+            state.isCourseLoading = false;
+            state.getCourseData = [];
+            state.isCourseError = action.error?.message;
+        })
+       
+        // add course reducer
+        builder.addCase(createCourse.pending, (state, action) => {
+            state.isCourseLoading = true;
+        })
+        builder.addCase(createCourse.fulfilled, (state, action) => {
+            state.isCourseLoading = false;
+            state.getCourseData = action.payload;
+            state.isCourseError = null;
+        })
+        builder.addCase(createCourse.rejected, (state, action) => {
             state.isCourseLoading = false;
             state.getCourseData = [];
             state.isCourseError = action.error?.message;

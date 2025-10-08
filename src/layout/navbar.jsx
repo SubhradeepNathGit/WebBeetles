@@ -142,7 +142,7 @@ const Navbar = () => {
                   <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg group-hover:bg-white/30 transition-all duration-300 cursor-pointer">
                     <span className="text-white text-lg sm:text-xl lg:text-2xl font-bold">
                       {getUserData?.user ? (
-                        <img className="rounded-full border-3 border-white/20"
+                        <img className="rounded-full border-3 border-white/20 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14"
                           src={
                             getUserData.user.profileImage
                               ? `http://localhost:3005${getUserData.user.profileImage}`
@@ -301,7 +301,7 @@ const Navbar = () => {
                 ) : (
                   <>
                     <Link
-                      to="/contact"
+                      to="/dashboard"
                       className="block text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg mb-3"
                       onClick={handleNavClick}
                     >

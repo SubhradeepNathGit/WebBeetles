@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { BookOpen, TrendingUp, Users, DollarSign, Star, Calendar, BarChart3, Download, ArrowRight, Sparkles, MessageSquare, Award, Clock, Eye, Video, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const InstructorDashboard = () => {
   const user = useSelector((state) => state.auth?.user);
@@ -77,7 +78,7 @@ const InstructorDashboard = () => {
                 <p className="text-purple-100 text-sm md:text-base">Empower students and track your teaching success</p>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -196,14 +197,14 @@ const InstructorDashboard = () => {
             <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
             <div className="space-y-3">
               {[
-                { label: "Create New Course", color: "purple", icon: BookOpen },
-                { label: "View All Students", color: "blue", icon: Users },
-                
+                { label: "Create New Course", color: "purple", icon: BookOpen, url: '/add' },
+                { label: "View All Students", color: "blue", icon: Users, url: '' },
+
               ].map((a, i) => (
-                <button key={i} className={`w-full px-5 py-4 bg-${a.color}-500/30 hover:bg-${a.color}-500/50 backdrop-blur-sm rounded-2xl text-white font-semibold text-sm transition-all border border-${a.color}-400/30 hover:scale-105 hover:shadow-xl flex items-center justify-between group`}>
+                <Link key={i}  to={a.url} className={`w-full px-5 py-4 bg-${a.color}-500/30 hover:bg-${a.color}-500/50 backdrop-blur-sm rounded-2xl text-white font-semibold text-sm transition-all border border-${a.color}-400/30 hover:scale-105 hover:shadow-xl flex items-center justify-between group`}>
                   <span className="flex items-center gap-3"><a.icon size={18} />{a.label}</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </button>
+                </Link>
               ))}
             </div>
           </div>

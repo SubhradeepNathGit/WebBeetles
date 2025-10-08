@@ -20,7 +20,6 @@ const Signin = () => {
     { isAuthLoading } = useSelector(state => state.userAuth);
 
     useEffect(() => {
-      console.log('123');
       
     if (isAuth) {
       navigate("/",{ replace: true }); 

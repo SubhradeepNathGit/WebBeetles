@@ -22,9 +22,8 @@ import AboutUs from "../pages/AboutUs";
 import CategoryDetails from "../pages/CategoryDetails";
 import TermsOfService from "../pages/TermsOfService";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
-import DashboardLayout from "../pages/DashboardLayout";
-import UserDashboard from "../pages/UserDashboard";
-import InstructorDashboard from "../pages/InstructorDashboard";
+import DashboardLayout from "../pages/dashboard/DashboardLayout";
+import InstructorRequestForm from "../components/dashboard/instructors/InstructorRequestForm";
 
 // Layout wrapper (must be used inside Router!)
 const Layout = ({ children }) => {
@@ -66,8 +65,9 @@ const Routing = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/dashboard" element={<DashboardLayout/>} />
-        <Route path="/user-dashboard" element={<UserDashboard/>} />
-        <Route path="/instructor-dashboard" element={<InstructorDashboard/>} />
+        <Route path="/dashboard/user/request-instructor" element={<InstructorRequestForm />} />
+
+
 
         {/* 404 Page (no navbar/footer) */}
         <Route path="*" element={<Error404 />} />
