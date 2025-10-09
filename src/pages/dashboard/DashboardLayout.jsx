@@ -8,6 +8,8 @@ import InstructorRequestForm from "../../components/dashboard/instructors/Instru
 import InstructorDashboard from "../../components/dashboard/instructors/InstructorDashboard";
 import RequestStatusPage from "../../components/dashboard/instructors/RequestStatusPage";
 import AddCourseForm from "../../components/dashboard/instructors/AddCourseForm";
+import MyCoursesPage from "../../components/dashboard/users/MyCoursesPage";
+import InstructorCourse from "../../components/dashboard/instructors/InstructorCourse";
 
 const DashboardLayout = () => {
   const [activePage, setActivePage] = useState("dashboard"),
@@ -49,7 +51,7 @@ const DashboardLayout = () => {
         navigate('/course');
         return;
       case 'user-myCourses':
-        return <div>My Courses Content</div>;
+        return <MyCoursesPage />;
       case 'requestInstructor':
         return <InstructorRequestForm userData={getUserData} />;
       case 'requestStatus':
@@ -57,7 +59,7 @@ const DashboardLayout = () => {
       case 'instructor-dashboard':
         return <InstructorDashboard />;
       case 'instructor-myCourses':
-        return <div>Request Status Content</div>;
+        return <InstructorCourse />;
       case 'add-myCourses':
         return <AddCourseForm />;
       default:

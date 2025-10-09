@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
                 <h1 className="text-4xl md:text-5xl font-bold text-white my-8">
                     Privacy Policy
                 </h1>
-                <p className="max-w-2xl mx-auto text-gray-400 text-lg">
+                <p className="md:mx-5 mx-2 text-gray-400 lg:text-lg text-md">
                     At WebBeetles, we care about your growth — and your privacy. <br />
                     When you choose to learn with us, you trust us with your personal information. This Privacy Policy explains how we handle that trust: how we collect, use, protect, and respect your data while you use our learning platform.
                 </p>

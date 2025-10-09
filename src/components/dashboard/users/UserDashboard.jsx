@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { 
-  BookOpen, TrendingUp, Award, Clock, Play, Star, Users, Target, 
+import { useDispatch, useSelector } from "react-redux";
+import {
+  BookOpen, TrendingUp, Award, Clock, Play, Star, Users, Target,
   Calendar, BarChart3, Download, ArrowRight, Sparkles, Trophy
 } from "lucide-react";
+import { userProfile } from "../../../redux/slice/userSlice";
 
 const UserDashboard = () => {
   const user = useSelector((state) => state.auth?.user);
   const userName = user?.name || user?.fullName || "User";
   const userPhoto = user?.photo || user?.profilePhoto || user?.avatar;
+
+  const { isAuth } = useSelector(state => state.checkAuth),
+    dispatch = useDispatch(),
+    { isUserLoading, getUserData, isUserError } = useSelector(state => state.user);
 
   const [stats, setStats] = useState({ coursesEnrolled: 0, coursesCompleted: 0, hoursLearned: 0, certificatesEarned: 0 });
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -20,6 +25,19 @@ const UserDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(userProfile())
+        .then(res => {
+          // console.log('Response for fetching user profile', res);
+        })
+        .catch((err) => {
+          getSweetAlert('Oops...', 'Something went wrong!', 'error');
+          console.log("Error occurred", err);
+        });
+    }
+  }, [isAuth, dispatch]);
 
   const fetchDashboardData = async () => {
     try {
@@ -92,15 +110,15 @@ const UserDashboard = () => {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex-1 flex items-center gap-4 md:gap-6">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full ring-4 ring-white/30 overflow-hidden shadow-2xl bg-gradient-to-br from-purple-400 to-pink-500 flex-shrink-0">
-                {userPhoto ? <img src={userPhoto} alt={userName} className="w-full h-full object-cover" /> : 
-                <div className="w-full h-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold">{userName.charAt(0).toUpperCase()}</div>}
+                {getUserData.user.profileImage ? <img src={`http://localhost:3005${getUserData.user.profileImage}`} alt={userName} className="w-full h-full object-cover" /> :
+                  <div className="w-full h-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold">{userName.charAt(0).toUpperCase()}</div>}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="text-yellow-300" size={24} />
+                  {/* <Sparkles className="text-yellow-300" size={24} /> */}
                   <span className="text-sm font-semibold text-purple-200 bg-white/20 px-3 py-1 rounded-full">Student Dashboard</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">Welcome back, {userName}! 👋</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">Welcome back, {getUserData.user.name.split(" ")[0]}! </h1>
                 <p className="text-purple-100 text-sm md:text-base">Continue your learning journey and achieve your goals</p>
               </div>
             </div>

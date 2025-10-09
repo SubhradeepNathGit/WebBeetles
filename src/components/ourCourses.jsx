@@ -117,7 +117,7 @@ const CoursesSection = () => {
     }
   }, [dispatch]);
 
-  // console.log('Course Data', getCourseData);
+  console.log('Course Data', getCourseData);
 
   // Filter courses based on search term
   const filteredCourses = getCourseData.filter(course =>

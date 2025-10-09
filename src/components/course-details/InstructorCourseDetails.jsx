@@ -106,7 +106,7 @@ const InstructorCourseDetails = ({ courseId }) => {
     }
 
     return (
-        <div className="bg-gray-900 p-6 rounded-3xl shadow-lg text-white">
+        <div className="bg-black p-6 rounded-3xl shadow-lg text-white">
             {!getSpecificCourseData?.instructor ? (
                 <div className="flex justify-center items-center min-h-[70vh]">
                     <Lottie
@@ -131,7 +131,7 @@ const InstructorCourseDetails = ({ courseId }) => {
                     </div>
 
                     <h3 className="text-lg font-semibold mb-3">This course includes:</h3>
-                    <ul className="divide-y divide-gray-700 text-gray-300 mb-6">
+                    <ul>
                         <li className="flex items-center gap-3 py-3">
                             <FaRegClock className="text-purple-500" />
                             54 Hours of Learn-Anywhere Videos
@@ -150,7 +150,7 @@ const InstructorCourseDetails = ({ courseId }) => {
                         </li>
                     </ul>
 
-                    <div className="flex flex-col items-start mb-5">
+                    <div className="flex flex-col items-start mt-3">
                         <p className="text-purple-500 text-2xl font-bold mb-4 flex items-center">
                             <MdCurrencyRupee className="inline mr-1" />
                             {getSpecificCourseData.price}
@@ -162,7 +162,7 @@ const InstructorCourseDetails = ({ courseId }) => {
                                 if (isAuth) handlePayment();
                                 else navigate('/signin');
                             }}
-                            className="flex items-center justify-center gap-2 w-full 
+                            className="flex mb-5 mt-1 items-center justify-center gap-2 w-full 
                 bg-purple-600 text-white 
                 backdrop-blur-md border border-white/30 
                 px-5 py-3 rounded-full transition 

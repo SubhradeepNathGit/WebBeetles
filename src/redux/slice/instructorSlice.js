@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axiosInstance/axiosInstance";
-import { endPoint_requestInstructor } from "../../api/apiUrl/apiUrl";
+import { endPoint_requestInstructor, endPoint_sepeficInstructor } from "../../api/apiUrl/apiUrl";
 
+// request instructor action 
 export const instructorRequest = createAsyncThunk('paymentSlice/instructorSlice',
     async (data) => {
         console.log('Received data in instructor slice', data);
@@ -11,6 +12,7 @@ export const instructorRequest = createAsyncThunk('paymentSlice/instructorSlice'
 
         return res.data;
     });
+
 
 const initialState = {
     isInstructorPending: false,
@@ -22,6 +24,7 @@ export const instructorSlice = createSlice({
     name: 'instructorSlice',
     initialState,
     extraReducers: (builder) => {
+        // request instructor slice 
         builder.addCase(instructorRequest.pending, (state, action) => {
             state.isInstructorPending = true;
         })
@@ -35,6 +38,7 @@ export const instructorSlice = createSlice({
             state.getInstructorData = [];
             state.isInstructorError = action.error?.message;
         })
+
     }
 })
 
