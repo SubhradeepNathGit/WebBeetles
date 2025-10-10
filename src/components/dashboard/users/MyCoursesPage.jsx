@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Play, Clock, Award, BookOpen, ChevronRight, ChevronDown, PlayCircle, FileText, CheckCircle, Lock, Star, ThumbsUp, MessageSquare, Edit2, Trash2 } from 'lucide-react';
 
-const MyCoursesPage = () => {
+const MyCoursesPage = ({userData}) => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [expandedSections, setExpandedSections] = useState({});
   const [activeTab, setActiveTab] = useState('content');

@@ -51,13 +51,13 @@ const AddCourseForm = () => {
     const sections = [
       {
         sectionTitle: data.sectionTitle,
-        lectures: data.lectures.map((lec) => ({
+        lectures: data.lectures.map((lec,index) => ({
           title: lec.lectureTitle,
           videoUrl: lec.video?.[0] ? URL.createObjectURL(lec.video[0]) : "",
           duration: lec.duration,
-          isPreview: false,
-        })),
-      },
+          isPreview: index === 0 ? true : false
+        }))
+      }
     ];
 
     formData.append("sections", JSON.stringify(sections));
@@ -280,12 +280,16 @@ const AddCourseForm = () => {
                       type="file"
                       accept="video/*"
                       id={`video-${lecture.id}`}
-                      className="hidden"
+                      // className="hidden"
+                       className={`flex items-center gap-2 w-full p-3 rounded-lg bg-white/10 border ${errors.lectures?.[lIdx]?.video
+                        ? "border-red-500"
+                        : "border-white/20"
+                        } hover:border-white/40 cursor-pointer`}
                       {...register(`lectures.${lIdx}.video`, {
                         required: "Video is required",
                       })}
                     />
-                    <label
+                    {/* <label
                       htmlFor={`video-${lecture.id}`}
                       className={`flex items-center gap-2 w-full p-3 rounded-lg bg-white/10 border ${errors.lectures?.[lIdx]?.video
                         ? "border-red-500"
@@ -296,7 +300,7 @@ const AddCourseForm = () => {
                       <span className="text-white/80 text-xs truncate">
                         Upload video file
                       </span>
-                    </label>
+                    </label> */}
                     {errors.lectures?.[lIdx]?.video && (
                       <p className="text-red-400 text-xs mt-1">
                         {errors.lectures[lIdx].video.message}

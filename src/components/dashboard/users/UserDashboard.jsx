@@ -5,6 +5,7 @@ import {
   Calendar, BarChart3, Download, ArrowRight, Sparkles, Trophy
 } from "lucide-react";
 import { userProfile } from "../../../redux/slice/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const UserDashboard = () => {
   const user = useSelector((state) => state.auth?.user);
@@ -21,6 +22,7 @@ const UserDashboard = () => {
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
   const [weeklyGoal, setWeeklyGoal] = useState({ current: 0, target: 15 });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -97,7 +99,7 @@ const UserDashboard = () => {
     { icon: Target, value: stats.certificatesEarned, label: "Certificates Earned", color: "orange", trend: "+1" }
   ];
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="text-white text-xl">Loading dashboard...</div></div>;
+  if (loading && isUserLoading) return <div className="min-h-screen flex items-center justify-center"><div className="text-white text-xl">Loading dashboard...</div></div>;
 
   const goalPercentage = (weeklyGoal.current / weeklyGoal.target) * 100;
 
@@ -110,7 +112,7 @@ const UserDashboard = () => {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex-1 flex items-center gap-4 md:gap-6">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full ring-4 ring-white/30 overflow-hidden shadow-2xl bg-gradient-to-br from-purple-400 to-pink-500 flex-shrink-0">
-                {getUserData.user.profileImage ? <img src={`http://localhost:3005${getUserData.user.profileImage}`} alt={userName} className="w-full h-full object-cover" /> :
+                {getUserData?.user?.profileImage ? <img src={`http://localhost:3005${getUserData.user.profileImage}`} alt={userName} className="w-full h-full object-cover" /> :
                   <div className="w-full h-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold">{userName.charAt(0).toUpperCase()}</div>}
               </div>
               <div className="flex-1 min-w-0">
@@ -118,7 +120,7 @@ const UserDashboard = () => {
                   {/* <Sparkles className="text-yellow-300" size={24} /> */}
                   <span className="text-sm font-semibold text-purple-200 bg-white/20 px-3 py-1 rounded-full">Student Dashboard</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">Welcome back, {getUserData.user.name.split(" ")[0]}! </h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">Welcome back, {getUserData?.user?.name.split(" ")[0]}! </h1>
                 <p className="text-purple-100 text-sm md:text-base">Continue your learning journey and achieve your goals</p>
               </div>
             </div>
@@ -261,11 +263,11 @@ const UserDashboard = () => {
             <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
             <div className="space-y-3">
               {[
-                { label: "Browse All Courses", color: "purple" },
-                { label: "Request Instructor", color: "blue" },
-                { label: "View Certificates", color: "green" }
+                { label: "Browse All Courses", color: "purple", func: () => navigate('/course') },
+                { label: "Request Instructor", color: "blue", func: () => window.dispatchEvent(new CustomEvent("open-request-instructor")) },
+                { label: "View Certificates", color: "green", func: "" }
               ].map((action, i) => (
-                <button key={i} className={`w-full text-left px-5 py-4 bg-${action.color}-500/30 hover:bg-${action.color}-500/50 backdrop-blur-sm rounded-2xl text-white font-semibold text-sm transition-all border border-${action.color}-400/30 hover:scale-105 hover:shadow-xl flex items-center justify-between group`}>
+                <button key={i} onClick={action.func} className={`w-full text-left px-5 py-4 bg-${action.color}-500/30 hover:bg-${action.color}-500/50 backdrop-blur-sm rounded-2xl text-white font-semibold text-sm transition-all border border-${action.color}-400/30 hover:scale-105 hover:shadow-xl flex items-center justify-between group`}>
                   <span>{action.label}</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>

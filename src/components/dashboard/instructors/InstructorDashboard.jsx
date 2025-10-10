@@ -6,18 +6,10 @@ import {
   Clock, Eye, Video, Loader2, Camera, Edit3, X, CheckCircle2,
   Plus, Target, Zap, ChevronRight
 } from "lucide-react";
-import { specificInstructorRequest } from "../../../redux/slice/specificInstructorSlice";
-import { userProfile } from "../../../redux/slice/userSlice";
 
-const InstructorDashboard = () => {
-  const user = useSelector((state) => state.auth?.user);
-  const name = user?.name || user?.fullName || "Instructor";
-  const photo = user?.photo || user?.profilePhoto || user?.avatar;
-
-  const dispatch = useDispatch(),
-    { isAuth } = useSelector(state => state.checkAuth),
-    { isSpecificInstructorLoading, getSpecificInstructorData, isSpecificInstructorError } = useSelector(state => state.specificInstructor),
-    { isUserLoading, getUserData, isUserError } = useSelector(state => state.user);
+const InstructorDashboard = ({ instructorDetails }) => {
+  const name = instructorDetails?.user?.name || "Instructor";
+  const photo = instructorDetails?.user?.profileImage;
 
   const [data, setData] = useState({ stats: { totalCourses: 0, totalStudents: 0 }, courses: [], activity: [], tasks: [], monthly: { enrollments: 0, revenue: 0 } });
   const [bio, setBio] = useState("");
@@ -27,35 +19,6 @@ const InstructorDashboard = () => {
   const [updatingPhoto, setUpdatingPhoto] = useState(false);
   const [updatingBio, setUpdatingBio] = useState(false);
   const fileInputRef = useRef(null);
-
-  useEffect(() => {
-    if (isAuth) {
-      dispatch(userProfile())
-        .then(res => {
-          // console.log('Response for fetching user profile', res);
-        })
-        .catch((err) => {
-          getSweetAlert('Oops...', 'Something went wrong!', 'error');
-          console.log("Error occurred", err);
-        });
-    }
-  }, [isAuth, dispatch]);
-
-  // useEffect(() => {
-  //   if (Object.keys(getUserData).length > 0) {
-  //     dispatch(specificInstructorRequest(getUserData.user._id))
-  //       .then(res => {
-  //         // console.log('Response for fetching user profile', res);
-  //       })
-  //       .catch((err) => {
-  //         getSweetAlert('Oops...', 'Something went wrong!', 'error');
-  //         console.log("Error occurred", err);
-  //       });
-  //   }
-  // }, [isAuth, dispatch]);
-
-  // console.log('Logged user', getSpecificInstructorData);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -133,10 +96,12 @@ const InstructorDashboard = () => {
   ];
 
   const quickActions = [
-    { label: "Create New Course", icon: Plus, gradient: "from-purple-500/30 to-purple-600/30" },
-    { label: "View All Students", icon: Users, gradient: "from-blue-500/30 to-blue-600/30" },
-    { label: "Course Analytics", icon: BarChart3, gradient: "from-pink-500/30 to-pink-600/30" }
+    { label: "Create New Course", icon: Plus, gradient: "from-purple-500/30 to-purple-600/30", func: () => window.dispatchEvent(new CustomEvent("open-add-course")), },
+    { label: "View All Students", icon: Users, gradient: "from-blue-500/30 to-blue-600/30", func: "" },
+    { label: "Course Analytics", icon: BarChart3, gradient: "from-pink-500/30 to-pink-600/30", func: "" }
   ];
+
+  // console.log('Instructor details', instructorDetails);
 
   return (
     <div className="min-h-screen bg-black p-3 sm:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
@@ -147,7 +112,7 @@ const InstructorDashboard = () => {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4 lg:gap-6">
             <div className="relative flex-shrink-0">
               <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full ring-4 ring-white/30 overflow-hidden shadow-2xl bg-gradient-to-br from-blue-400 to-purple-500">
-                {getUserData.user.profileImage ? <img src={`http://localhost:3005${getUserData.user.profileImage}`} alt={name} className="w-full h-full object-cover" /> :
+                {photo ? <img src={`http://localhost:3005${photo}`} alt={name} className="w-full h-full object-cover" /> :
                   <div className="w-full h-full flex items-center justify-center text-white text-2xl sm:text-3xl lg:text-4xl font-bold">{name[0].toUpperCase()}</div>}
               </div>
               <button
@@ -177,12 +142,12 @@ const InstructorDashboard = () => {
                 {/* <Sparkles className="text-yellow-300" size={18} /> */}
                 <span className="text-xs font-bold text-purple-200 bg-white/20 px-2.5 py-1 rounded-full">INSTRUCTOR DASHBOARD</span>
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-3 lg:mb-4">Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">{getUserData.user.name.split(" ")[0]}</span>! 🎓</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-3 lg:mb-4">Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">{name.split(" ")[0]}</span>! 🎓</h1>
 
               {!editingBio ? (
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 lg:gap-3">
                   <div className="flex-1 bg-white/10 px-3 sm:px-4 py-2.5 sm:py-3 lg:py-4 rounded-xl border border-white/20">
-                    <p className="text-purple-100 text-xs sm:text-sm lg:text-base">{bio || "No bio added yet."}</p>
+                    <p className="text-purple-100 text-xs sm:text-sm lg:text-base">{instructorDetails?.bio || "No bio added yet."}</p>
                   </div>
                   <button onClick={() => { setTempBio(bio); setEditingBio(true); }} className="inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-white bg-purple-600/50 hover:bg-purple-600/70 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-purple-400/40 transition-all hover:shadow-lg active:scale-95">
                     <Edit3 size={14} /> Edit Bio
@@ -353,7 +318,7 @@ const InstructorDashboard = () => {
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6">Quick Actions</h2>
               <div className="space-y-2 sm:space-y-3">
                 {quickActions.map((a, i) => (
-                  <button key={i} className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r ${a.gradient} hover:opacity-90 rounded-lg text-white font-semibold text-xs sm:text-sm transition-all hover:scale-[1.02] hover:shadow-xl flex items-center justify-between group active:scale-95`}>
+                  <button key={i}  onClick={a.func} className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r ${a.gradient} hover:opacity-90 rounded-lg text-white font-semibold text-xs sm:text-sm transition-all hover:scale-[1.02] hover:shadow-xl flex items-center justify-between group active:scale-95`}>
                     <span className="flex items-center gap-2">
                       <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center border border-white/30"><a.icon size={16} /></div>
                       {a.label}

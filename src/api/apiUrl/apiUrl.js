@@ -19,6 +19,7 @@ const endPoint_deleteCategory = 'api/categories/delete-category';
 
 // instructor 
 const endPoint_requestInstructor = 'api/instructor/request';
+const endPoint_requestInstructorStatus = 'api/instructor/my-status';
 const endPoint_allInstructor = 'api/instructor/all-instructors';
 const endPoint_editInstructorProfile = 'api/instructor/edit-profile';
 const endPoint_sepeficInstructor = 'api/instructor'; 
@@ -44,7 +45,7 @@ export default baseUrl;
 export {
     endPoint_userRegister, endPoint_userLogin, endPoint_userVerifyEmail, endPoint_userProfile, endPoint_userUpdateProfile, endPoint_userForgotPassword, endPoint_userResetPassword, endPoint_userResendOTP,
     endPoint_createCategory, endPoint_allCategory, endPoint_categoryDetails, endPoint_updateCategory, endPoint_deleteCategory,
-    endPoint_requestInstructor, endPoint_allInstructor, endPoint_editInstructorProfile,endPoint_sepeficInstructor,
+    endPoint_requestInstructor, endPoint_requestInstructorStatus, endPoint_allInstructor, endPoint_editInstructorProfile,endPoint_sepeficInstructor,
     endPoint_allCourse, endPoint_sepeficCourse, endPoint_addCourse, endPoint_updateCourse, endPoint_deleteCourse, endPoint_courseRating, endPoint_categoryWiseCourse,
     endPoint_payment_create,endPoint_payment_verify,
     endPoint_contact

@@ -13,7 +13,7 @@ const CoursesSection = () => {
     [searchTerm, setSearchTerm] = useState(''),
     sectionRef = useRef(null),
     dispatch = useDispatch(),
-    { isCourseLoading, getCourseData = [], isCourseError } = useSelector(state => state.course);
+    { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state.course);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -117,7 +117,7 @@ const CoursesSection = () => {
     }
   }, [dispatch]);
 
-  console.log('Course Data', getCourseData);
+  // console.log('Course Data', getCourseData);
 
   // Filter courses based on search term
   const filteredCourses = getCourseData.filter(course =>

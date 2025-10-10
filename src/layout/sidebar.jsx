@@ -36,10 +36,10 @@ const DashboardSidebar = ({ setActivePage, activePage }) => {
 
   // Safely access user from Redux state
   const user = useSelector((state) => state.auth?.user);
-  const role = getUserData.user?.role || "User";
-  const userName = getUserData.user?.name || user?.fullName || "User";
-  const userEmail = getUserData.user?.email || "";
-  const userPhoto = getUserData.user?.profileImage || null;
+  const role = getUserData?.user?.role || "User";
+  const userName = getUserData?.user?.name || "User";
+  const userEmail = getUserData?.user?.email || "";
+  const userPhoto = getUserData?.user?.profileImage || null;
 
   // Sidebar menu items
   const userMenu = [
@@ -117,12 +117,14 @@ const DashboardSidebar = ({ setActivePage, activePage }) => {
                   e.target.nextSibling.style.display = 'flex';
                 }}
               />
-            ) : null}
+            ) : <div className="w-full h-full flex items-center justify-center text-white text-2xl sm:text-3xl lg:text-4xl font-bold">{userName[0].toUpperCase()}</div>}
             <div
               className={`w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0 ${userPhoto ? 'hidden' : 'flex'}`}
             >
               {/* {userName.charAt(0).toUpperCase()} */}
-              <img src={`http://localhost:3005${userPhoto}`} className="w-13 h-13 rounded-full" />
+              {userPhoto ?
+                <img src={`http://localhost:3005${userPhoto}`} className="w-13 h-13 rounded-full" />
+                : <div className="w-full h-full flex items-center justify-center text-white text-2xl sm:text-3xl lg:text-4xl font-bold">{userName[0].toUpperCase()}</div>}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-base font-bold text-white truncate mb-0.5">{userName}</p>

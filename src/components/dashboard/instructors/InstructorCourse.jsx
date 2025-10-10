@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Clock, Users, DollarSign, Star, Edit2, Trash2, Plus, Upload, X, BookOpen, Eye, ChevronRight, ChevronDown, PlayCircle, FileText, Video } from 'lucide-react';
+import DashboardLayout from '../../../pages/dashboard/DashboardLayout';
 
 const InstructorCourse = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -411,10 +412,10 @@ const InstructorCourse = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Instructor Dashboard</h1>
+            <h1 className="text-4xl font-bold mb-2">My Courses</h1>
             <p className="text-gray-400">Manage your courses and track performance</p>
           </div>
-          <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold transition-all flex items-center gap-2">
+          <button onClick={() => window.dispatchEvent(new CustomEvent("open-add-course"))} className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-semibold transition-all flex items-center gap-2">
             <Plus className="w-5 h-5" />
             Create New Course
           </button>
