@@ -13,7 +13,7 @@ const CoursesSection = () => {
     [searchTerm, setSearchTerm] = useState(''),
     sectionRef = useRef(null),
     dispatch = useDispatch(),
-    { isCourseLoading, getCourseData = [], isCourseError } = useSelector(state => state.course);
+    { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state.course);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

@@ -4,30 +4,46 @@ import {
   Clock, CheckCircle, XCircle, AlertCircle, Send, Mail,
   FileText, Calendar, RefreshCw, Loader2, Award
 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { instructorRequestStatus } from "../../../redux/slice/instructorSlice";
 
-const RequestStatusPage = () => {
+const RequestStatusPage = ({ userData }) => {
   const [requestData, setRequestData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const navigate = useNavigate(),
+    dispatch = useDispatch(),
+    { isInstructorPending, getInstructorData, isInstructorError } = useSelector(react => react.specificInstructor);
 
   useEffect(() => {
-    const fetchRequestStatus = async () => {
-      setLoading(true);
-      await new Promise(r => setTimeout(r, 1000));
-      setRequestData({
-        status: "pending",
-        submittedAt: "October 5, 2025",
-        requestId: "REQ-2025-10842",
-        applicantName: "John Doe",
-        email: "john.doe@example.com",
-        phone: "+1 (555) 123-4567",
-        experience: "5 years",
-        expertise: "Web Development, React, Node.js",
-        message: "I have extensive experience in teaching web development and would love to share my knowledge with students on this platform.",
-        expectedResponseTime: "2-3 business days"
+    dispatch(instructorRequestStatus())
+      .then((res) => {
+        // console.log('Instructor request status:', res);
+      })
+      .catch((err) => {
+        getSweetAlert("Oops...", "Something went wrong!", "error");
+        console.log("Error occurred", err);
       });
-      setLoading(false);
-    };
+  }, [dispatch]);
+
+  const fetchRequestStatus = async () => {
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 1000));
+    setRequestData({
+      status: "pending",
+      submittedAt: "October 5, 2025",
+      requestId: "REQ-2025-10842",
+      applicantName: "John Doe",
+      email: "john.doe@example.com",
+      phone: "+1 (555) 123-4567",
+      experience: "5 years",
+      expertise: "Web Development, React, Node.js",
+      message: "I have extensive experience in teaching web development and would love to share my knowledge with students on this platform.",
+      expectedResponseTime: "2-3 business days"
+    });
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchRequestStatus();
   }, []);
 
@@ -72,7 +88,6 @@ const RequestStatusPage = () => {
       <div className="h-screen bg-black flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-20 h-20 text-purple-400/50 animate-spin" />
-         
         </div>
       </div>
     );
@@ -83,7 +98,7 @@ const RequestStatusPage = () => {
   return (
     <div className="min-h-screen bg-black p-3 sm:p-4">
       <div className="max-w-5xl mx-auto space-y-3 sm:space-y-4">
-        
+
         <div className="bg-gradient-to-r from-purple-600/30 to-black backdrop-blur-xl rounded-2xl shadow-2xl border  p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs font-bold text-purple-200 bg-white/20 px-2.5 py-1 rounded-full">INSTRUCTOR APPLICATION</span>
@@ -94,7 +109,7 @@ const RequestStatusPage = () => {
 
         <div className={`bg-gradient-to-br ${status.bgGradient} backdrop-blur-xl rounded-2xl shadow-2xl border ${status.borderColor} p-4 sm:p-6 relative overflow-hidden`}>
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-          
+
           <div className="relative z-10 flex flex-col items-center text-center">
             <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${status.iconBg} flex items-center justify-center mb-3 shadow-2xl border-4 ${status.borderColor} ${status.animation}`}>
               <status.icon className={`${status.iconColor}`} size={36} />
@@ -130,7 +145,7 @@ const RequestStatusPage = () => {
           <div className="space-y-0 relative">
             <div className="relative flex gap-3">
               <div className="absolute left-[15px] top-8 h-[calc(100%-16px)] w-0.5 bg-gradient-to-b from-green-400/50 to-orange-400/50"></div>
-              
+
               <div className="flex flex-col items-center z-10">
                 <div className="w-8 h-8 rounded-full bg-green-500/30 border-2 border-green-400 flex items-center justify-center">
                   <CheckCircle size={16} className="text-green-400" />
@@ -146,13 +161,12 @@ const RequestStatusPage = () => {
 
             <div className="relative flex gap-3">
               {(requestData.status === "approved" || requestData.status === "rejected") && (
-                <div className={`absolute left-[15px] top-8 h-[calc(100%-16px)] w-0.5 ${
-                  requestData.status === "approved" 
-                    ? "bg-gradient-to-b from-green-400/50 to-green-400/50" 
-                    : "bg-gradient-to-b from-orange-400/50 to-red-400/50"
-                }`}></div>
+                <div className={`absolute left-[15px] top-8 h-[calc(100%-16px)] w-0.5 ${requestData.status === "approved"
+                  ? "bg-gradient-to-b from-green-400/50 to-green-400/50"
+                  : "bg-gradient-to-b from-orange-400/50 to-red-400/50"
+                  }`}></div>
               )}
-              
+
               <div className="flex flex-col items-center z-10">
                 <div className={`w-8 h-8 rounded-full ${requestData.status === "pending" ? "bg-orange-500/30 border-2 border-orange-400 animate-pulse" : "bg-green-500/30 border-2 border-green-400"} flex items-center justify-center`}>
                   {requestData.status === "pending" ? <RefreshCw size={16} className="text-orange-400 animate-spin" /> : <CheckCircle size={16} className="text-green-400" />}
@@ -184,7 +198,7 @@ const RequestStatusPage = () => {
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           {requestData.status === "pending" && (
-            <button className="flex-1 bg-purple-700  hover:from-purple-400  text-white font-semibold py-2.5 px-4 rounded-xl border border-blue-400/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm">
+            <button className="flex-1 bg-purple-700  hover:from-purple-400  text-white font-semibold py-2.5 px-4 rounded-xl border border-blue-400/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm" onClick={fetchRequestStatus}>
               <RefreshCw size={16} />
               Refresh Status
             </button>
@@ -201,8 +215,8 @@ const RequestStatusPage = () => {
               Submit New Application
             </button>
           )}
-           <button
-            onClick={() => navigate("/contact")} 
+          <button
+            onClick={() => navigate("/contact")}
             className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-2.5 px-4 rounded-xl border border-white/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm"
           >
             <Mail size={16} />

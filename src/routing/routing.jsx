@@ -20,10 +20,9 @@ import ContactUs from "../pages/ContactUs";
 import CourseDetails from "../pages/CourseDetails";
 import AboutUs from "../pages/AboutUs";
 import CategoryDetails from "../pages/CategoryDetails";
-import TermsOfService from "../pages/TermsOfService";
-import PrivacyPolicy from "../pages/PrivacyPolicy";
+import TermsOfService from "../pages/terms&policy/TermsOfService";
+import PrivacyPolicy from "../pages/terms&policy/PrivacyPolicy";
 import DashboardLayout from "../pages/dashboard/DashboardLayout";
-import InstructorRequestForm from "../components/dashboard/instructors/InstructorRequestForm";
 
 // Layout wrapper (must be used inside Router!)
 const Layout = ({ children }) => {
@@ -65,7 +64,6 @@ const Routing = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/dashboard" element={<DashboardLayout/>} />
-        <Route path="/dashboard/user/request-instructor" element={<InstructorRequestForm />} />
 
 
 

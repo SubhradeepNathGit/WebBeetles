@@ -7,6 +7,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { userLogin } from '../../../redux/slice/authSlice/authSlice'
 import toastifyAlert from '../../../util/toastify'
 import getSweetAlert from '../../../util/sweetAlert'
+// import Lottie from 'lottie-react'
+// import loaderAnimation from '../../../assets/animations/Loading Dots Blue.json';
 
 const Signin = () => {
 
@@ -54,6 +56,18 @@ const Signin = () => {
         getSweetAlert('Oops...', 'Something went wrong!', 'error');
       })
   }
+
+  // if(isAuthLoading){
+  //   return (
+  //         <div className="flex justify-center items-center min-h-[70vh]">
+  //           <Lottie
+  //             animationData={loaderAnimation}
+  //             loop={true}
+  //             className="w-40 h-40 sm:w-52 sm:h-52"
+  //           />
+  //         </div>
+  //   )
+  // }
 
   return (
     <div className="relative h-screen overflow-hidden">

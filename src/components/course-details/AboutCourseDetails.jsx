@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { FaCheckCircle } from "react-icons/fa";
@@ -62,10 +63,10 @@ const AboutCourseDetails = ({ courseId }) => {
 
                     {/* Course Description */}
                     <div className="flex flex-col">
-                        <h2 className="text-3xl font-bold mb-4">
+                        <h2 className="text-4xl font-bold mb-4">
                             {getSpecificCourseData.title}{" "}
-                            <span className="block text-sm font-light text-purple-500 ml-5">
-                                -{getSpecificCourseData.category.name}
+                            <span className="block text-sm font-semibold text-purple-500  ">
+                                {getSpecificCourseData.category.name}
                             </span>
                         </h2>
                         <h2 className="text-xl font-semibold mb-3">About The Course</h2>
@@ -101,8 +102,8 @@ const AboutCourseDetails = ({ courseId }) => {
                                     setActiveLesson(idx === activeLesson ? null : idx)
                                 }
                                 className={`flex items-center justify-between w-full px-5 py-3 rounded-xl border transition ${idx === activeLesson
-                                        ? "bg-purple-600 text-white border-purple-600"
-                                        : "bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800"
+                                    ? "bg-purple-600 text-white border-purple-600"
+                                    : "bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800"
                                     }`}
                             >
                                 <span>{lesson.title}</span>

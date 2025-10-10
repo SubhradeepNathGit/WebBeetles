@@ -8,7 +8,7 @@ const TermsOfService = () => {
                 <h1 className="text-4xl md:text-5xl font-bold text-white my-8">
                     Terms of Service
                 </h1>
-                <p className="max-w-2xl mx-auto text-gray-400 text-lg">
+                <p className="md:mx-5 mx-2 text-gray-400 lg:text-lg text-md">
                     Welcome to WebBeetles, a professional learning platform dedicated to providing high-quality educational resources, courses, and training programs. By accessing or using our website, mobile application, or any of our services (collectively referred to as “the Platform”), you agree to comply with and be bound by these Terms and Conditions. Please read them carefully before using our services.
                 </p>
             </section>
