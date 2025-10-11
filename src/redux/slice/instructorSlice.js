@@ -1,20 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axiosInstance/axiosInstance";
-import { endPoint_allInstructor, endPoint_requestInstructor, endPoint_requestInstructorStatus, endPoint_sepeficInstructor } from "../../api/apiUrl/apiUrl";
+import { endPoint_allInstructor, endPoint_editInstructorProfile, endPoint_requestInstructor, endPoint_requestInstructorStatus, endPoint_sepeficInstructor } from "../../api/apiUrl/apiUrl";
 
 // request instructor action 
-export const instructorRequest = createAsyncThunk('paymentSlice/instructorSlice',
+export const instructorRequest = createAsyncThunk('instructorSlice/instructorSlice',
     async (data) => {
-        console.log('Received data in instructor request slice', data);
+        // console.log('Received data in instructor request slice', data);
 
         const res = await axiosInstance.post(endPoint_requestInstructor, data);
-        console.log('Response from instructor request slice', res);
+        // console.log('Response from instructor request slice', res);
 
         return res.data;
     });
 
 // request status action 
-export const instructorRequestStatus = createAsyncThunk('paymentSlice/instructorRequestStatus',
+export const instructorRequestStatus = createAsyncThunk('instructorSlice/instructorRequestStatus',
     async (data) => {
         console.log('Received data in instructor request status slice', data);
 
@@ -25,10 +25,32 @@ export const instructorRequestStatus = createAsyncThunk('paymentSlice/instructor
     });
 
 // all instructor action 
-export const allInstructor = createAsyncThunk('paymentSlice/allInstructor',
+export const allInstructor = createAsyncThunk('instructorSlice/allInstructor',
     async () => {
         const res = await axiosInstance.get(endPoint_allInstructor);
         // console.log('Response from all instructor slice', res);
+
+        return res.data;
+    });
+
+// specific instructor action 
+export const specificInstructor = createAsyncThunk('instructorSlice/specificInstructor',
+    async (id) => {
+        // console.log('Received data in specific instructor details slice', id);
+
+        const res = await axiosInstance.get(`${endPoint_sepeficInstructor}/${id}`);
+        // console.log('Response from specific instructor slice', res);
+
+        return res.data;
+    });
+
+// Update instructor action 
+export const updateInstructor = createAsyncThunk('updateInstructor/specificInstructor',
+    async (data) => {
+        // console.log('Update instructor details slice', id);
+
+        const res = await axiosInstance.post(endPoint_editInstructorProfile, data);
+        // console.log('Response from Update instructor slice', res);
 
         return res.data;
     });
@@ -73,7 +95,7 @@ export const instructorSlice = createSlice({
             state.getInstructorData = [];
             state.isInstructorError = action.error?.message;
         })
-        
+
         // all instructor slice 
         builder.addCase(allInstructor.pending, (state, action) => {
             state.isInstructorPending = true;
@@ -84,6 +106,36 @@ export const instructorSlice = createSlice({
             state.isInstructorError = null;
         })
         builder.addCase(allInstructor.rejected, (state, action) => {
+            state.isInstructorPending = false;
+            state.getInstructorData = [];
+            state.isInstructorError = action.error?.message;
+        })
+
+        // specific instructor slice 
+        builder.addCase(specificInstructor.pending, (state, action) => {
+            state.isInstructorPending = true;
+        })
+        builder.addCase(specificInstructor.fulfilled, (state, action) => {
+            state.isInstructorPending = false;
+            state.getInstructorData = action.payload;
+            state.isInstructorError = null;
+        })
+        builder.addCase(specificInstructor.rejected, (state, action) => {
+            state.isInstructorPending = false;
+            state.getInstructorData = [];
+            state.isInstructorError = action.error?.message;
+        })
+
+        // update instructor slice 
+        builder.addCase(updateInstructor.pending, (state, action) => {
+            state.isInstructorPending = true;
+        })
+        builder.addCase(updateInstructor.fulfilled, (state, action) => {
+            state.isInstructorPending = false;
+            state.getInstructorData = action.payload;
+            state.isInstructorError = null;
+        })
+        builder.addCase(updateInstructor.rejected, (state, action) => {
             state.isInstructorPending = false;
             state.getInstructorData = [];
             state.isInstructorError = action.error?.message;

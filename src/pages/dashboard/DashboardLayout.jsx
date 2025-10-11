@@ -10,7 +10,8 @@ import RequestStatusPage from "../../components/dashboard/users/RequestStatusPag
 import AddCourseForm from "../../components/dashboard/instructors/AddCourseForm";
 import MyCoursesPage from "../../components/dashboard/users/MyCoursesPage";
 import InstructorCourse from "../../components/dashboard/instructors/InstructorCourse";
-import { allInstructor } from "../../redux/slice/instructorSlice";
+import { specificInstructor } from "../../redux/slice/instructorSlice";
+import { Loader2 } from "lucide-react";
 
 const DashboardLayout = ({ currentPage }) => {
   const [activePage, setActivePage] = useState(currentPage ? currentPage : "dashboard"),
@@ -19,8 +20,6 @@ const DashboardLayout = ({ currentPage }) => {
     { isAuth } = useSelector((state) => state.checkAuth),
     { isUserLoading, getUserData, isUserError } = useSelector(state => state.user),
     { isInstructorPending, getInstructorData, isInstructorError } = useSelector(state => state.instructor);
-
-  let instructor = null;
 
   useEffect(() => {
     dispatch(userProfile())
@@ -34,15 +33,21 @@ const DashboardLayout = ({ currentPage }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(allInstructor())
-      .then((res) => {
-        // console.log('Instructor profile fetched:', res);
-      })
-      .catch((err) => {
-        getSweetAlert("Oops...", "Something went wrong!", "error");
-        console.log("Error occurred", err);
-      });
-  }, [dispatch]);
+    if (Object.keys(getUserData).length > 0) {
+      dispatch(specificInstructor(getUserData?.user?._id))
+        .then((res) => {
+          // console.log('Instructor profile fetched:', res);
+        })
+        .catch((err) => {
+          getSweetAlert("Oops...", "Something went wrong!", "error");
+          console.log("Error occurred", err);
+        });
+    }
+  }, [dispatch, getUserData]);
+
+  // console.log('User details', getUserData);
+  // console.log('Instructor details', getInstructorData);
+
 
   useEffect(() => {
     const handleOpenAddCourse = () => setActivePage("add-myCourses");
@@ -62,19 +67,6 @@ const DashboardLayout = ({ currentPage }) => {
     };
   }, []);
 
-  // console.log(getUserData, getInstructorData);
-
-  if (Object.keys(getUserData).length > 0 && getInstructorData.length > 0) {
-    instructor = getInstructorData.find(instructor => instructor.user._id == getUserData.user._id);
-  }
-
-  // console.log(instructor);
-
-  if (Array.isArray(getInstructorData) && getInstructorData.length > 0 && getUserData?.user?._id) {
-    instructor = getInstructorData.find(
-      (ins) => ins?.user?._id === getUserData.user._id
-    );
-  }
 
   const renderContent = () => {
     switch (activePage) {
@@ -93,19 +85,28 @@ const DashboardLayout = ({ currentPage }) => {
       case 'requestStatus':
         return <RequestStatusPage userData={getUserData} />;
       case 'instructor-dashboard':
-        return <InstructorDashboard instructorDetails={instructor} />
+        return <InstructorDashboard instructorDetails={getInstructorData} />
       case 'instructor-myCourses':
-        return <InstructorCourse />;
+        return <InstructorCourse instructorDetails={getInstructorData} />;
       case 'add-myCourses':
         return <AddCourseForm />;
       default:
         return getUserData?.user?.role === "Instructor" ? (
-          <InstructorDashboard instructorDetails={instructor} />
+          <InstructorDashboard instructorDetails={getInstructorData} />
         ) : (
           <UserDashboard />
         );
     }
   };
+
+  if (Object.keys(getUserData).length == 0) return (
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
+        <p className="text-purple-200 text-sm font-medium">Loading...</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex min-h-screen w-full bg-black text-white">

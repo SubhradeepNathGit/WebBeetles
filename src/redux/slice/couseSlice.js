@@ -27,10 +27,10 @@ export const categoryWiseCourse = createAsyncThunk('courseSlice/categoryWiseCour
 // add course action
 export const createCourse = createAsyncThunk('courseSlice/createCourse',
     async (data) => {
-        console.log('Receive data in add course slice', data);
+        // console.log('Receive data in add course slice', data);
 
         const res = await axiosInstance.post(endPoint_addCourse, data);
-        console.log('Response for adding course', res);
+        // console.log('Response for adding course', res);
 
         return res.data;
     }

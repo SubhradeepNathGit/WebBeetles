@@ -22,7 +22,7 @@ const ContactForm = () => {
     if (isAuth) {
       dispatch(userProfile())
         .then(res => {
-          console.log('Response for fetching user profile', res);
+          // console.log('Response for fetching user profile', res);
         })
         .catch((err) => {
           getSweetAlert('Oops...', 'Something went wrong!', 'error');
@@ -49,11 +49,13 @@ const ContactForm = () => {
         .then(res => {
           // console.log("Response for adding query in contact", res);
 
-          new Promise((r) => setTimeout(r, 1500));
-          setShowToast(true);
-          reset();
+          if (res.meta.requestStatus !== "rejected") {
+            new Promise((r) => setTimeout(r, 1500));
+            setShowToast(true);
+            reset();
 
-          setTimeout(() => setShowToast(false), 5000);
+            setTimeout(() => setShowToast(false), 5000);
+          }
         })
     }
     catch (err) {

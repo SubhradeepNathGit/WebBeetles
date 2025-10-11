@@ -30,8 +30,10 @@ const endPoint_sepeficCourse = 'api/courses/details';
 const endPoint_addCourse = 'api/courses/create-course';
 const endPoint_updateCourse = 'api/courses/update-course';
 const endPoint_deleteCourse = 'api/courses/delete-course';
-const endPoint_courseRating = 'api/courses';
 const endPoint_categoryWiseCourse = 'api/categories/courses';
+const endPoint_userEnrolledCourse = 'courses/68dbea0aa43918cfa359c5fc/content';
+const endPoint_userEnrolledCourseDetails = 'courses/68dbea0aa43918cfa359c5fc/content';
+const endPoint_courseRating = 'api/courses';
 
 // payment 
 const endPoint_payment_create = 'api/payments/purchase';
