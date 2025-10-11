@@ -188,7 +188,7 @@ const CoursesSection = () => {
               className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-8`}
             >
               {filteredCourses.length > 0 ? (
-                filteredCourses.map((course) => (
+                filteredCourses.slice(0,6).map((course) => (
                   <motion.div key={course._id} variants={cardVariants} className="group relative max-w-sm mx-auto w-full">
                     <div className="
                   relative rounded-xl overflow-hidden transition-all duration-500 
