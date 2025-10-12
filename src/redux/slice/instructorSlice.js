@@ -47,10 +47,10 @@ export const specificInstructor = createAsyncThunk('instructorSlice/specificInst
 // Update instructor action 
 export const updateInstructor = createAsyncThunk('updateInstructor/specificInstructor',
     async (data) => {
-        // console.log('Update instructor details slice', id);
+        console.log('Received data in update instructor details slice', data);
 
         const res = await axiosInstance.post(endPoint_editInstructorProfile, data);
-        // console.log('Response from Update instructor slice', res);
+        console.log('Response from Update instructor slice', res);
 
         return res.data;
     });
@@ -132,7 +132,7 @@ export const instructorSlice = createSlice({
         })
         builder.addCase(updateInstructor.fulfilled, (state, action) => {
             state.isInstructorPending = false;
-            state.getInstructorData = action.payload;
+            state.getInstructorData = { ...state.getInstructorData, ...action.payload };
             state.isInstructorError = null;
         })
         builder.addCase(updateInstructor.rejected, (state, action) => {

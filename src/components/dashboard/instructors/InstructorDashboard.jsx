@@ -2,10 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   BookOpen, TrendingUp, Users, DollarSign, Star, Calendar, BarChart3, ArrowRight,
   MessageSquare, Clock, Eye, Video, Loader2, Camera, Edit3, X, CheckCircle2,
-  Plus, Target, Zap, ChevronRight, Mail, Shield, BadgeCheck, UserCircle,
-  Linkedin, Twitter, Github, Globe, Link as LinkIcon, Tag, Code, ExternalLink,
-  AlertCircle
+  Plus, Target, Zap, ChevronRight, Shield, BadgeCheck, UserCircle,
+  Linkedin, Twitter, Github, Instagram, Facebook, Youtube, Mail, Dribbble, Twitch,
+  Globe, Link as LinkIcon, Tag, Code, ExternalLink, AlertCircle
 } from "lucide-react";
+import { FaPinterest, FaDiscord, FaSlack, FaReddit } from "react-icons/fa";
+import toastifyAlert from "../../../util/toastify";
+import { useDispatch } from "react-redux";
+import { updateInstructor } from "../../../redux/slice/instructorSlice";
+import getSweetAlert from "../../../util/sweetAlert";
+import { updateUserProfile } from "../../../redux/slice/userSlice";
 
 const InstructorDashboard = ({ instructorDetails }) => {
 
@@ -15,7 +21,6 @@ const InstructorDashboard = ({ instructorDetails }) => {
   const [photo, setPhoto] = useState(instructorDetails?.user?.profileImage);
   const email = instructorDetails?.user?.email || "";
   const isVerified = instructorDetails?.user?.isVerified || false;
-  const bio = instructorDetails?.bio || "";
   const expertise = instructorDetails?.expertise || [];
   const socialLinks = instructorDetails?.socialLinks || [];
   const slug = instructorDetails?.slug || "";
@@ -23,14 +28,13 @@ const InstructorDashboard = ({ instructorDetails }) => {
   const applicationStatus = instructorDetails?.applicationStatus || "";
   const createdAt = instructorDetails?.createdAt || "";
   const updatedAt = instructorDetails?.updatedAt || "";
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (instructorDetails?.user?.profileImage) {
       setPhoto(instructorDetails.user.profileImage);
     }
   }, [instructorDetails]);
-
-  // console.log(instructorDetails?.user?.profileImage);
 
   const [data, setData] = useState({
     stats: { totalCourses: 0, totalStudents: 0 }, courses:
@@ -54,6 +58,9 @@ const InstructorDashboard = ({ instructorDetails }) => {
       ]
     , monthly: { enrollments: 0, revenue: 0 }
   });
+
+  const [bio, setBio] = useState(instructorDetails?.bio || "");
+
   const [tempBio, setTempBio] = useState("");
   const [tempExpertise, setTempExpertise] = useState([]);
   const [tempSocials, setTempSocials] = useState([]);
@@ -67,139 +74,119 @@ const InstructorDashboard = ({ instructorDetails }) => {
   const [updatingSocials, setUpdatingSocials] = useState(false);
   const fileInputRef = useRef(null);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const token = localStorage.getItem('token');
-  //       const response = await fetch('http://localhost:3005/api/instructor/dashboard', {
-  //         headers: {
-  //           'Authorization': `Bearer ${token}`,
-  //           'Content-Type': 'application/json'
-  //         }
-  //       });
+  let instructor_obj = {
+    bio: instructorDetails?.bio,
+    expertise: instructorDetails?.expertise,
+    socialLinks: instructorDetails?.socialLinks
+  }
 
-  //       if (!response.ok) throw new Error('Failed to fetch dashboard data');
+  console.log(instructor_obj);
 
-  //       const result = await response.json();
-  //       setData(result.data || {
-  //         stats: { totalCourses: 0, totalStudents: 0 },
-  //         courses: [],
-  //         activity: [],
-  //         tasks: [],
-  //         monthly: { enrollments: 0, revenue: 0 }
-  //       });
-  //     } catch (error) {
-  //       console.error('Dashboard fetch error:', error);
-  //       // Fallback to empty data on error
-  //       setData({
-  //         stats: { totalCourses: 0, totalStudents: 0 },
-  //         courses: [],
-  //         activity: [],
-  //         tasks: [],
-  //         monthly: { enrollments: 0, revenue: 0 }
-  //       });
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
+  const handleEditBio = () => {
+    setTempBio(bio);
+    setEditingBio(true);
+  };
 
+  // handle bio 
   const handleBioSave = async () => {
     setUpdatingBio(true);
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   const response = await fetch('http://localhost:3005/api/instructor/bio', {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`,
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({ bio: tempBio })
-    //   });
+    instructor_obj = { ...instructor_obj, bio: tempBio };
 
-    //   if (!response.ok) throw new Error('Failed to update bio');
-
-    //   alert("Bio updated successfully!");
-    //   setEditingBio(false);
-    //   window.location.reload(); // Reload to fetch updated data
-    // } catch (error) {
-    //   console.error('Bio update error:', error);
-    //   alert("Failed to update bio. Please try again.");
-    // } finally {
-    //   setUpdatingBio(false);
-    // }
+    if (!tempBio.trim()) {
+      toastifyAlert.warn("Bio cannot be empty!");
+      return;
+    }
+    else {
+      dispatch(updateInstructor(instructor_obj))
+        .then(res => {
+          console.log('Response from bio update', res);
+          if (res.meta.requestStatus === "fulfilled") {
+            setBio(tempBio);
+            setEditingBio(false);
+          }
+        })
+        .catch(err => {
+          console.error("Error occurred in updating bio", err);
+          getSweetAlert("Oops...", "Something went wrong!", "error");
+        })
+        .finally(() => {
+          setUpdatingBio(false);
+        });
+    }
   };
 
+  // handle expertise
   const handleExpertiseSave = async () => {
     setUpdatingExpertise(true);
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   const response = await fetch('http://localhost:3005/api/instructor/expertise', {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`,
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({ expertise: tempExpertise })
-    //   });
+    instructor_obj = { ...instructor_obj, expertise: tempExpertise };
 
-    //   if (!response.ok) throw new Error('Failed to update expertise');
-
-    //   alert("Expertise updated successfully!");
-    //   setEditingExpertise(false);
-    //   window.location.reload();
-    // } catch (error) {
-    //   console.error('Expertise update error:', error);
-    //   alert("Failed to update expertise. Please try again.");
-    // } finally {
-    //   setUpdatingExpertise(false);
-    // }
+    if (tempExpertise.length === 0) {
+      toastifyAlert.warn("Experties cannot be empty!");
+      return;
+    }
+    else {
+      dispatch(updateInstructor(instructor_obj))
+        .then(res => {
+          console.log('Response from experties update', res);
+          if (res.meta.requestStatus === "fulfilled") {
+            setEditingExpertise(false);
+            toastifyAlert.success(res.payload.message);
+          }
+        })
+        .catch(err => {
+          console.error("Error occurred in updating experties", err);
+          getSweetAlert("Oops...", "Something went wrong!", "error");
+        })
+        .finally(() => {
+          setUpdatingExpertise(false);
+        });
+    }
   };
 
+  // handle social 
   const handleSocialsSave = async () => {
     setUpdatingSocials(true);
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   // Filter out empty social links
-    //   const cleanedSocials = tempSocials
-    //     .filter(s => s.platform.trim() && s.url.trim())
-    //     .map(({ platform, url }) => ({ platform, url }));
+    const cleanedSocials = tempSocials
+      .filter(s => s.platform.trim() && s.url.trim())
+      .map(({ platform, url }) => ({ platform, url }));
 
-    //   const response = await fetch('http://localhost:3005/api/instructor/social-links', {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`,
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({ socialLinks: cleanedSocials })
-    //   });
+    instructor_obj = { ...instructor_obj, socialLinks: cleanedSocials };
 
-    //   if (!response.ok) throw new Error('Failed to update social links');
-
-    //   alert("Social links updated successfully!");
-    //   setEditingSocials(false);
-    //   window.location.reload();
-    // } catch (error) {
-    //   console.error('Social links update error:', error);
-    //   alert("Failed to update social links. Please try again.");
-    // } finally {
-    //   setUpdatingSocials(false);
-    // }
+    if (tempSocials.length === 0) {
+      toastifyAlert.warn("Socials cannot be empty!");
+      return;
+    }
+    else {
+      dispatch(updateInstructor(instructor_obj))
+        .then(res => {
+          console.log('Response from socials update', res);
+          if (res.meta.requestStatus === "fulfilled") {
+            setEditingSocials(false);
+            toastifyAlert.success(res.payload.message);
+          }
+        })
+        .catch(err => {
+          console.error("Error occurred in updating socials", err);
+          getSweetAlert("Oops...", "Something went wrong!", "error");
+        })
+        .finally(() => {
+          setUpdatingSocials(false);
+        });
+    }
   };
 
+  // handle profile-pic 
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+      toastifyAlert.warn('Please upload an image file');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
+    if (file.size > 100 * 1024) {
+      toastifyAlert.warn('Image size should be less than 100KB');
       return;
     }
     setUpdatingPhoto(true);
@@ -211,9 +198,25 @@ const InstructorDashboard = ({ instructorDetails }) => {
     }
     setPhoto(previewUrl);
     console.log("Photo updated successfully!", previewUrl);
+    // console.log(previewUrl.split('/')[previewUrl.split('/').length-1]);
 
-    setUpdatingPhoto(false);
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    dispatch(updateUserProfile(formData))
+      .then(res => {
+        console.log('Response from photo update', res);
+
+      })
+      .catch(err => {
+        console.error("Error occurred in uploading photo", err);
+        getSweetAlert("Oops...", "Something went wrong!", "error");
+      })
+      .finally(() => {
+        setUpdatingPhoto(false);
+      });
   };
+
   const addSkill = () => {
     const skill = newSkill.trim();
     if (skill && !tempExpertise.includes(skill)) {
@@ -240,9 +243,24 @@ const InstructorDashboard = ({ instructorDetails }) => {
 
   const getSocialIcon = (platform) => {
     const p = (platform || "").toLowerCase();
-    if (p.includes("linkedin")) return <Linkedin size={16} />;
-    if (p.includes("twitter")) return <Twitter size={16} />;
-    if (p.includes("github")) return <Github size={16} />;
+
+    if (p.includes("linkedin")) return <Linkedin size={16} className="text-blue-600" />;
+    if (p.includes("twitter") || p.includes("x.com")) return <Twitter size={16} className="text-sky-500" />;
+    if (p.includes("github")) return <Github size={16} className="text-gray-800 dark:text-gray-200" />;
+    if (p.includes("instagram")) return <Instagram size={16} className="text-pink-500" />;
+    if (p.includes("facebook")) return <Facebook size={16} className="text-blue-500" />;
+    if (p.includes("youtube")) return <Youtube size={16} className="text-red-600" />;
+    if (p.includes("dribbble")) return <Dribbble size={16} className="text-pink-400" />;
+    if (p.includes("twitch")) return <Twitch size={16} className="text-purple-500" />;
+
+    if (p.includes("pinterest")) return <FaPinterest size={16} className="text-red-500" />;
+    if (p.includes("discord")) return <FaDiscord size={16} className="text-indigo-500" />;
+    if (p.includes("slack")) return <FaSlack size={16} className="text-purple-400" />;
+    if (p.includes("reddit")) return <FaReddit size={16} className="text-orange-500" />;
+
+    if (p.includes("mailto:") || p.includes("@")) return <Mail size={16} className="text-rose-600" />;
+    if (p.includes("http") || p.includes("www")) return <Globe size={16} className="text-green-600" />;
+
     return <Globe size={16} />;
   };
 
@@ -275,6 +293,12 @@ const InstructorDashboard = ({ instructorDetails }) => {
     { label: "View All Students", icon: Users, gradient: "from-blue-500/30 to-blue-600/30", func: () => console.log('All Students Clicked!') },
     { label: "Course Analytics", icon: BarChart3, gradient: "from-pink-500/30 to-pink-600/30", func: () => console.log('Course Analytics Clicked!') }
   ];
+
+  useEffect(() => {
+    if (instructorDetails?.bio) {
+      setBio(instructorDetails.bio);
+    }
+  }, [instructorDetails]);
 
   if (!instructorDetails || Object.keys(instructorDetails).length === 0) {
     return (
@@ -336,7 +360,7 @@ const InstructorDashboard = ({ instructorDetails }) => {
                   <div className="flex-1 bg-white/10 px-3 sm:px-4 py-2.5 sm:py-3 lg:py-4 rounded-xl border border-white/20">
                     <p className="text-purple-100 text-xs sm:text-sm lg:text-base">{bio || "No bio added yet."}</p>
                   </div>
-                  <button onClick={() => { setTempBio(bio); setEditingBio(true); }} className="inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-white bg-purple-600/50 hover:bg-purple-600/70 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-purple-400/40 transition-all hover:shadow-lg active:scale-95">
+                  <button onClick={handleEditBio} className="inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-white bg-purple-600/50 hover:bg-purple-600/70 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-purple-400/40 transition-all hover:shadow-lg active:scale-95">
                     <Edit3 size={14} /> Edit Bio
                   </button>
                 </div>
@@ -489,7 +513,7 @@ const InstructorDashboard = ({ instructorDetails }) => {
                   <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-blue-500/30 flex items-center justify-center border border-blue-400/30"><Video className="text-blue-300" size={18} /></div>
                   My Courses
                 </h2>
-                <button className="inline-flex items-center gap-1 text-purple-200 hover:text-white font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all border border-white/20 active:scale-95">
+                <button onClick={() => window.dispatchEvent(new CustomEvent("open-instructor-course"))} className="inline-flex items-center gap-1 text-purple-200 hover:text-white font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all border border-white/20 active:scale-95">
                   View All<ChevronRight size={14} />
                 </button>
               </div>

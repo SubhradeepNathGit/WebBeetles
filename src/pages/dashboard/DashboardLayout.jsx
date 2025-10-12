@@ -57,6 +57,15 @@ const DashboardLayout = ({ currentPage }) => {
       window.removeEventListener("open-add-course", handleOpenAddCourse);
     };
   }, []);
+ 
+  useEffect(() => {
+    const handleOpenAddCourse = () => setActivePage("instructor-myCourses");
+    window.addEventListener("open-instructor-course", handleOpenAddCourse);
+
+    return () => {
+      window.removeEventListener("open-instructor-course", handleOpenAddCourse);
+    };
+  }, []);
 
   useEffect(() => {
     const handleOpenAddCourse = () => setActivePage("requestInstructor");
