@@ -14,10 +14,10 @@ export const userProfile = createAsyncThunk("userProfileSlice/userProfile",
 // update user profile action 
 export const updateUserProfile = createAsyncThunk("updateUserProfile/userProfile",
     async (data) => {
-        console.log('Update user details slice', data);
+        // console.log('Update user details slice', data);
 
         const res = await axiosInstance.post(endPoint_userUpdateProfile, data);
-        console.log('Response for user profile slice', res);
+        // console.log('Response for user profile slice', res);
 
         return res.data;
     });

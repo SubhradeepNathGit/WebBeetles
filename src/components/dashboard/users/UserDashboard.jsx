@@ -1,28 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   BookOpen, TrendingUp, Award, Clock, Play, Star, Users, Target,
-  Calendar, BarChart3, Download, ArrowRight, Sparkles, Trophy
+  Calendar, BarChart3, Download, ArrowRight, Sparkles, Trophy,
+  Loader2,
+  Camera
 } from "lucide-react";
-import { userProfile } from "../../../redux/slice/userSlice";
+import { updateUserProfile, userProfile } from "../../../redux/slice/userSlice";
 import { useNavigate } from "react-router-dom";
+import toastifyAlert from "../../../util/toastify";
+import { userWiseCourse } from "../../../redux/slice/couseSlice";
+import CourseRating from "./rating-review/CourseRating";
 
-const UserDashboard = () => {
+const UserDashboard = ({ userDetails }) => {
+
+  const [updatingPhoto, setUpdatingPhoto] = useState(false);
+  const fileInputRef = useRef(null);
   const user = useSelector((state) => state.auth?.user);
   const userName = user?.name || user?.fullName || "User";
-  const userPhoto = user?.photo || user?.profilePhoto || user?.avatar;
+  const [userPhoto, setUserPhoto] = useState(user?.photo || user?.profilePhoto);
+  const [photo, setPhoto] = useState(user?.photo || user?.profilePhoto);
 
-  const { isAuth } = useSelector(state => state.checkAuth),
-    dispatch = useDispatch(),
-    { isUserLoading, getUserData, isUserError } = useSelector(state => state.user);
-
-  const [stats, setStats] = useState({ coursesEnrolled: 0, coursesCompleted: 0, hoursLearned: 0, certificatesEarned: 0 });
+  const [stats, setStats] = useState({ coursesEnrolled: 0, coursesCompleted: 0, coursePending: 0, certificatesEarned: 0 });
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
   const [weeklyGoal, setWeeklyGoal] = useState({ current: 0, target: 15 });
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
+  const navigate = useNavigate(),
+    dispatch = useDispatch(),
+    imgType = ['jpeg', 'jpg', 'png'],
+    { isAuth } = useSelector(state => state.checkAuth),
+    { isUserLoading, isUserError } = useSelector(state => state.user),
+    { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state.course);
+
+  // console.log(getCourseData);
+
 
   useEffect(() => {
     fetchDashboardData();
@@ -41,6 +55,73 @@ const UserDashboard = () => {
     }
   }, [isAuth, dispatch]);
 
+  useEffect(() => {
+    dispatch(userWiseCourse())
+      .then(res => {
+        // console.log('Response for user wise course fetching', res);
+      })
+      .catch((err) => {
+        getSweetAlert('Oops...', 'Something went wrong!', 'error');
+        console.log("Error occurred", err);
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (getCourseData?.courses?.length) {
+      setStats({
+        coursesEnrolled: getCourseData.courses.length,
+        coursesCompleted: 3,
+        coursePending: 47,
+        certificatesEarned: 3,
+      });
+    }
+  }, [getCourseData]);
+
+  // handle profile-pic 
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    // console.log(file);
+
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toastifyAlert.warn('Please upload an image file');
+      return;
+    }
+    if (file.size > 100 * 1024) {
+      toastifyAlert.warn('Profile image size should be less than 100KB');
+      return;
+    }
+    if (!imgType.includes(file.type.split('/')[1])) {
+      toastifyAlert.warn("Profile image type should be jpeg / jpg / png");
+      return;
+    }
+    setUpdatingPhoto(true);
+
+    const previewUrl = URL.createObjectURL(file);
+
+    if (photo && photo.startsWith("blob:")) {
+      URL.revokeObjectURL(photo);
+    }
+    setUserPhoto(previewUrl);
+    // console.log("Photo updated successfully!", previewUrl);
+    // console.log(previewUrl.split('/')[previewUrl.split('/').length-1]);
+
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    dispatch(updateUserProfile(formData))
+      .then(res => {
+        // console.log('Response from photo update', res);
+      })
+      .catch(err => {
+        console.error("Error occurred in uploading photo", err);
+        getSweetAlert("Oops...", "Something went wrong!", "error");
+      })
+      .finally(() => {
+        setUpdatingPhoto(false);
+      });
+  };
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -54,7 +135,6 @@ const UserDashboard = () => {
       // ]);
 
       // Mock data
-      setStats({ coursesEnrolled: 8, coursesCompleted: 3, hoursLearned: 47, certificatesEarned: 3 });
       setEnrolledCourses([
         { id: 1, title: "Advanced React & Redux Masterclass", instructor: "Sarah Johnson", progress: 65, thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400", duration: "12 hours", nextLesson: "State Management Patterns", rating: 4.8, students: 12453, lessonsCompleted: 23, totalLessons: 35 },
         { id: 2, title: "Full Stack Web Development Bootcamp", instructor: "Mike Chen", progress: 42, thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400", duration: "35 hours", nextLesson: "Backend API Development", rating: 4.9, students: 8765, lessonsCompleted: 15, totalLessons: 36 },
@@ -95,11 +175,11 @@ const UserDashboard = () => {
   const statCards = [
     { icon: BookOpen, value: stats.coursesEnrolled, label: "Courses Enrolled", color: "purple", trend: "+2" },
     { icon: Award, value: stats.coursesCompleted, label: "Courses Completed", color: "green", trend: "+1" },
-    { icon: Clock, value: stats.hoursLearned, label: "Hours Learned", color: "blue", trend: "+5h" },
+    { icon: Clock, value: stats.coursePending, label: "Courses In-progress", color: "blue", trend: "+5h" },
     { icon: Target, value: stats.certificatesEarned, label: "Certificates Earned", color: "orange", trend: "+1" }
   ];
 
-  if (loading && isUserLoading) return <div className="min-h-screen flex items-center justify-center"><div className="text-white text-xl">Loading dashboard...</div></div>;
+  if (loading && isUserLoading && isCourseLoading) return <div className="min-h-screen flex items-center justify-center"><div className="text-white text-xl">Loading dashboard...</div></div>;
 
   const goalPercentage = (weeklyGoal.current / weeklyGoal.target) * 100;
 
@@ -108,22 +188,57 @@ const UserDashboard = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-purple-500/30 backdrop-blur-xl rounded-3xl shadow-2xl mb-8 border border-white/30 overflow-hidden relative">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
+
         <div className="px-6 md:px-8 py-8 md:py-10 relative z-10">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex-1 flex items-center gap-4 md:gap-6">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full ring-4 ring-white/30 overflow-hidden shadow-2xl bg-gradient-to-br from-purple-400 to-pink-500 flex-shrink-0">
-                {getUserData?.user?.profileImage ? <img src={`http://localhost:3005${getUserData.user.profileImage}`} alt={userName} className="w-full h-full object-cover" /> :
-                  <div className="w-full h-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold">{userName.charAt(0).toUpperCase()}</div>}
+
+              {/* PROFILE IMAGE WRAPPER */}
+              <div className="relative w-16 h-16 md:w-20 md:h-20">
+                <div className="w-full h-full rounded-full ring-4 ring-white/30 overflow-hidden shadow-2xl bg-gradient-to-br from-purple-400 to-pink-500">
+                  {userDetails?.user?.profileImage ? (
+                    <img
+                      src={`http://localhost:3005${userDetails.user.profileImage}`}
+                      alt={userName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold">
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+
+                {/* UPLOAD BUTTON */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={updatingPhoto}
+                  className="absolute bottom-0 right-0 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-2 rounded-full transition-all shadow-lg border border-white/30 disabled:opacity-50 hover:scale-110 active:scale-95"
+                >
+                  {updatingPhoto ? (
+                    <Loader2 size={16} className="animate-spin" />) : (<Camera size={16} />)}
+                </button>
+
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </div>
+
+              {/* USER INFO */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-3">
-                  {/* <Sparkles className="text-yellow-300" size={24} /> */}
-                  <span className="text-sm font-semibold text-purple-200 bg-white/20 px-3 py-1 rounded-full">Student Dashboard</span>
+                  <span className="text-sm font-semibold text-purple-200 bg-white/20 px-3 py-1 rounded-full">
+                    Student Dashboard
+                  </span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">Welcome back, {getUserData?.user?.name.split(" ")[0]}! </h1>
-                <p className="text-purple-100 text-sm md:text-base">Continue your learning journey and achieve your goals</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">
+                  Welcome back, {userDetails?.user?.name.split(" ")[0]}!
+                </h1>
+                <p className="text-purple-100 text-sm md:text-base">
+                  Continue your learning journey and achieve your goals
+                </p>
               </div>
             </div>
+
+            {/* DOWNLOAD BUTTON */}
             <button className="flex items-center gap-2 px-5 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-xl font-medium transition-all shadow-lg border border-white/30 hover:scale-105">
               <Download size={18} />
               <span className="hidden sm:inline">Download Report</span>
@@ -157,14 +272,14 @@ const UserDashboard = () => {
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 md:p-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white flex items-center gap-2"><Play className="text-purple-300" size={28} />Continue Learning</h2>
-              <button className="text-purple-200 hover:text-white font-semibold text-sm flex items-center gap-1 bg-white/10 px-4 py-2 rounded-xl hover:bg-white/20 transition-all border border-white/20">View All<ArrowRight size={16} /></button>
+              <button onClick={() => window.dispatchEvent(new CustomEvent("open-user-course"))} className="text-purple-200 hover:text-white font-semibold text-sm flex items-center gap-1 bg-white/10 px-4 py-2 rounded-xl hover:bg-white/20 transition-all border border-white/20">View All<ArrowRight size={16} /></button>
             </div>
             <div className="space-y-5">
-              {enrolledCourses.map((course) => (
-                <div key={course.id} className="group bg-white/5 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/15 transition-all duration-300 border border-white/10 hover:border-white/30 hover:shadow-2xl">
+              {getCourseData?.courses?.slice(0, 3).map((course) => (
+                <div key={course._id} className="group bg-white/5 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/15 transition-all duration-300 border border-white/10 hover:border-white/30 hover:shadow-2xl">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="relative flex-shrink-0">
-                      <img src={course.thumbnail} alt={course.title} className="w-full sm:w-40 h-32 sm:h-28 rounded-xl object-cover ring-2 ring-white/20" />
+                      <img src={`http://localhost:3005${course.thumbnail}`} alt={course.title} className="w-full sm:w-40 h-32 sm:h-28 rounded-xl object-cover ring-2 ring-white/20" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                         <button className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-2xl transform scale-90 group-hover:scale-100 transition-transform">
                           <Play size={20} className="text-purple-600 ml-1" fill="currentColor" />
@@ -173,22 +288,22 @@ const UserDashboard = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-white text-lg mb-2 group-hover:text-purple-200 transition-colors line-clamp-1">{course.title}</h3>
-                      <p className="text-sm text-purple-200 mb-3">by {course.instructor}</p>
+                      <p className="text-sm text-purple-200 mb-3">by {course.instructor.name}</p>
                       <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs text-purple-200 mb-4">
-                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Star size={14} className="text-yellow-400" fill="currentColor" />{course.rating}</span>
-                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Users size={14} />{course.students.toLocaleString()}</span>
-                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Clock size={14} />{course.duration}</span>
+                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Star size={14} className="text-yellow-400" fill="currentColor" /><CourseRating courseId={course._id} /></span>
+                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Users size={14} />40</span>
+                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Clock size={14} />00.00</span>
                       </div>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-purple-200">Progress: {course.lessonsCompleted}/{course.totalLessons} lessons</span>
-                          <span className="font-bold text-white bg-white/20 px-3 py-1 rounded-lg">{course.progress}%</span>
+                          <span className="text-purple-200">Progress: 10/15 lessons</span>
+                          <span className="font-bold text-white bg-white/20 px-3 py-1 rounded-lg">70%</span>
                         </div>
                         <div className="h-3 bg-white/20 rounded-full overflow-hidden shadow-inner">
-                          <div className="h-full bg-gradient-to-r from-purple-400 via-pink-500 to-purple-500 rounded-full transition-all duration-500 shadow-lg" style={{ width: `${course.progress}%` }} />
+                          <div className="h-full bg-gradient-to-r from-purple-400 via-pink-500 to-purple-500 rounded-full transition-all duration-500 shadow-lg" style={{ width: `70%` }} />
                         </div>
                         <p className="text-xs text-purple-200 flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>Next: <span className="font-semibold text-white">{course.nextLesson}</span>
+                          <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>Category: <span className="font-semibold text-white">{course.category.name}</span>
                         </p>
                       </div>
                     </div>
@@ -265,7 +380,7 @@ const UserDashboard = () => {
               {[
                 { label: "Browse All Courses", color: "purple", func: () => navigate('/course') },
                 { label: "Request Instructor", color: "blue", func: () => window.dispatchEvent(new CustomEvent("open-request-instructor")) },
-                { label: "View Certificates", color: "green", func: () => console.log("View Certificates clicked") } 
+                { label: "View Certificates", color: "green", func: () => console.log("View Certificates clicked") }
               ].map((action, i) => (
                 <button key={i} onClick={action.func}
                   className={`w-full text-left px-5 py-4 bg-${action.color}-500/30 hover:bg-${action.color}-500/50 backdrop-blur-sm rounded-2xl text-white font-semibold text-sm transition-all border border-${action.color}-400/30 hover:scale-105 hover:shadow-xl flex items-center justify-between group`}>

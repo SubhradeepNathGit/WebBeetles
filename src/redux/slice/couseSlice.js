@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../api/axiosInstance/axiosInstance";
-import { endPoint_addCourse, endPoint_allCourse, endPoint_categoryWiseCourse, endPoint_sepeficCourse } from "../../api/apiUrl/apiUrl";
+import { endPoint_addCourse, endPoint_allCourse, endPoint_categoryWiseCourse, endPoint_sepeficCourse, endPoint_userEnrolledCourse } from "../../api/apiUrl/apiUrl";
 
 // all course action
 export const allCourse = createAsyncThunk('courseSlice/allCourse',
@@ -36,12 +36,22 @@ export const createCourse = createAsyncThunk('courseSlice/createCourse',
     }
 )
 
+// user wise course action
+export const userWiseCourse = createAsyncThunk('userWiseCourse/createCourse',
+    async () => {
+        const res = await axiosInstance.get(endPoint_userEnrolledCourse);
+        // console.log('Response for user wise course', res);
+
+        return res.data;
+    }
+)
+
 // // specific course action
 // export const specificCourse = createAsyncThunk('courseSlice/specificCourse',
-//     async (data) => {
-//         console.log('Receive data for specific course',data);
+//     async (id) => {
+//         console.log('Receive data for specific course',id);
 
-//         const res = await axiosInstance.get(`${endPoint_sepeficCourse}/${data}`);
+//         const res = await axiosInstance.get(`${endPoint_sepeficCourse}/${id}`);
 //         console.log('Response for fetching specific course', res);
 
 //         return res.data;
@@ -57,6 +67,9 @@ const initialState = {
 export const courseSlice = createSlice({
     name: 'courseSlice',
     initialState,
+    reducers: {
+        resetCourseState: () => initialState
+    },
     extraReducers: (builder) => {
 
         // all course reducer
@@ -88,7 +101,7 @@ export const courseSlice = createSlice({
             state.getCourseData = [];
             state.isCourseError = action.error?.message;
         })
-       
+
         // add course reducer
         builder.addCase(createCourse.pending, (state, action) => {
             state.isCourseLoading = true;
@@ -99,6 +112,21 @@ export const courseSlice = createSlice({
             state.isCourseError = null;
         })
         builder.addCase(createCourse.rejected, (state, action) => {
+            state.isCourseLoading = false;
+            state.getCourseData = [];
+            state.isCourseError = action.error?.message;
+        })
+
+        // user wise course reducer
+        builder.addCase(userWiseCourse.pending, (state, action) => {
+            state.isCourseLoading = true;
+        })
+        builder.addCase(userWiseCourse.fulfilled, (state, action) => {
+            state.isCourseLoading = false;
+            state.getCourseData = action.payload;
+            state.isCourseError = null;
+        })
+        builder.addCase(userWiseCourse.rejected, (state, action) => {
             state.isCourseLoading = false;
             state.getCourseData = [];
             state.isCourseError = action.error?.message;
@@ -123,3 +151,5 @@ export const courseSlice = createSlice({
 });
 
 export default courseSlice.reducer;
+
+export const {resetCourseState} = courseSlice.actions;

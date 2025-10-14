@@ -3,7 +3,7 @@ import axiosInstance from "../../api/axiosInstance/axiosInstance";
 import { endPoint_sepeficInstructor } from "../../api/apiUrl/apiUrl";
 
 // specific instructor action 
-export const specificInstructorRequest = createAsyncThunk('paymentSlice/specificInstructorRequest',
+export const specificInstructorRequest = createAsyncThunk('specificInstructorSlice/specificInstructorRequest',
     async (id) => {
         console.log('Data received in specific instructor slice', id);
 
@@ -20,7 +20,7 @@ const initialState = {
 }
 
 export const specificInstructorSlice = createSlice({
-    name: 'specificCourseSlice',
+    name: 'specificInstructorSlice',
     initialState,
     extraReducers: (builder) => {
 

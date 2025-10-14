@@ -114,23 +114,19 @@ const CategoriesSection = () => {
         ) : (
           <>
             {/* Cards Grid */}
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
+            <motion.div variants={containerVariants}
+              initial="hidden" whileInView="visible"
               viewport={{ once: true, amount: 0.1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
-            >
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+                
               {getCategoryData.slice(0, 6).map((cat, index) => (
                 <motion.div
                   key={cat._id || index}
                   variants={cardVariants}
-                  className="max-w-sm mx-auto w-full mt-2"
-                >
+                  className="max-w-sm mx-auto w-full mt-2">
                   <div
-                    className="relative rounded-3xl p-6 sm:p-8 h-64 flex flex-col justify-between transition-all duration-300 hover:scale-105 bg-neutral-900 hover:bg-gradient-to-br hover:from-purple-600 hover:to-black/30 border border-neutral-900 hover:border-purple-500 group"
-                  >
-                    {/* Icon */}
+                    className="relative rounded-3xl p-6 sm:p-8 h-64 flex flex-col justify-between transition-all duration-300 hover:scale-105 bg-neutral-900 hover:bg-gradient-to-br hover:from-purple-600 hover:to-black/30 border border-neutral-900 hover:border-purple-500 group">
+
                     <div
                       className="absolute -top-6 right-6 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full 
                     bg-purple-700 text-white transition-all duration-300

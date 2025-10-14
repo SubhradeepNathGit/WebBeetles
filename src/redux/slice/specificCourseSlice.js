@@ -4,10 +4,10 @@ import { endPoint_sepeficCourse } from "../../api/apiUrl/apiUrl";
 
 // specific course action
 export const specificCourse = createAsyncThunk('specificCourseSlice/specificCourse',
-    async (data) => {
-        // console.log('Receive data for specific course', data);
+    async (id) => {
+        // console.log('Receive data for specific course', id);
 
-        const res = await axiosInstance.get(`${endPoint_sepeficCourse}/${data}`);
+        const res = await axiosInstance.get(`${endPoint_sepeficCourse}/${id}`);
         // console.log('Response for fetching specific course', res);
 
         return res.data;

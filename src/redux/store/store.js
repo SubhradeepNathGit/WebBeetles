@@ -9,6 +9,7 @@ import specificCategorySliceReducer from "../slice/specificCategorySlice";
 import contactAuthSliceReducer from "../slice/contactSlice";
 import specificInstructorSliceReducer from "../slice/specificInstructorSlice";
 import instructorSliceReducer from "../slice/instructorSlice";
+import reviewSliceReducer from "../slice/reviewSlice";
 
 const store = configureStore({
     reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
         specificCourse: specificCourseSliceReducer,
         specificCategory: specificCategorySliceReducer,
         query: contactAuthSliceReducer,
+        review: reviewSliceReducer,
         instructor:instructorSliceReducer,
         specificInstructor: specificInstructorSliceReducer
     }

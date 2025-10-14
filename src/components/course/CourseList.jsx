@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { allCourse } from "../../redux/slice/couseSlice";
 import { HiCurrencyRupee } from "react-icons/hi";
 import Lottie from "lottie-react";
-import loaderAnimation from '../../assets/animations/loader.json'; 
+import loaderAnimation from '../../assets/animations/loader.json';
 
 
 const CourseList = () => {
@@ -178,12 +178,12 @@ const CourseList = () => {
                 {/* Conditional Rendering */}
                 {isCourseLoading ? (
                     <div className="flex justify-center items-center min-h-[70vh]">
-            <Lottie
-              animationData={loaderAnimation}
-              loop={true}
-              className="w-40 h-40 sm:w-52 sm:h-52"
-            />
-          </div>
+                        <Lottie
+                            animationData={loaderAnimation}
+                            loop={true}
+                            className="w-40 h-40 sm:w-52 sm:h-52"
+                        />
+                    </div>
                 ) : isCourseError ? (
                     <h2 className="text-center text-red-500 text-lg">
                         Failed to load Course!
@@ -201,13 +201,12 @@ const CourseList = () => {
                                 filteredCourses.map((course) => (
                                     <motion.div key={course._id} variants={cardVariants} className="group relative max-w-sm mx-auto w-full">
                                         <div className="
-                                 relative rounded-xl overflow-hidden transition-all duration-500 
-                                 bg-gradient-to-br from-gray-900 to-gray-800
-                                 hover:from-purple-00 hover:to-purple-800
-                                 hover:scale-105
-                                 shadow-2xl hover:shadow-purple-500/20
-                                 h-[420px] flex flex-col
-                               ">
+                                            relative rounded-xl overflow-hidden transition-all duration-500 
+                                            bg-gradient-to-br from-gray-900 to-gray-800
+                                            hover:from-purple-00 hover:to-purple-800
+                                            hover:scale-105
+                                            shadow-2xl hover:shadow-purple-500/20
+                                            h-[420px] flex flex-col">
                                             <div className="relative h-60 overflow-hidden m-3 mb-0 rounded-lg">
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
                                                 <img

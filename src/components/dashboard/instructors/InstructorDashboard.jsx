@@ -28,7 +28,8 @@ const InstructorDashboard = ({ instructorDetails }) => {
   const applicationStatus = instructorDetails?.applicationStatus || "";
   const createdAt = instructorDetails?.createdAt || "";
   const updatedAt = instructorDetails?.updatedAt || "";
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(),
+    imgType = ['jpeg', 'jpg', 'png'];
 
   useEffect(() => {
     if (instructorDetails?.user?.profileImage) {
@@ -80,7 +81,7 @@ const InstructorDashboard = ({ instructorDetails }) => {
     socialLinks: instructorDetails?.socialLinks
   }
 
-  console.log(instructor_obj);
+  // console.log('Instructor details', instructor_obj);
 
   const handleEditBio = () => {
     setTempBio(bio);
@@ -186,9 +187,15 @@ const InstructorDashboard = ({ instructorDetails }) => {
     }
 
     if (file.size > 100 * 1024) {
-      toastifyAlert.warn('Image size should be less than 100KB');
+      toastifyAlert.warn('Profile image size should be less than 100KB');
       return;
     }
+
+    if (!imgType.includes(file.type.split('/')[1])) {
+      toastifyAlert.warn("Profile image type should be jpeg / jpg / png");
+      return;
+    }
+
     setUpdatingPhoto(true);
 
     const previewUrl = URL.createObjectURL(file);

@@ -13,6 +13,7 @@
     "@chakra-ui/react": "^3.27.0",
     "@emotion/react": "^11.14.0",
     "@reduxjs/toolkit": "^2.9.0",
+    "@tanstack/react-query": "^5.90.2",
     "axios": "^1.12.2",
     "framer-motion": "^12.23.16",
     "gsap": "^3.13.0",

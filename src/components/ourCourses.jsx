@@ -6,7 +6,7 @@ import { allCourse } from '../redux/slice/couseSlice';
 import { HiCurrencyRupee } from 'react-icons/hi';
 import getSweetAlert from '../util/sweetAlert';
 import Lottie from "lottie-react";
-import loaderAnimation from '../assets/animations/loader.json'; 
+import loaderAnimation from '../assets/animations/loader.json';
 
 const CoursesSection = () => {
   const [isVisible, setIsVisible] = useState(false),
@@ -105,17 +105,18 @@ const CoursesSection = () => {
   }
 
   useEffect(() => {
-    if (!isCourseLoading) {
+    if (!getCourseData.length || getCourseData.length === 0) {
       dispatch(allCourse())
-        .then((res) => {
-          // console.log("Course fetching response", res);
+        .then(res => {
+          // console.error("response from course section", res);
         })
         .catch((err) => {
           getSweetAlert('Oops...', 'Something went wrong!', 'error');
-          console.log("Error occurred", err);
+          console.error("Error occurred", err);
         });
     }
-  }, [dispatch]);
+  }, [dispatch, getCourseData]);
+
 
   // console.log('Course Data', getCourseData);
 
@@ -188,7 +189,7 @@ const CoursesSection = () => {
               className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-8`}
             >
               {filteredCourses.length > 0 ? (
-                filteredCourses.slice(0,6).map((course) => (
+                filteredCourses.slice(0, 6).map((course) => (
                   <motion.div key={course._id} variants={cardVariants} className="group relative max-w-sm mx-auto w-full">
                     <div className="
                   relative rounded-xl overflow-hidden transition-all duration-500 

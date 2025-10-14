@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { userProfile } from "../redux/slice/userSlice";
 import getSweetAlert from "../util/sweetAlert";
 import { logoutUser } from "../redux/slice/authSlice/checkAuth";
+import { resetCourseState } from "../redux/slice/couseSlice";
 import toastifyAlert from "../util/toastify";
 
 const DashboardSidebar = ({ setActivePage, activePage }) => {
@@ -62,7 +63,8 @@ const DashboardSidebar = ({ setActivePage, activePage }) => {
   const sidebarMenu = role === "Instructor" ? instructorMenu : userMenu;
 
   const userLogout = () => {
-    dispatch(logoutUser())
+    dispatch(resetCourseState());
+    dispatch(logoutUser());
     toastifyAlert.success("Logged out");
     navigate('/');
   }

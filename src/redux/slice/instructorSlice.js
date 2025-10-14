@@ -3,7 +3,7 @@ import axiosInstance from "../../api/axiosInstance/axiosInstance";
 import { endPoint_allInstructor, endPoint_editInstructorProfile, endPoint_requestInstructor, endPoint_requestInstructorStatus, endPoint_sepeficInstructor } from "../../api/apiUrl/apiUrl";
 
 // request instructor action 
-export const instructorRequest = createAsyncThunk('instructorSlice/instructorSlice',
+export const instructorRequest = createAsyncThunk('instructorSlice/instructorRequest',
     async (data) => {
         // console.log('Received data in instructor request slice', data);
 
@@ -47,10 +47,10 @@ export const specificInstructor = createAsyncThunk('instructorSlice/specificInst
 // Update instructor action 
 export const updateInstructor = createAsyncThunk('updateInstructor/specificInstructor',
     async (data) => {
-        console.log('Received data in update instructor details slice', data);
+        // console.log('Received data in update instructor details slice', data);
 
         const res = await axiosInstance.post(endPoint_editInstructorProfile, data);
-        console.log('Response from Update instructor slice', res);
+        // console.log('Response from Update instructor slice', res);
 
         return res.data;
     });

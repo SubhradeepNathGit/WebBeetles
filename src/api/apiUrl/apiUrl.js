@@ -5,6 +5,7 @@ const endPoint_userRegister = 'api/auth/register';
 const endPoint_userLogin = 'api/auth/login';
 const endPoint_userVerifyEmail = 'api/auth/verify-email';
 const endPoint_userProfile = 'api/auth/user-profile'; //user fetch
+const endPoint_fetchUserProfile = 'api/auth/user-profile'; //query user fetch
 const endPoint_userUpdateProfile = 'api/auth/update-profile'; //user update
 const endPoint_userForgotPassword = 'api/auth/forgot-password';
 const endPoint_userResetPassword = 'api/auth/reset-password';
@@ -22,7 +23,7 @@ const endPoint_requestInstructor = 'api/instructor/request';
 const endPoint_requestInstructorStatus = 'api/instructor/my-status';
 const endPoint_allInstructor = 'api/instructor/all-instructors';
 const endPoint_editInstructorProfile = 'api/instructor/edit-profile';
-const endPoint_sepeficInstructor = 'api/instructor'; 
+const endPoint_sepeficInstructor = 'api/instructor';
 
 // course
 const endPoint_allCourse = 'api/courses/all-courses';
@@ -31,9 +32,11 @@ const endPoint_addCourse = 'api/courses/create-course';
 const endPoint_updateCourse = 'api/courses/update-course';
 const endPoint_deleteCourse = 'api/courses/delete-course';
 const endPoint_categoryWiseCourse = 'api/categories/courses';
-const endPoint_userEnrolledCourse = 'courses/68dbea0aa43918cfa359c5fc/content';
-const endPoint_userEnrolledCourseDetails = 'courses/68dbea0aa43918cfa359c5fc/content';
-const endPoint_courseRating = 'api/courses';
+const endPoint_userEnrolledCourse = 'api/courses/my-enrolled-courses';
+const endPoint_userEnrolledCourseDetails1 = 'api/courses';
+const endPoint_userEnrolledCourseDetails2 = '/content';
+const endPoint_courseReview1 = 'api/courses/';
+const endPoint_courseReview2 = '/rate';
 
 // payment 
 const endPoint_payment_create = 'api/payments/purchase';
@@ -45,10 +48,10 @@ const endPoint_contact = 'api/contact/user-contact'
 export default baseUrl;
 
 export {
-    endPoint_userRegister, endPoint_userLogin, endPoint_userVerifyEmail, endPoint_userProfile, endPoint_userUpdateProfile, endPoint_userForgotPassword, endPoint_userResetPassword, endPoint_userResendOTP,
+    endPoint_userRegister, endPoint_userLogin, endPoint_userVerifyEmail, endPoint_userProfile, endPoint_fetchUserProfile, endPoint_userUpdateProfile, endPoint_userForgotPassword, endPoint_userResetPassword, endPoint_userResendOTP,
     endPoint_createCategory, endPoint_allCategory, endPoint_categoryDetails, endPoint_updateCategory, endPoint_deleteCategory,
-    endPoint_requestInstructor, endPoint_requestInstructorStatus, endPoint_allInstructor, endPoint_editInstructorProfile,endPoint_sepeficInstructor,
-    endPoint_allCourse, endPoint_sepeficCourse, endPoint_addCourse, endPoint_updateCourse, endPoint_deleteCourse, endPoint_courseRating, endPoint_categoryWiseCourse,
-    endPoint_payment_create,endPoint_payment_verify,
+    endPoint_requestInstructor, endPoint_requestInstructorStatus, endPoint_allInstructor, endPoint_editInstructorProfile, endPoint_sepeficInstructor,
+    endPoint_allCourse, endPoint_sepeficCourse, endPoint_addCourse, endPoint_updateCourse, endPoint_deleteCourse, endPoint_courseReview1, endPoint_courseReview2, endPoint_categoryWiseCourse, endPoint_userEnrolledCourse, endPoint_userEnrolledCourseDetails1, endPoint_userEnrolledCourseDetails2,
+    endPoint_payment_create, endPoint_payment_verify,
     endPoint_contact
 };

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { allCategory } from "../../redux/slice/categorySlice";
 import getSweetAlert from "../../util/sweetAlert";
 import Lottie from "lottie-react";
-import loaderAnimation from '../../assets/animations/loader.json'; 
+import loaderAnimation from '../../assets/animations/loader.json';
 
 // const categories = [
 //   {
@@ -144,7 +144,7 @@ const CategoryList = () => {
 
         {/* Conditional Rendering */}
         {isCategoryLoading ? (
-           <div className="flex justify-center items-center min-h-[70vh]">
+          <div className="flex justify-center items-center min-h-[70vh]">
             <Lottie
               animationData={loaderAnimation}
               loop={true}
@@ -169,11 +169,9 @@ const CategoryList = () => {
                 <motion.div
                   key={cat._id}
                   variants={cardVariants}
-                  className="max-w-sm mx-auto w-full mt-2"
-                >
+                  className="max-w-sm mx-auto w-full mt-2">
                   <div
-                    className="relative rounded-3xl p-6 sm:p-8 h-64 flex flex-col justify-between transition-all duration-300 hover:scale-105 bg-neutral-900 hover:bg-gradient-to-br hover:from-purple-600 hover:to-black/30 border border-neutral-900 hover:border-purple-500 group"
-                  >
+                    className="relative rounded-3xl p-6 sm:p-8 h-64 flex flex-col justify-between transition-all duration-300 hover:scale-105 bg-neutral-900 hover:bg-gradient-to-br hover:from-purple-600 hover:to-black/30 border border-neutral-900 hover:border-purple-500 group">
                     {/* Icon */}
                     <div
                       className="absolute -top-6 right-6 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full 
@@ -198,15 +196,11 @@ const CategoryList = () => {
                     <Link to={`category-details/${cat.slug}`}
                       className="w-fit px-4 sm:px-6 py-2.5 rounded-full border border-gray-500 text-gray-300 
                     flex items-center gap-2 text-sm font-medium transition-all duration-300
-                    hover:bg-white/20 hover:backdrop-blur-md hover:border-white/90 hover:text-white"
-                    >
+                    hover:bg-white/20 hover:backdrop-blur-md hover:border-white/90 hover:text-white">
                       Show More
                       <svg
                         className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"

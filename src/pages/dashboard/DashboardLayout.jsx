@@ -50,6 +50,15 @@ const DashboardLayout = ({ currentPage }) => {
 
 
   useEffect(() => {
+    const handleOpenAddCourse = () => setActivePage("user-myCourses");
+    window.addEventListener("open-user-course", handleOpenAddCourse);
+
+    return () => {
+      window.removeEventListener("open-user-course", handleOpenAddCourse);
+    };
+  }, []);
+  
+  useEffect(() => {
     const handleOpenAddCourse = () => setActivePage("add-myCourses");
     window.addEventListener("open-add-course", handleOpenAddCourse);
 
@@ -80,7 +89,7 @@ const DashboardLayout = ({ currentPage }) => {
   const renderContent = () => {
     switch (activePage) {
       case 'user-dashboard':
-        return <UserDashboard />;
+        return <UserDashboard  userDetails={getUserData}/>;
       case 'home':
         navigate('/');
         return;
@@ -103,7 +112,7 @@ const DashboardLayout = ({ currentPage }) => {
         return getUserData?.user?.role === "Instructor" ? (
           <InstructorDashboard instructorDetails={getInstructorData} />
         ) : (
-          <UserDashboard />
+          <UserDashboard userDetails={getUserData}/>
         );
     }
   };
