@@ -1,0 +1,6 @@
+{
+  "imports": {},
+  "name": "verify-payment",
+  "runtime": "deno",
+  "entrypoint": "index.js"
+}
