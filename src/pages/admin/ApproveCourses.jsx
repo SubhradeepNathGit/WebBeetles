@@ -3,7 +3,7 @@ import ApproveCourseHeader from "../../components/admin/approve-course/ApproveCo
 import ApproveCourseStats from "../../components/admin/approve-course/ApproveCourseStats";
 import PendingTable from "../../components/admin/approve-course/PendingTable";
 import LiveCourseTable from "../../components/admin/approve-course/live-course/LiveCourseTable";
-import PreviewModal from "../../components/admin/approve-course/modal/previewModal";
+import PreviewModal from "../../components/admin/approve-course/modal/PreviewModal";
 import RejectedCourseTable from "../../components/admin/approve-course/reject-course/RejectedCourseTable";
 import { useDispatch, useSelector } from "react-redux";
 import { allCourse, updateCourseApproveReject, updateCourseBlockUnblockByAdmin } from "../../redux/slice/couseSlice";

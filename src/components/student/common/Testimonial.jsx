@@ -56,7 +56,7 @@ const TestimonialSection = () => {
             </div>
             <div>
               <h4 className="text-white font-semibold text-base">
-                {data?.name ?? 'User'} <span className="text-purple-400 text-sm font-normal">({(data?.role?.charAt(0)?.toUpperCase() + data?.role?.slice(1)) ?? 'User'})</span>
+                {data?.name ?? 'User'} <span className="text-purple-400 text-sm font-normal">({data?.role ? (data.role.charAt(0).toUpperCase() + data.role.slice(1)) : 'User'})</span>
               </h4>
               <p className="text-gray-400 text-sm">{courseData?.title ?? 'N/A'}</p>
             </div>
