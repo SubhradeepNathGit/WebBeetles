@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../../util/supabase/supabase";
+import getSweetAlert from "../../../util/alert/sweetAlert";
 
 // register action
 export const registerSlice = createAsyncThunk('authSlice/registerSlice',

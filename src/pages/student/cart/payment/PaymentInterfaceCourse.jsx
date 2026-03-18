@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import CourseOrderSummary from "../../../../Components/user/cart/payment/CourseOrderSummary";
-import PaymentForm from "../../../../Components/user/common/payment/PaymentForm";
+import CourseOrderSummary from "../../../../components/user/cart/payment/CourseOrderSummary";
+import PaymentForm from "../../../../components/user/common/payment/PaymentForm";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function PaymentInterfaceCourse() {

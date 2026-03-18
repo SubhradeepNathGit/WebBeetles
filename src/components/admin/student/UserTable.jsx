@@ -29,7 +29,7 @@ const UserTable = ({ filtered, allStudentData }) => {
                 ) : <p className='text-center py-2'>No Student available</p>}
             </div>
             <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between text-sm text-gray-500 bg-[#151515]">
-                <div>Showing {filtered?.length ?? 0} of {allStudentData?.length ?? 0} users</div>
+                <div>Showing {filtered?.length || 0} of {allStudentData?.length || 0} users</div>
                 <div className="flex items-center gap-2">
                     <button className="px-3 py-1.5 bg-[#1a1a1a] rounded-lg hover:bg-[#222] transition-colors disabled:opacity-30 text-xs" disabled>Previous</button>
                     <span className="text-xs bg-purple-600 text-white px-2.5 py-1 rounded-lg">1</span>

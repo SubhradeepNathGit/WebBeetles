@@ -6,7 +6,7 @@ export const addVideo = createAsyncThunk('videoSlice/addVideo',
     async ({ data, doc_type }, { rejectWithValue }) => {
         // console.log('Receive data in add video slice', data, doc_type);
 
-        let videoUrl = null, imageId = null, fileName = null, docName = null;
+        let videoUrl = null, fileName = null, docName = null;
         const file = data.video_url;
         const { old_path, id, ...newPayload } = data;
 
@@ -23,7 +23,6 @@ export const addVideo = createAsyncThunk('videoSlice/addVideo',
             const { data: publicUrlData } = supabase.storage.from("lecture").getPublicUrl(fileName);
 
             videoUrl = publicUrlData.publicUrl;
-            imageId = uploadData.path;
         }
 
         const res = await supabase.from("lectures").insert([{ ...newPayload, lecture_name: docName, video_url: videoUrl }]);

@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import supabase from "../../util/supabase/supabase";
 
 export const addPaymentDetails = createAsyncThunk('paymentSlice/addPaymentDetails',
     async (paymentDetails) => {

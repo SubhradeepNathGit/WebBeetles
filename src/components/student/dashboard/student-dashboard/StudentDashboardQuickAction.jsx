@@ -1,7 +1,9 @@
 import React from 'react'
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 const StudentDashboardQuickAction = () => {
+    const navigate = useNavigate();
     return (
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 md:p-8">
             <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>

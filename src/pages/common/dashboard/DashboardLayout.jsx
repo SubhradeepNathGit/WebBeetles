@@ -13,6 +13,7 @@ import AvailableCategory from "../../../components/instructor/dashboard/Availabl
 import InstructorProfile from "../../../components/instructor/dashboard/InstructorProfile";
 import StudentProfile from "../../../components/student/dashboard/student-profile/StudentProfile";
 import InstructorAnalytics from "../../../components/instructor/dashboard/InstructorAnalytics";
+import getSweetAlert from "../../../util/alert/sweetAlert";
 
 const DashboardLayout = ({ currentPage }) => {
 

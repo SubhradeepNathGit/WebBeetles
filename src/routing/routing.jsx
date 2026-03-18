@@ -49,13 +49,13 @@ import AdminLayout from "../layout/admin/AdminLayout";
 
 // Pages - admin
 import AdminSignin from "../pages/admin/auth/AdminSignin";
-import Dashboard from "../Pages/admin/Dashboard";
+import Dashboard from "../pages/admin/Dashboard";
 import Students from "../pages/admin/Student";
-import Instructors from "../Pages/admin/Instructors";
+import Instructors from "../pages/admin/Instructors";
 import InstructorReviews from "../pages/admin/InstructorReviews";
-import ApproveCourses from "../Pages/admin/ApproveCourses";
-import Analytics from "../Pages/admin/Analytics";
-import Settings from "../Pages/admin/Settings";
+import ApproveCourses from "../pages/admin/ApproveCourses";
+import Analytics from "../pages/admin/Analytics";
+import Settings from "../pages/admin/Settings";
 import Charges from "../pages/admin/Charges";
 import Contact from "../pages/admin/Contact";
 import AllCategory from "../pages/admin/AllCategory";

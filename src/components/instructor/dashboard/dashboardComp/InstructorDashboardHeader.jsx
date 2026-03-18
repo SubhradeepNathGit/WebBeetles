@@ -6,6 +6,7 @@ import { formatDate } from '../../../../util/dateFormat/dateFormat';
 import hotToast from '../../../../util/alert/hot-toast';
 import { updateInstructor } from '../../../../redux/slice/instructorSlice';
 import { checkLoggedInUser } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
+import toastifyAlert from '../../../../util/alert/toastify';
 
 const InstructorDashboardHeader = ({ instructorDetails }) => {
     const dispatch = useDispatch(),

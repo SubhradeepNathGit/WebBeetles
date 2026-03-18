@@ -12,7 +12,7 @@ import getSweetAlert from '../../../util/alert/sweetAlert';
 const TableRow = ({ u }) => {
 
     const dispatch = useDispatch();
-    const { isStudentLoading, getStudentData, isStudentError } = useSelector(state => state?.student);
+    const { isStudentLoading } = useSelector(state => state?.student);
 
     const [menu, setMenu] = useState(null);
     const [openMarkModal, setOpenMarkModal] = useState(false);
@@ -85,7 +85,7 @@ const TableRow = ({ u }) => {
                     </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-300 font-medium">{isLoading ? <Loader2 className='animate-spin w-4 h-4 inline mb-1' /> : data?.length ?? 0} course{data?.length > 1 ? 's' : ''}</td>
-                <td className="px-6 py-4 text-sm text-yellow-500 font-semibold">{"₹" + (totalAmount?.toLocaleString() ?? 0)}</td>
+                <td className="px-6 py-4 text-sm text-yellow-500 font-semibold">{"₹" + (totalAmount?.toLocaleString() || 0)}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 flex items-center gap-1.5 mt-4">
                     <Calendar size={13} /> {formatDateDDMMYY(u?.created_at)}
                 </td>

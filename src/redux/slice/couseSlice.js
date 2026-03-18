@@ -43,7 +43,7 @@ export const createCourse = createAsyncThunk('courseSlice/createCourse',
     async (data) => {
         // console.log('Receive data in add course slice', data);
 
-        let imageUrl = null, imageId = null;
+        let imageUrl = null;
         const file = data?.thumbnail?.[0];
         if (file) {
             const fileName = `${data?.title}_${Date.now()}.${file.name.split(".").pop()}`;
@@ -55,7 +55,6 @@ export const createCourse = createAsyncThunk('courseSlice/createCourse',
             const { data: publicUrlData } = supabase.storage.from("course").getPublicUrl(fileName);
 
             imageUrl = publicUrlData.publicUrl;
-            imageId = uploadData.path;
         }
 
         const res = await supabase.from("courses").insert([{ ...data, thumbnail: imageUrl }]).select();
