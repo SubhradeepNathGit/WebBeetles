@@ -5,7 +5,7 @@ import WhyChooseUsSection from "../../components/student/home/whychooseUs";
 import CoursesSection from "../../components/student/home/ourCourses";
 import HowItWorksSection from "../../components/student/common/steps";
 import StaticSection from "../../components/student/home/animatedLines";
-import PreFooterCTA from "../../components/student/common/prefooter";
+import PreFooterCTA from "../../components/student/common/Prefooter";
 import CategoriesSection from "../../components/student/home/categories";
 import TestimonialSection from "../../components/student/common/testimonial";
 import PricingSection from "../../components/student/home/pricing";

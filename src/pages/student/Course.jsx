@@ -1,7 +1,7 @@
 import React from "react";
 import CourseBanner from "../../components/student/course/CourseBanner";
 import CourseList from "../../components/student/course/CourseList";
-import PreFooterCTA from "../../components/student/common/prefooter";
+import PreFooterCTA from "../../components/student/common/Prefooter";
 
 const Course = () => {
     return (

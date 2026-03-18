@@ -1,7 +1,7 @@
 import React from "react";
 import ContactBanner from "../../components/student/contact/ContactBanner";
 import ContactMap from "../../components/student/contact/ContactMap";
-import PreFooterCTA from "../../components/student/common/prefooter";
+import PreFooterCTA from "../../components/student/common/Prefooter";
 import ContactDesc from "../../components/student/contact/ContactDesc";
 import FAQSection from "../../components/student/common/FAQ";
 
