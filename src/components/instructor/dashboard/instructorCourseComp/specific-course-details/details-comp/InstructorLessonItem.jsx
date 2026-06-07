@@ -9,8 +9,8 @@ const InstructorLessonItem = ({ section,lesson, setUpdateData, setDeletedData, s
     return (
         <div className="flex items-center justify-between p-4 hover:bg-gray-800 transition-colors border-b border-gray-800 last:border-b-0">
             <div className="flex items-center gap-4 flex-1">
-                <div className="w-10 h-10 rounded-lg bg-purple-600/20 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-purple-400" />
+                <div className="w-10 h-10 rounded-lg bg-rose-600/20 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-rose-400" />
                 </div>
                 <div className="flex-1">
                     <h4 className="font-medium">{lesson?.video_title ?? 'N/A'}</h4>
@@ -42,7 +42,7 @@ const InstructorLessonItem = ({ section,lesson, setUpdateData, setDeletedData, s
                         <> <Play className="w-4 h-4" /> Play </>) : (<><EyeIcon className="w-4 h-4" /> View</>
                     )}
                 </button>
-                <button className={`px-4 py-2 ${!selectedCourse?.is_completed ? 'bg-purple-600 hover:bg-purple-700 cursor-pointer' : 'bg-purple-400 cursor-not-allowed'} rounded-lg text-sm font-medium transition-colors`}
+                <button className={`px-4 py-2 ${!selectedCourse?.is_completed ? 'bg-rose-600 hover:bg-rose-700 cursor-pointer' : 'bg-rose-400 cursor-not-allowed'} rounded-lg text-sm font-medium transition-colors`}
                     onClick={() => { if (!selectedCourse?.is_completed) { setUpdateData(lesson); setShowUploadModal(true); } }} disabled={selectedCourse?.is_completed}>
                     <Edit2 className="w-4 h-4" />
                 </button>

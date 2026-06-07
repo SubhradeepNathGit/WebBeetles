@@ -6,42 +6,33 @@ import StudentDashboardRecentActivity from "./student-dashboard/StudentDashboard
 import StudentDashboardDeadlines from "./student-dashboard/StudentDashboardDeadlines";
 import StudentDashboardWeeklyGoal from "./student-dashboard/StudentDashboardWeeklyGoal";
 import StudentDashboardQuickAction from "./student-dashboard/StudentDashboardQuickAction";
+import StudentDashboardSubscriptionCard from "./student-dashboard/StudentDashboardSubscriptionCard";
 
 const StudentDashboard = ({ studentDetails: getStudentData }) => {
-
-  // console.log('Logged student data', getStudentData);
-
   return (
-    <div className="min-h-screen p-4 md:p-6 lg:p-8 overflow-y-auto">
-
+    <div className="min-h-screen bg-black">
       {/* Header */}
       <StudentDashboardHeader userDetails={getStudentData} />
 
-      {/* Stats Cards */}
+      {/* Subscription / Plan Card */}
+      <StudentDashboardSubscriptionCard userDetails={getStudentData} />
+
+      {/* Stats Row */}
       <StudentDashboardStats />
 
-      {/* Main Content */}
-      <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
-        <div className="lg:col-span-2 space-y-6 md:space-y-8">
-          {/* Continue Learning */}
+      {/* Main Content Grid */}
+      <div className="grid lg:grid-cols-3 gap-5 md:gap-6">
+        {/* Left — 2/3 */}
+        <div className="lg:col-span-2 space-y-5 md:space-y-6">
           <StudentDashboardContinueLearning />
-
-          {/* Recent Activity */}
           <StudentDashboardRecentActivity studentDetails={getStudentData} />
         </div>
 
-
-        {/* Sidebar */}
-        <div className="space-y-6 md:space-y-8">
-          {/* Deadlines */}
+        {/* Right — 1/3 */}
+        <div className="space-y-5 md:space-y-6">
           <StudentDashboardDeadlines />
-
-          {/* Weekly Goal */}
           <StudentDashboardWeeklyGoal />
-
-          {/* Quick Actions */}
           <StudentDashboardQuickAction />
-
         </div>
       </div>
     </div>

@@ -5,135 +5,100 @@ import { useDispatch, useSelector } from 'react-redux';
 import toastifyAlert from '../../../../util/alert/toastify';
 import hotToast from '../../../../util/alert/hot-toast';
 
+const planColors = {
+  STARTER: { label: 'Starter Plan', dot: 'bg-purple-500', text: 'text-purple-400', badge: 'bg-purple-500/15 border-purple-500/30 text-purple-300' },
+  PRO:     { label: 'Pro Plan',     dot: 'bg-blue-500',   text: 'text-blue-400',   badge: 'bg-blue-500/15 border-blue-500/30 text-blue-300' },
+  EXPERT:  { label: 'Expert Plan',  dot: 'bg-amber-500',  text: 'text-amber-400',  badge: 'bg-amber-500/15 border-amber-500/30 text-amber-300' },
+};
+
 const StudentDashboardHeader = ({ userDetails }) => {
+  const userName = userDetails?.name || userDetails?.fullName || "Student";
+  const [userPhoto, setUserPhoto] = useState(userDetails?.profile_image_url || userDetails?.profilePhoto);
+  const fileInputRef = useRef(null);
+  const dispatch = useDispatch();
+  const imgType = ['jpeg', 'jpg', 'png'];
 
-    const userName = userDetails?.name || userDetails?.fullName || "Student";
-    const [userPhoto, setUserPhoto] = useState(userDetails?.profile_image_url || userDetails?.profilePhoto);
-    const fileInputRef = useRef(null),
-        dispatch = useDispatch();
-    const [photo, setPhoto] = useState(userDetails?.profile_image_url || userDetails?.profilePhoto);
-    const imgType = ['jpeg', 'jpg', 'png'];
+  const { isStudentLoading } = useSelector(state => state?.student);
+  const currentPlan = userDetails?.subscription_plan;
+  const planCfg = currentPlan ? planColors[currentPlan] : null;
 
-    const { isStudentLoading, getStudentData, isStudentError } = useSelector(state => state?.student);
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/'))           { toastifyAlert.warn('Please upload an image file'); return; }
+    if (file.size > 100 * 1024)                    { toastifyAlert.warn('Profile image size should be less than 100KB'); return; }
+    if (!imgType.includes(file.type.split('/')[1])){ toastifyAlert.warn("Profile image type should be jpeg / jpg / png"); return; }
 
-    // console.log('User data',userDetails);
+    setUserPhoto(URL.createObjectURL(file));
 
-    // handle profile-pic 
-    const handlePhotoChange = async (e) => {
-        const file = e.target.files[0];
-        // console.log(file);
-
-        if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            toastifyAlert.warn('Please upload an image file');
-            return;
+    dispatch(updateStudentProfile({ data: { profile_image: file }, id: userDetails.id }))
+      .then(res => {
+        if (res.meta.requestStatus === "fulfilled") {
+          setUserPhoto(res.payload.profile_image_url + `?t=${Date.now()}`);
+          hotToast('Profile image updated successfully', "success");
+        } else {
+          hotToast('Something went wrong!', "error");
         }
-        if (file.size > 100 * 1024) {
-            toastifyAlert.warn('Profile image size should be less than 100KB');
-            return;
-        }
-        if (!imgType.includes(file.type.split('/')[1])) {
-            toastifyAlert.warn("Profile image type should be jpeg / jpg / png");
-            return;
-        }
+      })
+      .catch(() => hotToast('Upload failed', "error"));
+  };
 
-        const previewUrl = URL.createObjectURL(file);
-
-        if (photo && photo.startsWith("blob:")) {
-            URL.revokeObjectURL(photo);
-        }
-        setUserPhoto(previewUrl);
-        // console.log("Photo updated successfully!", previewUrl);
-        // console.log(previewUrl.split('/')[previewUrl.split('/').length-1]);
-
-        const image_obj = {
-            profile_image: file
-        }
-
-        dispatch(updateStudentProfile({
-            data: image_obj,
-            id: userDetails.id,
-        }))
-            .then(res => {
-                // console.log('Response from photo update', res);
-
-                if (res.meta.requestStatus === "fulfilled") {
-                    const freshUrl = res.payload.profile_image_url + `?t=${Date.now()}`;
-                    setUserPhoto(freshUrl);
-                    hotToast('Profile image updated successfully', "success");
-                }
-                else {
-                    hotToast('Something went wrong!', "error");
-                }
-            })
-            .catch(err => {
-                console.error("Error occurred in uploading photo", err);
-                getSweetAlert("Oops...", "Something went wrong!", "error");
-            });
-    };
-
-    return (
-        <div className="bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-purple-500/30 backdrop-blur-xl rounded-3xl shadow-2xl mb-8 border border-white/30 overflow-hidden relative">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
-
-            <div className="px-6 md:px-8 py-8 md:py-10 relative z-10">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex-1 flex items-center gap-4 md:gap-6">
-
-                        {/* PROFILE IMAGE WRAPPER */}
-                        <div className="relative w-16 h-16 md:w-20 md:h-20">
-                            <div className="w-full h-full rounded-full ring-4 ring-white/30 overflow-hidden shadow-2xl bg-gradient-to-br from-purple-400 to-pink-500">
-                                {userPhoto ? (
-                                    <img
-                                        src={userPhoto}
-                                        alt={userName}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold">
-                                        {userName.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* UPLOAD BUTTON */}
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                disabled={isStudentLoading}
-                                className="absolute bottom-0 right-0 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-2 rounded-full transition-all shadow-lg border border-white/30 disabled:opacity-50 hover:scale-110 active:scale-95 cursor-pointer"
-                            >
-                                {isStudentLoading ? (
-                                    <Loader2 size={16} className="animate-spin" />) : (<Camera size={16} />)}
-                            </button>
-
-                            <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-                        </div>
-
-                        {/* USER INFO */}
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-3">
-                                <span className="text-sm font-semibold text-purple-200 bg-white/20 px-3 py-1 rounded-full">
-                                    Student Dashboard
-                                </span>
-                            </div>
-                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">
-                                Welcome back, {userDetails?.name?.split(" ")[0] || "Student"}!
-                            </h1>
-                            <p className="text-purple-100 text-sm md:text-base">
-                                Continue your learning journey and achieve your goals
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* DOWNLOAD BUTTON */}
-                    <button className="flex items-center gap-2 px-5 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-xl font-medium transition-all shadow-lg border border-white/30 hover:scale-105 cursor-pointer">
-                        <Download size={18} />
-                        <span className="hidden sm:inline">Download Report</span>
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className="rounded-xl bg-[#111] border border-white/8 px-6 py-6 mb-6 flex items-center justify-between gap-6 flex-wrap">
+      {/* Left — avatar + info */}
+      <div className="flex items-center gap-5">
+        {/* Avatar */}
+        <div className="relative flex-shrink-0">
+          <div className="w-16 h-16 rounded-full overflow-hidden ring-1 ring-white/15">
+            {userPhoto ? (
+              <img src={userPhoto} alt={userName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-[#1e1e2e] text-white text-2xl font-bold">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          {/* Camera button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isStudentLoading}
+            className="absolute -bottom-1 -right-1 w-6 h-6 rounded-md bg-[#222] border border-white/15
+              flex items-center justify-center cursor-pointer hover:bg-[#2a2a2a] transition-colors"
+          >
+            {isStudentLoading
+              ? <Loader2 size={11} className="animate-spin text-white/60" />
+              : <Camera size={11} className="text-white/60" />
+            }
+          </button>
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
         </div>
-    )
-}
 
-export default StudentDashboardHeader
+        {/* Text */}
+        <div>
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/6 border border-white/10 text-white/50 uppercase tracking-wide">
+              Student Dashboard
+            </span>
+            {planCfg ? (
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${planCfg.badge}`}>
+                {planCfg.label}
+              </span>
+            ) : (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400">
+                No Active Plan
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+            Welcome back, <span className="text-purple-400">{userDetails?.name?.split(" ")[0] || "Student"}</span>!
+          </h1>
+          <p className="text-sm text-white/40 mt-0.5">Continue your learning journey and achieve your goals</p>
+        </div>
+      </div>
+
+
+    </div>
+  );
+};
+
+export default StudentDashboardHeader;

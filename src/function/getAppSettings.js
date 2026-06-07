@@ -2,7 +2,7 @@ import supabase from "../util/supabase/supabase";
 
 export const getAppSettings = async () => {
 
-     const res = await supabase.from("platform_settings").select("*").single();
+     const res = await supabase.from("platform_settings").select("*").maybeSingle();
     // console.log('Response for fetching platform data', res);
 
     if (res?.error) throw new Error(res?.error.message);

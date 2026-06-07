@@ -23,7 +23,7 @@ const VideoPlayerModal = ({ videoUrl, title, onClose, setVideoTitle }) => {
                             <ChevronLeft size={18} />
                         </button>
 
-                        <Video size={18} className="text-purple-400" />
+                        <Video size={18} className="text-emerald-400" />
 
                         <p className="text-sm font-semibold text-white">
                             {title || "Video Preview"}
@@ -35,7 +35,7 @@ const VideoPlayerModal = ({ videoUrl, title, onClose, setVideoTitle }) => {
                             href={videoUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 rounded-lg text-xs"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs"
                         >
                             <ExternalLink size={13} /> Open in Tab
                         </a>

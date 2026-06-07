@@ -14,7 +14,7 @@ const RegistrationChartView = () => {
       </div>
 
       <p className="text-2xl font-bold text-white mb-6">
-        Monthly Growth <span className="text-sm font-normal text-purple-400 ml-1">registrations</span>
+        Monthly Growth <span className="text-sm font-normal text-emerald-400 ml-1">registrations</span>
       </p>
 
       <div className="h-56">

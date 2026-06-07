@@ -1,33 +1,50 @@
-import React from 'react'
+import React from 'react';
 import { formatDateByHHAndDay } from '../../../../util/timeFormat/timeFormat';
-import { Award, Play, Target, Trophy, Loader2, Star, AlarmClock } from "lucide-react";
+import { Award, Play, Target, Trophy, Star, AlarmClock } from "lucide-react";
 import { useCourseDetails } from '../../../../tanstack/query/fetchSpecificCourseDetails';
 
+const activityConfig = {
+  completed:   { icon: Award,      text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+  Enrollment:  { icon: Play,       text: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20" },
+  certificate: { icon: Trophy,     text: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/20" },
+  review:      { icon: Star,       text: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20" },
+  question:    { icon: Target,     text: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/20" },
+  default:     { icon: AlarmClock, text: "text-purple-400",  bg: "bg-purple-500/10",  border: "border-purple-500/20" },
+};
+
+const getActivityConfig = (title = '') => {
+  if (title.includes('completed')) return activityConfig.completed;
+  if (title.includes('Enrollment')) return activityConfig.Enrollment;
+  if (title.includes('certificate')) return activityConfig.certificate;
+  if (title.includes('review')) return activityConfig.review;
+  if (title.includes('question')) return activityConfig.question;
+  return activityConfig.default;
+};
+
 const StudentActivityCard = ({ activity }) => {
+  const { data } = useCourseDetails(activity?.course_id);
+  const cfg = getActivityConfig(activity?.title);
+  const Icon = cfg.icon;
 
-    const { isLoading, data, error } = useCourseDetails(activity?.course_id);
+  return (
+    <div className="group flex items-center gap-3 p-2.5 rounded-lg border border-transparent hover:bg-white/4 hover:border-white/8 transition-all duration-200 cursor-default">
+      {/* Icon */}
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 border transition-transform group-hover:scale-105 ${cfg.bg} ${cfg.border}`}>
+        <Icon size={15} className={cfg.text} />
+      </div>
 
-    const activityIcons = (title) => {
-        if (title.includes('completed')) return <Award size={16} className="text-green-400" />
-        else if (title.includes('Enrollment')) return <Play size={16} className="text-blue-400" />
-        else if (title.includes('certificate')) return <Trophy size={16} className="text-yellow-600" />
-        else if (title.includes('review')) return <Star size={16} className="text-yellow-400" />
-        else if (title.includes('question')) return <Target size={16} className="text-red-400" />
-        else return <AlarmClock size={16} className="text-blue-700" />
-    };
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium text-white truncate mb-0.5">{activity?.message ?? 'N/A'}</p>
+        <p className="text-[10px] text-white/40 truncate">{data?.title ?? ''}</p>
+      </div>
 
-    return (
-        <div key={activity?.id} className="flex items-start gap-4 pb-4 border-b border-white/10 last:border-0 last:pb-0 hover:bg-white/5 p-3 rounded-xl transition-all">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 border border-white/20">
-                {activityIcons(activity?.title)}
-            </div>
-            <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white mb-1">{activity?.message ?? 'N/A'}</p>
-                <p className="text-xs text-purple-200">{data?.title ?? 'N/A'}</p>
-            </div>
-            <span className="text-xs text-purple-300 whitespace-nowrap">{formatDateByHHAndDay(activity?.created_at)}</span>
-        </div>
-    )
-}
+      {/* Timestamp */}
+      <span className="text-[10px] text-white/30 whitespace-nowrap flex-shrink-0">
+        {formatDateByHHAndDay(activity?.created_at)}
+      </span>
+    </div>
+  );
+};
 
-export default StudentActivityCard
+export default StudentActivityCard;

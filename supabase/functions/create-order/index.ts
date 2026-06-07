@@ -27,14 +27,16 @@ Deno.serve(async (req) => {
       return new Response("Unauthorized", { status: 401, headers });
     }
 
-    const { data: { user } } = await supabase.auth.getUser(authHeader);
-    if (!user) {
+    // Extract just the JWT token (strip "Bearer " prefix)
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
       return new Response("Unauthorized", { status: 401, headers });
     }
 
-    const { total, cartItems } = await req.json();
+    const { total, cartItems, planName, isSubscription } = await req.json();
 
-    if (!total || !cartItems || cartItems.length === 0) {
+    if (!total || (!isSubscription && (!cartItems || cartItems.length === 0))) {
       return new Response("Invalid request data", { status: 400, headers });
     }
 
@@ -48,12 +50,13 @@ Deno.serve(async (req) => {
       currency: "INR",
     });
 
-    // Insert into purchases table with status 'created'
+    // Insert into purchases table with status 'created' and optional metadata
     const { data: purchaseData, error: purchaseError } = await supabase.from("purchases").insert({
       user_id: user.id,
       razorpay_order_id: order.id,
       amount: total,
       payment_status: "created",
+      metadata: isSubscription ? { plan_name: planName, is_subscription: true } : null
     }).select().single();
 
     if (purchaseError) {

@@ -59,12 +59,12 @@ const InstructorDashboard = ({ instructorDetails }) => {
   });
 
   const stats = [
-    { icon: BookOpen, value: getCourseData?.length ?? 0, label: "Total Courses", color: "purple" },
+    { icon: BookOpen, value: getCourseData?.length ?? 0, label: "Total Courses", color: "rose" },
     { icon: Users, value: studentCount?.toLocaleString(), label: "Total Students", color: "blue" }
   ];
 
   const quickActions = [
-    { label: "Create New Course", icon: Plus, gradient: "from-purple-500/30 to-purple-600/30", func: () => window.dispatchEvent(new CustomEvent("open-add-course")) },
+    { label: "Create New Course", icon: Plus, gradient: "from-rose-500/30 to-rose-600/30", func: () => window.dispatchEvent(new CustomEvent("open-add-course")) },
     { label: "View All Students", icon: Users, gradient: "from-blue-500/30 to-blue-600/30", func: () => console.log('All Students Clicked!') },
     { label: "Course Analytics", icon: BarChart3, gradient: "from-pink-500/30 to-pink-600/30", func: () => window.dispatchEvent(new CustomEvent("open-instructor-analytics")) }
   ];
@@ -73,8 +73,8 @@ const InstructorDashboard = ({ instructorDetails }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
-          <p className="text-purple-200 text-sm font-medium">Loading dashboard...</p>
+          <Loader2 className="w-12 h-12 text-rose-500 animate-spin" />
+          <p className="text-rose-200 text-sm font-medium">Loading dashboard...</p>
         </div>
       </div>
     );

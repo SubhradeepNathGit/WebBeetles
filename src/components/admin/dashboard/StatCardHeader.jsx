@@ -30,9 +30,9 @@ const StatCardHeader = () => {
   const pendingApplication = getInstructorData?.filter(ins => ins?.application_status == "pending");
   const totalRevenue = revenueData?.reduce((acc, cur) => acc + Number(cur?.amount), 0);
 
-  function StatCard({ icon: Icon, label, value, sub, trend, trendUp = true, iconColor = "text-purple-400" }) {
+  function StatCard({ icon: Icon, label, value, sub, trend, trendUp = true, iconColor = "text-emerald-400" }) {
     return (
-      <div className="bg-[#111] p-5 rounded-2xl border border-white/5 hover:border-purple-500/20 transition-all duration-200 shadow-xl group">
+      <div className="bg-[#111] p-5 rounded-2xl border border-white/5 hover:border-emerald-500/20 transition-all duration-200 shadow-xl group">
         <div className="flex items-start justify-between mb-4">
           <div className={`p-2.5 rounded-xl bg-[#1a1a1a] border border-white/5 ${iconColor}`}>
             <Icon size={20} />
@@ -43,7 +43,7 @@ const StatCardHeader = () => {
             </span>
           )}
         </div>
-        <div className="text-2xl font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">{value}</div>
+        <div className="text-2xl font-bold text-white mb-1 group-hover:text-emerald-300 transition-colors">{value}</div>
         <div className="text-sm text-gray-400">{label}</div>
         {sub && <div className="text-xs text-gray-600 mt-1">{sub}</div>}
       </div>

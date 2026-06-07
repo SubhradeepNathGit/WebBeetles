@@ -115,7 +115,7 @@ const InstructorSocialLinks = ({ instructorDetails }) => {
                     <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-blue-500/30 flex items-center justify-center border border-blue-400/30"><LinkIcon size={18} className="text-blue-300" /></div>
                     Social Links
                 </h2>
-                {!editingSocials && <button onClick={() => { setTempSocials([...socialLinks]); setEditingSocials(true); }} className="text-xs sm:text-sm text-purple-200 hover:text-white font-semibold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all border border-white/20 cursor-pointer"><Edit3 size={14} className="inline mr-1" /> Edit</button>}
+                {!editingSocials && <button onClick={() => { setTempSocials([...socialLinks]); setEditingSocials(true); }} className="text-xs sm:text-sm text-rose-200 hover:text-white font-semibold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all border border-white/20 cursor-pointer"><Edit3 size={14} className="inline mr-1" /> Edit</button>}
             </div>
 
             {!editingSocials ? (
@@ -125,21 +125,21 @@ const InstructorSocialLinks = ({ instructorDetails }) => {
                             <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center border border-white/20 text-blue-300 group-hover:scale-110 transition-transform">{getSocialIcon(link?.platform)}</div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-white font-semibold text-sm capitalize">{link?.platform ?? 'N/A'}</p>
-                                <p className="text-purple-200 text-xs truncate">{link?.url ?? 'N/A'}</p>
+                                <p className="text-rose-200 text-xs truncate">{link?.url ?? 'N/A'}</p>
                             </div>
-                            <ExternalLink size={16} className="text-purple-300 group-hover:text-white" />
+                            <ExternalLink size={16} className="text-rose-300 group-hover:text-white" />
                         </a>
-                    )) : <p className="text-purple-200 text-sm">No social links.</p>}
+                    )) : <p className="text-rose-200 text-sm">No social links.</p>}
                 </div>
             ) : (
                 <div className="space-y-3">
                     {tempSocials?.map(link => (
-                        <div key={link._id} className="flex gap-2">
+                        <div key={link._id} className="flex flex-col sm:flex-row gap-2">
                             <input type="text" value={link?.platform} onChange={(e) => updateSocialLink(link._id, 'platform', e.target.value)}
-                                placeholder="Platform" className="w-1/3 bg-white/10 text-purple-100 placeholder:text-purple-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50" />
+                                placeholder="Platform" className="w-full sm:w-1/3 bg-white/10 text-rose-100 placeholder:text-rose-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50" />
                             <input type="url" value={link?.url} onChange={(e) => updateSocialLink(link._id, 'url', e.target.value)}
-                                placeholder="URL" className="flex-1 bg-white/10 text-purple-100 placeholder:text-purple-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50" />
-                            <button onClick={() => removeSocialLink(link?._id)} className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-2 rounded-lg border border-red-400/30"><X size={16} /></button>
+                                placeholder="URL" className="flex-1 w-full bg-white/10 text-rose-100 placeholder:text-rose-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50" />
+                            <button onClick={() => removeSocialLink(link?._id)} className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-2 rounded-lg border border-red-400/30 w-full sm:w-auto flex items-center justify-center"><X size={16} /></button>
                         </div>
                     ))}
                     <button onClick={addSocialLink}

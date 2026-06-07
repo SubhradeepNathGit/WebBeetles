@@ -25,7 +25,7 @@ const DocumentViewerModal = ({ app, onClose }) =>{
                         >
                             <ChevronLeft size={18} />
                         </button>
-                        <FileText size={18} className="text-purple-400" />
+                        <FileText size={18} className="text-emerald-400" />
                         <div>
                             <p className="text-sm font-semibold text-white">{app.documentName || "Qualification Document"}</p>
                             <p className="text-xs text-gray-500">Submitted by {app.name}</p>
@@ -47,7 +47,7 @@ const DocumentViewerModal = ({ app, onClose }) =>{
                                     href={docUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 rounded-lg transition-colors text-xs font-medium"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg transition-colors text-xs font-medium"
                                 >
                                     <ExternalLink size={13} /> Open in Tab
                                 </a>
@@ -68,7 +68,7 @@ const DocumentViewerModal = ({ app, onClose }) =>{
                         <>
                             {iframeLoading && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 bg-[#111]">
-                                    <Loader2 size={32} className="text-purple-500 animate-spin" />
+                                    <Loader2 size={32} className="text-emerald-500 animate-spin" />
                                     <p className="text-sm text-gray-500">Loading document…</p>
                                 </div>
                             )}
@@ -81,8 +81,8 @@ const DocumentViewerModal = ({ app, onClose }) =>{
                         </>
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full gap-5 px-8 text-center">
-                            <div className="w-20 h-20 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                                <FileText size={36} className="text-purple-400" />
+                            <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <FileText size={36} className="text-emerald-400" />
                             </div>
                             <div>
                                 <p className="text-white font-semibold text-lg mb-1">{app.documentName}</p>

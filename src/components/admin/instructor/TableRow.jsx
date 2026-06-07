@@ -15,7 +15,7 @@ const TableRow = ({ inst,setOpenMarkModal, setInstructorId, setChangeStatus }) =
     const STATUS_COLORS = {
         Active: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20 px-4",
         Suspended: "bg-red-500/10 text-red-500 border-red-500/20",
-        NA: "bg-purple-500/10 text-purple-500 border-purple-500/20 px-6.5",
+        NA: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-6.5",
     };
 
     const APPROVAL_STATUS_COLORS = {
@@ -33,7 +33,7 @@ const TableRow = ({ inst,setOpenMarkModal, setInstructorId, setChangeStatus }) =
                 </td>
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-purple-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
                             {inst?.profile_image_url ? <img className='rounded-full' src={inst?.profile_image_url} alt={inst?.name?.charAt(0)} /> : inst?.name?.charAt(0)}
                         </div>
                         <div>
@@ -43,7 +43,7 @@ const TableRow = ({ inst,setOpenMarkModal, setInstructorId, setChangeStatus }) =
                     </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-300 font-medium">
-                    <div className="flex items-center gap-1.5"><BookOpen size={13} className="text-purple-400" />{inst?.application_status === "approved" ? (isCourseLoading ? <Loader2 className='w-4 h-4 inline animate-spin' /> : courseData?.length ?? 'N/A') : '0'}</div>
+                    <div className="flex items-center gap-1.5"><BookOpen size={13} className="text-emerald-400" />{inst?.application_status === "approved" ? (isCourseLoading ? <Loader2 className='w-4 h-4 inline animate-spin' /> : courseData?.length ?? 'N/A') : '0'}</div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-300 font-medium">{inst?.application_status === "approved" ? (isStatsLoading ? <Loader2 className='w-4 h-4 inline animate-spin' /> : statusData?.totalStudents ?? 'N/A') : '0'}</td>
                 <td className="px-6 py-4 text-sm text-yellow-500 font-semibold">{"₹" + (inst?.application_status === "approved" ? (isStatsLoading ? <Loader2 className='w-4 h-4 inline animate-spin' /> : statusData?.totalRevenue?.toLocaleString() ?? 'N/A') : '0')}</td>
@@ -73,7 +73,7 @@ const TableRow = ({ inst,setOpenMarkModal, setInstructorId, setChangeStatus }) =
                                 <CourseRow key={i} course={course} i={i} />
                             ))}
                             {courseData?.length > 3 && (
-                                <div className="bg-[#161616] rounded-xl p-3 border border-white/5 flex items-center justify-center text-xs text-purple-400 hover:text-yellow-400 transition-colors cursor-pointer">
+                                <div className="bg-[#161616] rounded-xl p-3 border border-white/5 flex items-center justify-center text-xs text-emerald-400 hover:text-yellow-400 transition-colors cursor-pointer">
                                     +{courseData?.length - 3} more course{courseData?.length - 3 > 1 ? 's' : ''}
                                 </div>
                             )}

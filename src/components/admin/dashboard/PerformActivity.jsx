@@ -17,7 +17,7 @@ const PerformActivity = () => {
     const getActivityIcon = (title) => {
         switch (title) {
             case "New Enrollment":
-                return <Users size={14} className="text-purple-400" />;
+                return <Users size={14} className="text-emerald-400" />;
             case "Submit review":
                 return <ClipboardCheck size={14} className="text-yellow-400" />;
             case "Course Approved":

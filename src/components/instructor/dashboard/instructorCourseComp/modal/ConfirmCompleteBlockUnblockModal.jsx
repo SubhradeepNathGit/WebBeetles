@@ -49,7 +49,7 @@ const ConfirmCompleteBlockUnblockModal = ({ markType, setOpenMarkModal, setSelec
                 <p className="text-gray-400 mb-6">Are you sure you want to {markType == 'complete' ? 'mark complete' : markCourse?.is_active ? 'block' : 'unblock'} "{markCourse?.title}"? {markType == 'complete' ? "You can't upload new lecture or change existing after this."
                     : "Student can't see the course."}</p>
                 <div className="flex gap-3">
-                    <button disabled={isCourseLoading} onClick={() => handleMark()} className={`flex-1 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors ${isCourseLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                    <button disabled={isCourseLoading} onClick={() => handleMark()} className={`flex-1 py-3 bg-rose-600 hover:bg-rose-700 rounded-lg font-semibold transition-colors ${isCourseLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         {isCourseLoading ? <Loader2 className="w-4 h-4 animate-spin inline" /> : ''} Confirm
                     </button>
                     <button disabled={isCourseLoading} onClick={() => setOpenMarkModal(false)} className={`flex-1 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-semibold transition-colors ${isCourseLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>

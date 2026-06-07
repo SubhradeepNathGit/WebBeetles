@@ -3,7 +3,7 @@ import DashboardSidebar from "../../../layout/common/Sidebar";
 import StudentDashboard from "../../../components/student/dashboard/StudentDashboard";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu } from "lucide-react";
 import InstructorDashboard from "../../../components/instructor/dashboard/InstructorDashboard";
 import AddCourseForm from "../../../components/instructor/dashboard/AddCourseForm";
 import MyCoursesPage from "../../../components/student/dashboard/MyCoursesPage";
@@ -17,91 +17,57 @@ import getSweetAlert from "../../../util/alert/sweetAlert";
 
 const DashboardLayout = ({ currentPage }) => {
 
-  const [activePage, setActivePage] = useState(currentPage ? currentPage : "dashboard"),
-    { user_type } = useParams(),
-    navigate = useNavigate(),
-    dispatch = useDispatch(),
-    { isUserLoading, userAuthData, userError } = useSelector(state => state.checkAuth);
+  const [activePage, setActivePage] = useState(currentPage ?? "dashboard");
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // console.log('user_type', user_type);
-  // console.log('currentPage', currentPage);
-  // console.log('User Auth Data', userAuthData);
+  const { user_type } = useParams();
+  const navigate      = useNavigate();
+  const dispatch      = useDispatch();
+  const { isUserLoading, userAuthData } = useSelector(state => state.checkAuth);
 
+  // Removed redundant checkLoggedInUser dispatch as ProtectedRoute already handles it
+
+  // Custom event listeners to switch active tab from anywhere in the app
   useEffect(() => {
-    dispatch(checkLoggedInUser())
-      .then(res => {
-        // console.log('Response for fetching user profile', res);
-      })
-      .catch((err) => {
-        getSweetAlert('Oops...', 'Something went wrong!', 'error');
-        console.log("Error occurred", err);
-      });
-  }, [dispatch]);
-
-  useEffect(() => {
-    const handleOpenTab = () => setActivePage("student-myCourses");
-    window.addEventListener("open-user-course", handleOpenTab);
-
-    return () => {
-      window.removeEventListener("open-user-course", handleOpenTab);
+    const handlers = {
+      "open-user-course":        () => setActivePage("student-myCourses"),
+      "open-add-course":         () => setActivePage("instructor-add-myCourses"),
+      "open-instructor-course":  () => setActivePage("instructor-myCourses"),
+      "open-instructor-analytics": () => setActivePage("instructor-analytics"),
+      "open-request-instructor": () => setActivePage("requestInstructor"),
     };
+    Object.entries(handlers).forEach(([event, fn]) => window.addEventListener(event, fn));
+    return () => Object.entries(handlers).forEach(([event, fn]) => window.removeEventListener(event, fn));
   }, []);
 
+  // Handle navigation side-effects safely outside of render
   useEffect(() => {
-    const handleOpenTab = () => setActivePage("instructor-add-myCourses");
-    window.addEventListener("open-add-course", handleOpenTab);
-
-    return () => {
-      window.removeEventListener("open-add-course", handleOpenTab);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleOpenTab = () => setActivePage("instructor-myCourses");
-    window.addEventListener("open-instructor-course", handleOpenTab);
-
-    return () => {
-      window.removeEventListener("open-instructor-course", handleOpenTab);
-    };
-  }, []);
-  
-  useEffect(() => {
-    const handleOpenTab = () => setActivePage("instructor-analytics");
-    window.addEventListener("open-instructor-analytics", handleOpenTab);
-
-    return () => {
-      window.removeEventListener("open-instructor-analytics", handleOpenTab);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleOpenTab = () => setActivePage("requestInstructor");
-    window.addEventListener("open-request-instructor", handleOpenTab);
-
-    return () => {
-      window.removeEventListener("open-request-instructor", handleOpenTab);
-    };
-  }, []);
-
-  // console.log('active page', activePage);
+    if (activePage === 'home') {
+      navigate(user_type === "student" ? '/' : '/instructor/');
+    } else if (activePage === 'allCourses') {
+      navigate('/course');
+    }
+  }, [activePage, navigate, user_type]);
 
   const renderContent = () => {
     switch (activePage) {
       case 'student-dashboard':
         return <StudentDashboard studentDetails={userAuthData} />;
       case 'home':
-        return navigate(user_type == "student" ? '/' : '/instructor/');
+        return null;
       case 'profile':
-        return (user_type == "student" ? <StudentProfile studentData={userAuthData} /> : <InstructorProfile instructorDetails={userAuthData} />);
+        return user_type === "student"
+          ? <StudentProfile studentData={userAuthData} />
+          : <InstructorProfile instructorDetails={userAuthData} />;
       case 'allCourses':
-        navigate('/course');
-        return;
+        return null;
       case 'student-myCourses':
         return <MyCoursesPage userData={userAuthData} />;
       case 'allCategory':
         return <AvailableCategory />;
       case 'instructor-dashboard':
-        return <InstructorDashboard instructorDetails={userAuthData} />
+        return <InstructorDashboard instructorDetails={userAuthData} />;
       case 'instructor-myCourses':
         return <InstructorCourse instructorDetails={userAuthData} />;
       case 'instructor-add-myCourses':
@@ -109,33 +75,68 @@ const DashboardLayout = ({ currentPage }) => {
       case 'instructor-analytics':
         return <InstructorAnalytics />;
       default:
-        return user_type == "student" ? (
-          <StudentDashboard studentDetails={userAuthData} />
-        ) : (
-          <InstructorDashboard instructorDetails={userAuthData} />
-        );
+        return user_type === "student"
+          ? <StudentDashboard studentDetails={userAuthData} />
+          : <InstructorDashboard instructorDetails={userAuthData} />;
     }
-  }
+  };
+
+  const isStudent = user_type === "student";
 
   if (isUserLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-black">
       <div className="flex flex-col items-center gap-4">
-        <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
-        <p className="text-purple-200 text-sm font-medium">Loading...</p>
+        <Loader2 className={`w-12 h-12 ${isStudent ? 'text-purple-400' : 'text-rose-500'} animate-spin`} />
+        <p className={`${isStudent ? 'text-purple-200' : 'text-rose-200'} text-sm font-medium`}>Loading...</p>
       </div>
     </div>
   );
 
+  // Left margin offset: 280px expanded, 80px (w-20) collapsed. Only applied on md+.
+  const mainMargin = sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]";
+
   return (
-    <div className="flex min-h-screen w-full bg-black text-white">
-      {/* Pass setActivePage as a prop to Sidebar */}
-      <DashboardSidebar setActivePage={setActivePage} activePage={activePage} user_type={user_type} userData={userAuthData} />
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto px-6 py-8">
-        <div className="max-w-7xl mx-auto">
-          {renderContent()} {/* Display content based on the activePage */}
+    <div className="min-h-screen bg-black text-white">
+
+      {/* ── Mobile Top Bar ── */}
+      <div
+        className={`md:hidden flex items-center justify-between p-4 bg-gradient-to-r
+          ${isStudent ? 'from-purple-900/50' : 'from-rose-950/50'} to-black
+          border-b ${isStudent ? 'border-purple-500/20' : 'border-rose-500/20'}
+          sticky top-0 z-30 backdrop-blur-md`}
+      >
+        <div className="flex items-center gap-3">
+          <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${isStudent ? 'from-purple-400 to-purple-600' : 'from-rose-400 to-rose-600'} flex items-center justify-center shadow-lg`}>
+            <span className="text-white font-bold text-sm">W</span>
+          </div>
+          <h1 className="font-bold text-lg">WebBeetles</h1>
+        </div>
+        <button
+          onClick={() => setIsMobileOpen(true)}
+          className="p-2 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-colors cursor-pointer"
+        >
+          <Menu size={20} />
+        </button>
+      </div>
+
+      {/* ── Fixed Sidebar ── */}
+      <DashboardSidebar
+        setActivePage={setActivePage}
+        activePage={activePage}
+        user_type={user_type}
+        userData={userAuthData}
+        isMobileOpen={isMobileOpen}
+        setIsMobileOpen={setIsMobileOpen}
+        onCollapseChange={setSidebarCollapsed}
+      />
+
+      {/* ── Main content — margin-left matches sidebar width on desktop ── */}
+      <main className={`min-h-screen transition-all duration-300 ${mainMargin}`}>
+        <div className="px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-8">
+          {renderContent()}
         </div>
       </main>
+
     </div>
   );
 };

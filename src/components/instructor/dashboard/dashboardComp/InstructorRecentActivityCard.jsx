@@ -22,9 +22,9 @@ const InstructorRecentActivityCard = ({ activity }) => {
             <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-lg bg-white/10 flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform flex-shrink-0">{activityIcons(activity?.title)}</div>
             <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm font-bold text-white mb-0.5 truncate">{studentData?.name ?? 'N/A'}</p>
-                <p className="text-xs text-purple-200 truncate">{activity?.message ?? 'N/A'} • {courseData?.title ?? 'N/A'}</p>
+                <p className="text-xs text-rose-200 truncate">{activity?.message ?? 'N/A'} • {courseData?.title ?? 'N/A'}</p>
             </div>
-            <span className="text-xs text-purple-300 whitespace-nowrap">{formatDateByHHAndDay(activity?.created_at)}</span>
+            <span className="text-xs text-rose-300 whitespace-nowrap">{formatDateByHHAndDay(activity?.created_at)}</span>
         </div>
     )
 }

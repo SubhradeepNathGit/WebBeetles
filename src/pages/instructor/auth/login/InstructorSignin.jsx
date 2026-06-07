@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import toastifyAlert from '../../../../util/alert/toastify'
 import getSweetAlert from '../../../../util/alert/sweetAlert'
 import { Loader2 } from 'lucide-react'
-import { logoutUser } from '../../../../redux/slice/authSlice/checkUserAuthSlice'
+import { logoutUser, setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice'
 // import Lottie from 'lottie-react'
 // import loaderAnimation from '../../../assets/animations/Loading Dots Blue.json';
 
@@ -20,16 +20,19 @@ const InstructorSignin = () => {
     dispatch = useDispatch(),
     navigate = useNavigate(),
     [show, setShow] = useState(false),
-    { isAuth } = useSelector(state => state.checkAuth),
+    { isUserAuth, userAuthData } = useSelector(state => state.checkAuth),
     { isUserAuthLoading } = useSelector(state => state.auth),
     user_type = 'instructor';
 
   useEffect(() => {
-
-    if (isAuth) {
-      navigate("/instructor/", { replace: true });
+    if (isUserAuth && userAuthData) {
+      if (userAuthData.role === user_type) {
+        navigate(`/${user_type}/dashboard`, { replace: true });
+      } else {
+        navigate(`/${userAuthData.role}/dashboard`, { replace: true });
+      }
     }
-  }, [isAuth, navigate]);
+  }, [isUserAuth, userAuthData, navigate, user_type]);
 
   const loginDataHandler = (data) => {
     // console.log('Login form data', data);
@@ -43,17 +46,20 @@ const InstructorSignin = () => {
       .then(res => {
         // console.log("Response after user login:", res);
 
-        if (res?.payload?.userData?.role !== user_type) {
-          getSweetAlert('Oops...', "Invalid login credentials", 'error');
-          dispatch(logoutUser({ user_type, status: false }))
-          return;
-        }
-
-        const instructorData = res?.payload?.userData;
-
         if (res.meta.requestStatus === "fulfilled") {
+          if (res?.payload?.userData?.role !== user_type) {
+            getSweetAlert('Oops...', "Invalid login credentials", 'error');
+            dispatch(logoutUser({ user_type, status: false }));
+            return;
+          }
 
+          const instructorData = res?.payload?.userData;
+          // Clear stale tokens from other roles
+          sessionStorage.removeItem('student_token');
+          sessionStorage.removeItem('admin_token');
           sessionStorage.setItem('instructor_token', res.payload.session.access_token);
+          // Immediately set auth data in Redux to prevent race conditions
+          dispatch(setUserAuthData(instructorData));
 
           if (instructorData?.application_status == 'pending' && !instructorData?.application_complete) {
             navigate(`/instructor/profile-form`, { state: { instructorData } });
@@ -67,12 +73,9 @@ const InstructorSignin = () => {
           else {
             dispatch(updateLastSignInAt({ id: res?.payload?.user?.id, user_type }))
               .then(res => {
-
                 if (res.meta.requestStatus === "fulfilled") {
-
                   toastifyAlert.success('Logged In Successfully');
                   navigate(`/${user_type}/dashboard`);
-
                 } else {
                   getSweetAlert('Oops...', res.payload, 'info');
                 }
@@ -84,8 +87,7 @@ const InstructorSignin = () => {
           }
         }
         else {
-          // getSweetAlert('Oops...', 'Something went wrong!', 'error');
-          getSweetAlert('Oops...', res.payload.message, 'error');
+          getSweetAlert('Oops...', res.payload?.message || 'Something went wrong!', 'error');
         }
       })
       .catch(err => {
@@ -95,37 +97,37 @@ const InstructorSignin = () => {
   }
 
   return (
-    <div className="relative h-screen overflow-hidden">
-      {/* Background layer that replaces .background::after */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10"
-        style={{
-          backgroundImage:
-            `linear-gradient(#ea5645,#ec0505), url('/auth/signin/c2f6150a61f3119b499a9fad384211c20ac49766.jpg')`,
-          backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'top', transform: 'scaleX(-1)'
-        }} />
-      <div className="container mx-auto px-4 lg:px-6 h-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6">
-
-        <div className="hidden md:flex w-full md:w-1/2 flex-col justify-center items-center md:items-start text-white text-center md:text-left">
-          <h1 className="font-display text-4xl lg:text-7xl xl:text-8xl leading-tight mb-4 select-none font-bold">
+    <div className="flex flex-col md:flex-row h-screen w-full bg-gradient-to-b from-rose-900 to-black">
+      {/* Left Panel — Branding with Crimson/Rose Gradient */}
+      <div className="hidden md:flex w-1/2 h-screen relative overflow-hidden items-center justify-center">
+        <div className="relative z-10 px-10 lg:px-16 xl:px-20 text-left">
+          <h1 className="text-5xl lg:text-7xl xl:text-8xl leading-tight mb-6 select-none font-bold text-white">
             WebBeetles
           </h1>
-          <p className="max-w-[600px] font-normal text-sm lg:text-base xl:text-lg leading-relaxed">
+          <p className="max-w-md font-normal text-sm lg:text-base xl:text-lg leading-relaxed text-white/80">
             By continuing, you agree to our Terms and Conditions and acknowledge you've read our privacy policy. Transform your learning experience with our comprehensive platform.
           </p>
         </div>
+      </div>
 
-        <div className="w-full md:w-1/2 flex justify-center md:justify-end h-full items-center">
-          <div className="w-full max-w-[500px] lg:max-w-[500px] bg-white/10 backdrop-blur-sm rounded-2xl lg:rounded-3xl p-6 lg:p-8 shadow-2xl my-4">
-            <h2 className="text-2xl lg:text-3xl xl:text-4xl font-display text-white text-center mb-6">
-              Welcome to <Link className="text-red-900 font-bold" to='/instructor/'>WebBeetles</Link>
-            </h2>
+      {/* Right Panel — Login Form */}
+      <div className="w-full md:w-1/2 h-screen bg-transparent flex items-center justify-center relative overflow-hidden">
+        {/* Subtle ambient glow */}
+        <div aria-hidden="true" className="md:hidden absolute inset-0 bg-gradient-to-br from-rose-950/40 via-transparent to-black pointer-events-none" />
+        <div aria-hidden="true" className="absolute top-0 right-0 w-72 h-72 bg-rose-600/10 rounded-full filter blur-[100px] pointer-events-none" />
 
-            <form className="space-y-4 lg:space-y-5 text-white" onSubmit={handleSubmit(loginDataHandler)}>
+        <div className="relative z-10 w-full max-w-md mx-auto px-6 sm:px-10 py-10 lg:py-14">
+          <h2 className="text-2xl lg:text-3xl xl:text-4xl text-white text-center mb-10 font-light tracking-wide">
+            Welcome to <Link className="text-rose-400 font-bold" to='/instructor/'>WebBeetles</Link>
+          </h2>
 
-              {/* email field  */}
-              <label className="block text-sm lg:text-base mb-2">Email</label>
+          <form className="space-y-5 text-white" onSubmit={handleSubmit(loginDataHandler)}>
+
+            {/* email field  */}
+            <div>
+              <label className="block text-sm lg:text-base mb-2 text-rose-100/80 font-medium">Email</label>
               <input type="email" placeholder="Enter your email" autoComplete='email'
-                className="w-full rounded-full px-6 py-2 lg:py-3 text-sm lg:text-base placeholder-gray-500 text-gray-800 outline-0 bg-white mb-2"
+                className="w-full rounded-xl px-5 py-3 text-sm lg:text-base text-white placeholder-gray-500 bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
                 {...register('email', {
                   required: {
                     value: true,
@@ -136,81 +138,74 @@ const InstructorSignin = () => {
                     message: 'Invalid email'
                   }
                 })} />
-              {errors.email && <p className='text-xs text-red-400 mt-0 mb-2'>{errors.email?.message}</p>}
+              {errors.email && <p className='text-xs text-red-400 mt-1'>{errors.email?.message}</p>}
+            </div>
 
-              {/* password field  */}
-              <div>
-                <label htmlFor="password" className="block text-sm lg:text-base mb-2 text-white">Password</label>
-                <div className="relative">
-                  <input type={show ? "text" : "password"} placeholder="Enter your Password" autoComplete="current-password"
-                    className="w-full rounded-full px-6 pr-12 py-2 lg:py-3 text-sm lg:text-base placeholder-gray-500 text-gray-800 outline-0 bg-white"
-                    {...register("password", {
-                      required: {
-                        value: true,
-                        message: "Required*",
-                      }
-                    })} />
-                  <button type="button" className="absolute inset-y-0 right-4 flex items-center text-lg text-gray-600 hover:text-[rgba(44,6,159,0.8)]" onClick={() => setShow(!show)}>
-                    {show ? <FaRegEyeSlash className='text-[#ec0505] cursor-pointer' /> : <FaRegEye className='text-[#ec0505] cursor-pointer' />}
-                  </button>
-                </div>
-                {errors.password && <p className='text-xs text-red-400 mt-1'>{errors.password?.message}</p>}
+            {/* password field  */}
+            <div>
+              <label htmlFor="password" className="block text-sm lg:text-base mb-2 text-rose-100/80 font-medium">Password</label>
+              <div className="relative">
+                <input type={show ? "text" : "password"} placeholder="Enter your Password" autoComplete="current-password"
+                  className="w-full rounded-xl px-5 pr-12 py-3 text-sm lg:text-base text-white placeholder-gray-500 bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                  {...register("password", {
+                    required: {
+                      value: true,
+                      message: "Required*",
+                    }
+                  })} />
+                <button type="button" className="absolute inset-y-0 right-4 flex items-center text-lg text-gray-400 hover:text-rose-400 transition-colors" onClick={() => setShow(!show)}>
+                  {show ? <FaRegEyeSlash /> : <FaRegEye />}
+                </button>
               </div>
+              {errors.password && <p className='text-xs text-red-400 mt-1'>{errors.password?.message}</p>}
+            </div>
 
-              <Link to="/forget-password" className="block text-center text-sm lg:text-base text-white hover:text-[#87CEEB] transition-colors">
+            <div className="flex justify-end">
+              <Link to="/instructor/forget-password" className="text-sm text-rose-300 hover:text-rose-100 transition-colors">
                 Forgot your password?
               </Link>
-
-              <button type="submit" disabled={isUserAuthLoading}
-                className={`w-full py-2 lg:py-3 rounded-full text-base lg:text-lg font-semibold text-white transition-colors
-                ${isUserAuthLoading ? "bg-[#7fc4fb] cursor-not-allowed opacity-70" : "cursor-pointer bg-[#f70202] hover:bg-[#f74747] hover:border-2 hover:border-white"}`}>
-                {isUserAuthLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline' /> : ''} {isUserAuthLoading ? "Logging in..." : "Login"}
-              </button>
-            </form>
-
-            <div className="flex items-center gap-4 my-4">
-              <hr className="flex-1 border-t border-white/30" />
-              <span className="text-white/80 text-sm lg:text-base">OR</span>
-              <hr className="flex-1 border-t border-white/30" />
             </div>
 
-            <div className="space-y-3">
-              <Link to="/instructor/signup" className="block w-full text-center border-2 border-[#fff] text-[#fff] hover:bg-[#f74747] hover:text-white py-2 lg:py-3 rounded-full text-base lg:text-lg font-semibold transition-all">
-                Register
-              </Link>
-            </div>
+            <button type="submit" disabled={isUserAuthLoading}
+              className={`w-full py-3 rounded-xl text-base lg:text-lg font-semibold text-white transition-all duration-300 mt-2
+              ${isUserAuthLoading ? "bg-rose-500/50 cursor-not-allowed opacity-70" : "cursor-pointer bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-lg hover:shadow-rose-500/25"}`}>
+              {isUserAuthLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline' /> : ''} {isUserAuthLoading ? "Logging in..." : "Login"}
+            </button>
+          </form>
 
-            {/* Socials */}
-            <div className="flex justify-center gap-4 mt-4">
-              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer"
-                className="hover:scale-110 transition-transform">
-                <FaFacebook className="text-[#1877F2] text-[28px]" />
-              </a>
-              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer"
-                className="hover:scale-110 transition-transform">
-                <FaInstagram className="text-[28px]" style={{
-                  background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }} />
-              </a>
-              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer"
-                className="hover:scale-110 transition-transform">
-                <FaLinkedinIn className="text-[#0A66C2] text-[28px]" />
-              </a>
-              <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer"
-                className="hover:scale-110 transition-transform">
-                <FaXTwitter className="text-white text-[28px]" />
-              </a>
-            </div>
-
-            <p className="text-gray-200 text-center text-xs lg:text-sm font-medium mt-4">
-              By continuing, you agree to WebBeetles's{" "}
-              <Link to="/terms" className="text-[#87CEEB] hover:text-[#b97fff] transition-colors">Terms and Conditions</Link> and{" "}
-              <Link to="/privacy" className="text-[#87CEEB] hover:text-[#b97fff] transition-colors">Privacy Policy</Link>.
-            </p>
+          <div className="flex items-center gap-4 my-6">
+            <hr className="flex-1 border-t border-white/10" />
+            <span className="text-rose-200/50 text-sm font-medium">OR</span>
+            <hr className="flex-1 border-t border-white/10" />
           </div>
+
+          <div className="space-y-3">
+            <Link to="/instructor/signup" className="block w-full text-center border border-rose-500/30 text-rose-200 hover:bg-rose-500/10 py-3 rounded-xl text-base font-semibold transition-all duration-300">
+              Create an account
+            </Link>
+          </div>
+
+          {/* Socials */}
+          <div className="flex justify-center gap-5 mt-6">
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-blue-400 transition-all border border-white/5">
+              <FaFacebook className="text-[20px]" />
+            </a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-pink-400 transition-all border border-white/5">
+              <FaInstagram className="text-[20px]" />
+            </a>
+            <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-blue-500 transition-all border border-white/5">
+              <FaLinkedinIn className="text-[20px]" />
+            </a>
+            <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all border border-white/5">
+              <FaXTwitter className="text-[20px]" />
+            </a>
+          </div>
+
+          <p className="text-rose-200/60 text-center text-xs mt-8">
+            By continuing, you agree to WebBeetles's{" "}
+            <Link to="/terms" className="text-rose-400 hover:text-rose-300 transition-colors">Terms</Link> and{" "}
+            <Link to="/privacy" className="text-rose-400 hover:text-rose-300 transition-colors">Privacy Policy</Link>.
+          </p>
         </div>
       </div>
     </div>

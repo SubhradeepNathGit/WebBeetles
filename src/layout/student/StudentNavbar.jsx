@@ -138,41 +138,47 @@ const StudentNavbar = () => {
                 >
                   Get Started
                 </Link> :
-                <div className="relative group inline-block">
+                <div className="relative group flex items-center gap-3">
+                  {/* Welcome Text */}
+                  <span className="text-white/90 font-medium text-sm lg:text-base hidden sm:block cursor-default">
+                    Welcome back, <span className="text-white font-bold">{getStudentData?.name?.split(" ")[0] || "Student"}</span>
+                  </span>
+                  
                   {/* Round Profile Button */}
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg group-hover:bg-white/30 transition-all duration-300 cursor-pointer">
-                    <span className="text-white text-lg sm:text-xl lg:text-2xl font-bold">
-                      {getStudentData ? (
-                        <img className="rounded-full border-3 border-white/20 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14"
-                          src={
-                            getStudentData.profile_image_url
-                              ? `${getStudentData.profile_image_url}`
-                              : "/demo/user.png"
-                          }
-                          alt={getStudentData?.name?.charAt(0)} />) : null}
-                    </span>
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center shadow-md ring-2 ring-white/20 group-hover:ring-purple-400/50 group-hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden">
+                    {getStudentData ? (
+                      <img className="w-full h-full object-cover"
+                        src={
+                          getStudentData.profile_image_url
+                            ? `${getStudentData.profile_image_url}`
+                            : "/demo/user.png"
+                        }
+                        alt={getStudentData?.name?.charAt(0)} />) : null}
                   </div>
 
                   {/* Dropdown Menu (visible on hover) */}
-                  <div className="absolute right-0 mt-2 w-40 bg-white/10 backdrop-blur-md rounded-lg shadow-lg py-2 text-white font-medium text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                    <Link
-                      to="/student/dashboard"
-                      className="block px-4 py-2 hover:bg-white/20 transition-all duration-200"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      to="/cart"
-                      className="block px-4 py-2 hover:bg-white/20 transition-all duration-200"
-                    >
-                      Cart
-                    </Link>
-                    <button
-                      onClick={() => userLogout()}
-                      className="w-full text-left px-4 py-2 hover:bg-white/20 transition-all duration-200"
-                    >
-                      Logout
-                    </button>
+                  <div className="absolute right-0 top-full pt-2 w-44 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                    <div className="bg-[#16161e] border border-white/10 rounded-xl shadow-2xl py-1.5 flex flex-col">
+                      <Link
+                        to="/student/dashboard"
+                        className="px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm font-medium"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        to="/cart"
+                        className="px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm font-medium"
+                      >
+                        Cart
+                      </Link>
+                      <div className="h-px bg-white/10 my-1 mx-3"></div>
+                      <button
+                        onClick={() => userLogout()}
+                        className="w-full text-left px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 text-sm font-medium"
+                      >
+                        Logout
+                      </button>
+                    </div>
                   </div>
                 </div>
               }

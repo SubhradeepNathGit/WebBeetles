@@ -27,8 +27,9 @@ Deno.serve(async (req) => {
       return new Response("Unauthorized", { status: 401, headers });
     }
 
-    const { data: { user } } = await supabase.auth.getUser(authHeader);
-    if (!user) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
       return new Response("Unauthorized", { status: 401, headers });
     }
 
@@ -49,22 +50,42 @@ Deno.serve(async (req) => {
       return new Response("Invalid signature", { status: 400, headers });
     }
 
-    // Update purchase status
-    await supabase
+    // Update purchase status and retrieve the metadata
+    const { data: purchase, error: updateError } = await supabase
       .from("purchases")
       .update({ payment_status: "paid", razorpay_payment_id })
-      .eq("razorpay_order_id", razorpay_order_id);
+      .eq("razorpay_order_id", razorpay_order_id)
+      .select()
+      .single();
 
-    // Call RPC to enroll user in all courses and insert purchase items
-    const { error: rpcError } = await supabase.rpc("enroll_multiple_courses", { 
-      p_user_id: user.id, 
-      p_razorpay_order_id: razorpay_order_id,
-      p_items: items 
-    });
+    if (updateError) {
+      console.error("Update purchase status error:", updateError);
+      return new Response("Purchase update failed", { status: 500, headers });
+    }
 
-    if (rpcError) {
-      console.error("RPC Error:", rpcError);
-      return new Response("Enrollment failed", { status: 500, headers });
+    if (purchase?.metadata?.is_subscription) {
+      // Update student plan
+      const { error: studentPlanError } = await supabase
+        .from("students")
+        .update({ subscription_plan: purchase.metadata.plan_name })
+        .eq("id", user.id);
+
+      if (studentPlanError) {
+        console.error("Student plan update error:", studentPlanError);
+        return new Response("Plan update failed", { status: 500, headers });
+      }
+    } else {
+      // Call RPC to enroll user in all courses and insert purchase items
+      const { error: rpcError } = await supabase.rpc("enroll_multiple_courses", { 
+        p_user_id: user.id, 
+        p_razorpay_order_id: razorpay_order_id,
+        p_items: items 
+      });
+
+      if (rpcError) {
+        console.error("RPC Error:", rpcError);
+        return new Response("Enrollment failed", { status: 500, headers });
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {

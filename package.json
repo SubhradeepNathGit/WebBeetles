@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^3.27.0",
+    "@emailjs/browser": "^4.4.1",
     "@reduxjs/toolkit": "^2.9.0",
     "@supabase/supabase-js": "^2.81.1",
     "@tanstack/react-query": "^5.90.2",
     "axios": "^1.12.2",
     "chart.js": "^4.5.1",
+    "emailjs-com": "^3.2.0",
     "framer-motion": "^12.23.16",
     "gsap": "^3.13.0",
     "lottie-react": "^2.4.1",

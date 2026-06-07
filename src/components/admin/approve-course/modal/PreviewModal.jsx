@@ -45,7 +45,7 @@ const PreviewModal = ({ preview, setPreview, setVideoModal, setImageModal, setVi
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Feature</p>
                         <div className="flex flex-wrap gap-x-2 gap-y-2">
                             {preview?.feature?.map((feat, index) => (
-                                <span key={index} className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-md font-medium">{feat}</span>
+                                <span key={index} className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-md font-medium">{feat}</span>
                             ))}
                         </div>
                     </div>
@@ -78,7 +78,7 @@ const PreviewModal = ({ preview, setPreview, setVideoModal, setImageModal, setVi
                     {/* Lecture preview card */}
                     <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                            <ListVideo size={28} className="text-purple-500/60 flex-shrink-0" />
+                            <ListVideo size={28} className="text-emerald-500/60 flex-shrink-0" />
                             <div>
                                 <p className="text-sm font-semibold text-white">{`${(demoVideo?.video_title || (preview?.title?.length > 35 ? preview?.title?.slice(0, 33) + '...' : preview?.title))} — Demo Video`}</p>
                                 <p className="text-xs text-gray-500 mt-0.5">Demo video on the specific course.</p>
@@ -89,7 +89,7 @@ const PreviewModal = ({ preview, setPreview, setVideoModal, setImageModal, setVi
                                 setVideoTitle(demoVideo?.video_title);
                                 setVideoModal(demoVideo?.video_url);
                             }}
-                            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-xs font-semibold shadow-lg shadow-purple-500/20 cursor-pointer"
+                            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-xs font-semibold shadow-lg shadow-emerald-500/20 cursor-pointer"
                         >
                             <Play size={13} /> Play Demo Video
                         </button>
@@ -98,7 +98,7 @@ const PreviewModal = ({ preview, setPreview, setVideoModal, setImageModal, setVi
                 <div className="p-5 border-t border-white/5 flex justify-end gap-3 bg-[#0d0d0d] rounded-b-2xl">
                     <button onClick={() => setPreview(null)} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl text-sm font-medium transition-colors cursor-pointer">Close</button>
                     <button onClick={() => { setOpenMarkModal(true); setChangeStatus("rejected"); setCourseId(preview?.id); setPreview(null); }} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-xl text-sm font-semibold transition-colors cursor-pointer"><X size={16} /> Reject Course</button>
-                    <button onClick={() => { setOpenMarkModal(true); setChangeStatus("approved"); setCourseId(preview?.id); setPreview(null); }} className="flex items-center gap-2 px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-purple-500/20 cursor-pointer"><Check size={16} /> Publish Course</button>
+                    <button onClick={() => { setOpenMarkModal(true); setChangeStatus("approved"); setCourseId(preview?.id); setPreview(null); }} className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-emerald-500/20 cursor-pointer"><Check size={16} /> Publish Course</button>
                 </div>
             </div>
         </div>

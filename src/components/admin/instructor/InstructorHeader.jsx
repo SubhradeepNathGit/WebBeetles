@@ -17,7 +17,7 @@ const InstructorHeader = ({ search, setSearch }) => {
                     <input
                         value={search} onChange={e => setSearch(e.target.value)}
                         placeholder="Search instructors..."
-                        className="pl-9 pr-4 py-2 bg-[#1a1a1a] border border-white/5 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 w-64 transition-all"
+                        className="pl-9 pr-4 py-2 bg-[#1a1a1a] border border-white/5 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-64 transition-all"
                     />
                 </div>
             </div>

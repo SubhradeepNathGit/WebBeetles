@@ -29,12 +29,7 @@ import TermsOfService from "../pages/common/terms&policy/TermsOfService";
 import PrivacyPolicy from "../pages/common/terms&policy/PrivacyPolicy";
 import DashboardLayout from "../pages/common/dashboard/DashboardLayout";
 
-// instructor - Layout
-import InstructorNavbar from "../layout/instructor/InstructorNavbar";
-import InstructorFooter from "../layout/instructor/InstructorFooter";
-
-// Pages - instructor
-import InstructorHome from "../pages/instructor/InstructorHome";
+// Pages - instructor (no layout — /instructor goes directly to login)
 import InstructorSignup from "../pages/instructor/auth/register/InstructorSignup";
 import InstructorSignin from "../pages/instructor/auth/login/InstructorSignin";
 import InstructorResetPassword from "../pages/instructor/auth/resetPassword/InstructorResetPassword";
@@ -42,7 +37,6 @@ import InstructorForgetPassword from "../pages/instructor/auth/forgetPassword/In
 import InstructorOtp from "../pages/instructor/auth/otp/InstructorOtp";
 import InstructorRequestForm from "../pages/instructor/request/form/InstructorRequestForm";
 import InstructorRequestStatus from "../pages/instructor/request/status/InstructorRequestStatus";
-
 
 // Admin - Layout
 import AdminLayout from "../layout/admin/AdminLayout";
@@ -64,6 +58,14 @@ import Admin from "../pages/admin/Admin";
 import ExamSet from "../pages/admin/ExamSet";
 import AdminProfile from "../pages/admin/AdminProfile";
 import { Loader2 } from "lucide-react";
+import ProtectedRoute from "./ProtectedRoute";
+import { useParams } from "react-router-dom";
+
+// Dynamic Protected Route Wrapper for Dashboards
+const DashboardProtectedRoute = () => {
+  const { user_type } = useParams();
+  return <ProtectedRoute role={user_type} />;
+};
 
 // Student Layout wrapper (must be used inside Router!)
 const StudentLayout = ({ children }) => {
@@ -78,23 +80,6 @@ const StudentLayout = ({ children }) => {
       {!hideLayout && <StudentNavbar />}
       {children}
       {!hideLayout && <StudentFooter />}
-    </>
-  );
-};
-
-// Instructor Layout wrapper (must be used inside Router!)
-const InstructorLayout = ({ children }) => {
-  const location = useLocation();
-
-  // routes that should NOT show navbar + footer
-  const hideLayoutRoutes = ["/user-signin", "/user-signup", "/404"];
-  const hideLayout = hideLayoutRoutes.includes(location.pathname);
-
-  return (
-    <>
-      {!hideLayout && <InstructorNavbar />}
-      {children}
-      {!hideLayout && <InstructorFooter />}
     </>
   );
 };
@@ -132,42 +117,50 @@ const Routing = () => {
         <Route path="/forget-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><ForgetPassword /></MaintenanceGuard>} />
         <Route path="/reset-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><ResetPassword /></MaintenanceGuard>} />
         <Route path="/otp" element={<MaintenanceGuard isMaintenance={isMaintenance}><Otp /></MaintenanceGuard>} />
-        <Route path="/cart" element={<MaintenanceGuard isMaintenance={isMaintenance}><Cart /></MaintenanceGuard>} />
+        
+        {/* Protected Student Cart */}
+        <Route element={<ProtectedRoute role="student" />}>
+          <Route path="/cart" element={<MaintenanceGuard isMaintenance={isMaintenance}><Cart /></MaintenanceGuard>} />
+        </Route>
 
 
-        {/* instructor */}
+        {/* instructor — all pages render without navbar/footer */}
 
-        {/* Pages with Layout */}
-        <Route path="/instructor/" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorLayout> <InstructorHome /></InstructorLayout></MaintenanceGuard>} />
-
-        {/* Pages (no navbar/footer) */}
+        {/* /instructor goes directly to login (no home page) */}
+        <Route path="/instructor/" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorSignin /></MaintenanceGuard>} />
         <Route path="/instructor/signin" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorSignin /></MaintenanceGuard>} />
         <Route path="/instructor/signup" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorSignup /></MaintenanceGuard>} />
         <Route path="/instructor/forget-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorForgetPassword /></MaintenanceGuard>} />
         <Route path="/instructor/reset-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorResetPassword /></MaintenanceGuard>} />
         <Route path="/instructor/otp" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorOtp /></MaintenanceGuard>} />
-        <Route path="/instructor/profile-form" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorRequestForm /></MaintenanceGuard>} />
-        <Route path="/instructor/request-status" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorRequestStatus /></MaintenanceGuard>} />
+        
+        {/* Protected Instructor Onboarding */}
+        <Route element={<ProtectedRoute role="instructor" />}>
+          <Route path="/instructor/profile-form" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorRequestForm /></MaintenanceGuard>} />
+          <Route path="/instructor/request-status" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorRequestStatus /></MaintenanceGuard>} />
+        </Route>
 
 
         {/* admin */}
 
-        {/* Pages with Layout */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="students" element={<Students />} />
-          <Route path="instructors" element={<Instructors />} />
-          <Route path="instructor-reviews" element={<InstructorReviews />} />
-          <Route path="approve-courses" element={<ApproveCourses />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="charge" element={<Charges />} />
-          <Route path="category" element={<AllCategory />} />
-          <Route path="admin" element={<Admin />} />
-          <Route path="contact" element={<Contact />} />
-          <Route path="notification" element={<Notification />} />
-          <Route path="examset" element={<ExamSet />} />
-          <Route path="profile" element={<AdminProfile />} />
-          <Route path="settings" element={<Settings />} />
+        {/* Protected Admin Routes */}
+        <Route element={<ProtectedRoute role="admin" />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="students" element={<Students />} />
+            <Route path="instructors" element={<Instructors />} />
+            <Route path="instructor-reviews" element={<InstructorReviews />} />
+            <Route path="approve-courses" element={<ApproveCourses />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="charge" element={<Charges />} />
+            <Route path="category" element={<AllCategory />} />
+            <Route path="admin" element={<Admin />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="notification" element={<Notification />} />
+            <Route path="examset" element={<ExamSet />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
 
         {/* Pages (no navbar/footer) */}
@@ -175,8 +168,10 @@ const Routing = () => {
 
         {/* common  */}
 
-        {/* Pages (no navbar/footer) */}
-        <Route path="/:user_type/dashboard" element={<DashboardLayout />} />
+        {/* Protected Dashboards (Student / Instructor) */}
+        <Route element={<DashboardProtectedRoute />}>
+          <Route path="/:user_type/dashboard" element={<DashboardLayout />} />
+        </Route>
 
 
         {/* 404 Page (no navbar/footer) */}
@@ -187,3 +182,4 @@ const Routing = () => {
 };
 
 export default Routing;
+

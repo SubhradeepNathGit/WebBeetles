@@ -109,7 +109,7 @@ const Promocode = ({ togglePromo, setOpenMarkModal, setChargeId, setType }) => {
                 {/* Add button */}
                 <button
                     onClick={() => setModalOpen(true)}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm px-3 py-2 rounded-xl cursor-pointer"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-3 py-2 rounded-xl cursor-pointer"
                 >
                     <Plus size={16} className="inline mr-1 mb-0.5" />
                     Add Promocode

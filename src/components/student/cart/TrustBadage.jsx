@@ -3,10 +3,10 @@ import { Award, Star } from 'lucide-react'
 
 const TrustBadage = () => {
     return (
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-slate-200">
+        <div className="bg-[#111] rounded-xl p-4 border border-white/10">
             <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-                    <Award className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center flex-shrink-0">
+                    <Award className="w-6 h-6 text-amber-400" />
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-1 mb-1">
@@ -15,10 +15,10 @@ const TrustBadage = () => {
                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                         <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                        <span className="text-xs font-bold text-slate-700 ml-1">4.9/5</span>
+                        <span className="text-xs font-bold text-white/70 ml-1">4.9/5</span>
                     </div>
-                    <p className="text-xs text-slate-600">Rated by 2,500+ students</p>
-                    <p className="text-xs text-emerald-600 font-semibold mt-1">98% Success Rate</p>
+                    <p className="text-xs text-white/50">Rated by 2,500+ students</p>
+                    <p className="text-xs text-purple-400 font-semibold mt-1">98% Success Rate</p>
                 </div>
             </div>
         </div>

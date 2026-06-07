@@ -6,10 +6,11 @@ import toastifyAlert from "../../../util/alert/toastify";
 export const fetchStudentDetails = createAsyncThunk("checkUserAuthSlice/fetchStudentDetails",
   async (studentId, { rejectWithValue }) => {
     try {
-      const res = await supabase.from("students").select("*").eq("id", studentId).single();
+      const res = await supabase.from("students").select("*").eq("id", studentId).maybeSingle();
       // console.log('Logged student details response', res);
 
       if (res?.error) throw new Error(res?.error.message);
+      if (!res?.data) throw new Error("Student not found");
       return res?.data;
     }
     catch (err) {
@@ -23,10 +24,11 @@ export const fetchInstructorDetails = createAsyncThunk("checkUserAuthSlice/fetch
   async (instructorId, { rejectWithValue }) => {
     
     try {
-      const res = await supabase.from("instructors").select("*").eq("id", instructorId).single();
+      const res = await supabase.from("instructors").select("*").eq("id", instructorId).maybeSingle();
       // console.log('Logged instructor details response', res);
 
       if (res?.error) throw new Error(res?.error.message);
+      if (!res?.data) throw new Error("Instructor not found");
       return res?.data;
     }
     catch (err) {
@@ -35,11 +37,41 @@ export const fetchInstructorDetails = createAsyncThunk("checkUserAuthSlice/fetch
     }
   });
 
-// Check if student session exists
+// fetch admin details
+export const fetchAdminDetails = createAsyncThunk("checkUserAuthSlice/fetchAdminDetails",
+  async (adminId, { rejectWithValue }) => {
+    try {
+      const res = await supabase.from("admins").select("*").eq("id", adminId).maybeSingle();
+      if (res?.error) throw new Error(res?.error.message);
+      if (!res?.data) throw new Error("Admin not found");
+      return res?.data;
+    }
+    catch (err) {
+      const message = err?.message ?? "Failed to fetch admin details";
+      return rejectWithValue(message);
+    }
+  });
+
+// Determine fetch order based on sessionStorage tokens.
+// This ensures we try the correct role's table FIRST, preventing
+// wrong-role resolution when the same user ID exists in multiple tables.
+const getFetchOrder = () => {
+  const order = [];
+  if (sessionStorage.getItem('admin_token')) order.push(fetchAdminDetails);
+  if (sessionStorage.getItem('instructor_token')) order.push(fetchInstructorDetails);
+  if (sessionStorage.getItem('student_token')) order.push(fetchStudentDetails);
+
+  // Fallback: add remaining fetchers for edge cases (e.g. fresh tab with no token hints)
+  if (!order.includes(fetchStudentDetails)) order.push(fetchStudentDetails);
+  if (!order.includes(fetchInstructorDetails)) order.push(fetchInstructorDetails);
+  if (!order.includes(fetchAdminDetails)) order.push(fetchAdminDetails);
+
+  return order;
+};
+
+// Check if user session exists and fetch the correct role's profile
 export const checkLoggedInUser = () => async (dispatch) => {
   const { data, error } = await supabase.auth.getSession();
-
-  // console.log('Logged data', data);
 
   if (error) {
     console.error("Error fetching session:", error.message);
@@ -55,43 +87,44 @@ export const checkLoggedInUser = () => async (dispatch) => {
       })
     );
 
-    // Fetch user details
-    const studentRes = await dispatch(fetchStudentDetails(data?.session?.user?.id));
+    const userId = data.session.user.id;
+    const fetchOrder = getFetchOrder();
 
-    if (studentRes.meta.requestStatus === "rejected") {
-      await dispatch(fetchInstructorDetails(data?.session?.user?.id));
+    for (const fetchFn of fetchOrder) {
+      const res = await dispatch(fetchFn(userId));
+      if (res.meta.requestStatus !== "rejected") return; // Found the correct profile
     }
 
+    // All fetches failed — no profile found in any table
+    dispatch(clearUser());
   } else {
     dispatch(clearUser());
   }
 }
 
-// Listen for Supabase Auth login/logout
+// Listen for Supabase Auth login/logout (session updates only)
+// User profile fetching is handled by login pages (setUserAuthData)
+// and ProtectedRoute (checkLoggedInUser) — NOT here, to avoid race conditions.
 export const listenAuthChanges = () => (dispatch) => {
-  supabase.auth.onAuthStateChange((_event, session) => {
+  supabase.auth.onAuthStateChange(async (_event, session) => {
     if (session?.user) {
-      dispatch(
-        setUser({
-          user: session.user,
-          session,
-        })
-      );
-
-      // Fetch user profile from students
-      dispatch(fetchStudentDetails(session.user.id));
+      dispatch(setUser({ user: session.user, session }));
     } else {
+      // Session ended — clear everything
+      sessionStorage.removeItem('student_token');
+      sessionStorage.removeItem('instructor_token');
+      sessionStorage.removeItem('admin_token');
       dispatch(clearUser());
     }
   })
 }
 
-// Logout
+// Logout — clears ALL role tokens to prevent stale session conflicts
 export const logoutUser = ({ user_type, status }) => async (dispatch) => {
   try {
-    const user_token = user_type == 'student' ? "student_token" : "instructor_token";
-    const token = sessionStorage.getItem(user_token);
-    if (token) sessionStorage.removeItem(user_token);
+    sessionStorage.removeItem('student_token');
+    sessionStorage.removeItem('instructor_token');
+    sessionStorage.removeItem('admin_token');
 
     const { error } = await supabase.auth.signOut();
 
@@ -114,6 +147,7 @@ const initialState = {
   session: undefined,
   isUserLoading: false,
   userError: null,
+  isAuthChecked: false,
 }
 
 export const checkUserAuthSlice = createSlice({
@@ -122,7 +156,6 @@ export const checkUserAuthSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.isUserAuth = true;
-      state.userAuthData = action.payload.user;
       state.session = action.payload.session;
       state.userError = null;
     },
@@ -130,6 +163,16 @@ export const checkUserAuthSlice = createSlice({
       state.isUserAuth = false;
       state.userAuthData = undefined;
       state.session = undefined;
+      state.userError = null;
+      state.isAuthChecked = true;
+    },
+    // Called by login pages to immediately populate auth data
+    // after a successful login — avoids the sequential fetch race condition
+    setUserAuthData: (state, action) => {
+      state.isUserAuth = true;
+      state.userAuthData = action.payload;
+      state.isAuthChecked = true;
+      state.isUserLoading = false;
       state.userError = null;
     },
   },
@@ -142,6 +185,7 @@ export const checkUserAuthSlice = createSlice({
       .addCase(fetchStudentDetails.fulfilled, (state, action) => {
         state.isUserLoading = false;
         state.userAuthData = action.payload;
+        state.isAuthChecked = true;
       })
       .addCase(fetchStudentDetails.rejected, (state, action) => {
         state.isUserLoading = false;
@@ -155,13 +199,29 @@ export const checkUserAuthSlice = createSlice({
       .addCase(fetchInstructorDetails.fulfilled, (state, action) => {
         state.isUserLoading = false;
         state.userAuthData = action.payload;
+        state.isAuthChecked = true;
       })
       .addCase(fetchInstructorDetails.rejected, (state, action) => {
         state.isUserLoading = false;
         state.userError = action.payload || "Failed to fetch user details";
+      })
+
+      // fetch admin
+      .addCase(fetchAdminDetails.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(fetchAdminDetails.fulfilled, (state, action) => {
+        state.isUserLoading = false;
+        state.userAuthData = action.payload;
+        state.isAuthChecked = true;
+      })
+      .addCase(fetchAdminDetails.rejected, (state, action) => {
+        state.isUserLoading = false;
+        state.userError = action.payload || "Failed to fetch user details";
+        state.isAuthChecked = true;
       });
   },
 })
 
-export const { setUser, clearUser } = checkUserAuthSlice.actions;
+export const { setUser, clearUser, setUserAuthData } = checkUserAuthSlice.actions;
 export default checkUserAuthSlice.reducer;

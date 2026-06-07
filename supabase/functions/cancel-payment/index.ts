@@ -26,8 +26,9 @@ Deno.serve(async (req) => {
       return new Response("Unauthorized", { status: 401, headers });
     }
 
-    const { data: { user } } = await supabase.auth.getUser(authHeader);
-    if (!user) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
       return new Response("Unauthorized", { status: 401, headers });
     }
 

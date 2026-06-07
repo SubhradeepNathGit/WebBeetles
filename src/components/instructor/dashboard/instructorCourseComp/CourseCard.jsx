@@ -18,7 +18,7 @@ const CourseCard = ({ course, setDeletedData, setSelectedCourse, setExpandedSect
 
     return (
         <>
-            <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-purple-600 transition-all group">
+            <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-rose-600 transition-all group">
                 <div className="relative h-48 overflow-hidden cursor-pointer" onClick={() => { setSelectedCourse(course); setExpandedSections({ 1: true }); }}>
                     <img src={course?.thumbnail} alt={course?.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
@@ -33,7 +33,7 @@ const CourseCard = ({ course, setDeletedData, setSelectedCourse, setExpandedSect
                             <span className={`absolute top-11 right-4 px-3 py-1 rounded-full text-xs font-semibold ${isActive ? 'bg-green-500' : 'bg-yellow-500 text-black'}`}>
                                 {isActive ? 'Active' : 'Draft'}
                             </span>
-                            <span className={`absolute top-18 right-4 px-3 py-1 rounded-full text-xs font-semibold ${!course.is_completed ? 'bg-purple-500' : 'bg-blue-500 text-white'}`}>
+                            <span className={`absolute top-18 right-4 px-3 py-1 rounded-full text-xs font-semibold ${!course.is_completed ? 'bg-rose-500' : 'bg-blue-500 text-white'}`}>
                                 {!course?.is_completed ? 'Ongoing' : 'Completed'}
                             </span>
                         </>
@@ -60,7 +60,7 @@ const CourseCard = ({ course, setDeletedData, setSelectedCourse, setExpandedSect
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => { setEditForm(course); setShowEditModal(true); }} disabled={course?.status != 'approved'} className={`flex-1 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${course?.status != 'approved' ? 'cursor-not-allowed bg-purple-500' : 'cursor-pointer bg-purple-600 hover:bg-purple-700'}`}>
+                        <button onClick={() => { setEditForm(course); setShowEditModal(true); }} disabled={course?.status != 'approved'} className={`flex-1 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${course?.status != 'approved' ? 'cursor-not-allowed bg-rose-500' : 'cursor-pointer bg-rose-600 hover:bg-rose-700'}`}>
                             <Edit2 className="w-4 h-4" />
                             Edit
                         </button>

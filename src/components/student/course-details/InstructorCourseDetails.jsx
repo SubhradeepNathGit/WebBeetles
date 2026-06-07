@@ -107,7 +107,7 @@ const InstructorCourseDetails = ({ courseData: getSpecificCourseData }) => {
                         />
                         <div>
                             <p className="font-semibold">{getSpecificCourseData?.instructor?.name ?? 'N/A'}</p>
-                            <p className="text-sm text-gray-400">{(getSpecificCourseData.instructor.role?.charAt(0)?.toUpperCase() + getSpecificCourseData.instructor.role?.slice(1)?.toLowerCase()) ?? 'Instructor'}</p>
+                            <p className="text-sm text-gray-400">{getSpecificCourseData.instructor.role ? (getSpecificCourseData.instructor.role.charAt(0).toUpperCase() + getSpecificCourseData.instructor.role.slice(1).toLowerCase()) : 'Instructor'}</p>
                         </div>
                     </div>
 

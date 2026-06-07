@@ -24,7 +24,7 @@ const InstructorSpecificCourseDetailsHeader = ({ lectureData, selectedCourse, se
 
     return (
         <>
-            <button onClick={() => setSelectedCourse(null)} className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mb-6 cursor-pointer">
+            <button onClick={() => setSelectedCourse(null)} className="flex items-center gap-2 text-rose-400 hover:text-rose-300 transition-colors mb-6 cursor-pointer">
                 <ChevronRight className="w-5 h-5 rotate-180" />
                 Back to Courses
             </button>
@@ -41,7 +41,7 @@ const InstructorSpecificCourseDetailsHeader = ({ lectureData, selectedCourse, se
 
                 <div className="flex gap-3">
                     <button onClick={() => { setEditForm(selectedCourse); setShowEditModal(true); }} disabled={selectedCourse?.status != 'approved'} className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2
-                        ${selectedCourse?.status != 'approved' ? 'cursor-not-allowed bg-purple-500' : 'cursor-pointer bg-purple-600 hover:bg-purple-700'}`}>
+                        ${selectedCourse?.status != 'approved' ? 'cursor-not-allowed bg-rose-500' : 'cursor-pointer bg-rose-600 hover:bg-rose-700'}`}>
                         <Edit2 className="w-4 h-4" />
                         Edit Course
                     </button>

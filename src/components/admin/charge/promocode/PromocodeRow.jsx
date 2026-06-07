@@ -23,7 +23,7 @@ const PromocodeRow = ({ promocode, togglePromo, openEdit, setOpenMarkModal, setC
                         {promocode?.status ? "Active" : "Inactive"}
                     </span>
                     <span
-                        className="text-[10px] px-2 py-[2px] mb-1 rounded-full font-medium bg-purple-500/10 text-purple-400">
+                        className="text-[10px] px-2 py-[2px] mb-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400">
                         {promocode?.apply_mode?.split("_")?.map(promo => promo?.charAt(0)?.toUpperCase() + promo?.slice(1)?.toLowerCase())?.join(" ")}
                     </span>
                 </div>
@@ -37,7 +37,7 @@ const PromocodeRow = ({ promocode, togglePromo, openEdit, setOpenMarkModal, setC
             {/* <div className="flex-1 mx-6 hidden sm:block">
                 <div className="w-full bg-white/5 rounded-full h-1.5">
                     <div
-                        className="bg-purple-600 h-1.5 rounded-full"
+                        className="bg-emerald-600 h-1.5 rounded-full"
                         style={{ width: `${percentUsed}%` }}
                     />
                 </div>

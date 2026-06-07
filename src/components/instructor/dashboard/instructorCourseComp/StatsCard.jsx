@@ -13,7 +13,7 @@ const StatsCard = ({ courses, getCourseData, studentCount, totalRevenue, avgRati
 
     return (
         <>
-            <StatCard icon={BookOpen} value={getCourseData?.length} label="Total Courses" gradient="from-purple-600/20 to-purple-800/20 border-purple-700/30" />
+            <StatCard icon={BookOpen} value={getCourseData?.length} label="Total Courses" gradient="from-rose-600/20 to-rose-800/20 border-rose-700/30" />
             <StatCard icon={Users} value={studentCount?.toLocaleString() ?? 0} label="Total Students" gradient="from-blue-600/20 to-blue-800/20 border-blue-700/30" />
             <StatCard icon={IndianRupee} value={totalRevenue.toLocaleString() ?? 0} label="Total Revenue" gradient="from-green-600/20 to-green-800/20 border-green-700/30" />
             <StatCard icon={Star} value={avgRating ?? 0.0} label="Avg Rating" gradient="from-yellow-600/20 to-yellow-800/20 border-yellow-700/30" />

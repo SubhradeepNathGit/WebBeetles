@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../../util/supabase/supabase";
+import supabaseAdmin from "../../../util/supabase/supabaseAdmin";
 import getSweetAlert from "../../../util/alert/sweetAlert";
+import { generateOTP, sendOTPEmail, sendForgetPasswordEmail } from "../../../util/email/emailService";
 
 // register action
 export const registerSlice = createAsyncThunk('authSlice/registerSlice',
@@ -8,9 +10,11 @@ export const registerSlice = createAsyncThunk('authSlice/registerSlice',
         try {
             // console.log('Data received for user registration', data);
 
-            const { data: authData, error: authError } = await supabase.auth.signUp({
+            // Create user via admin API with email pre-confirmed (bypasses Supabase SMTP)
+            const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
                 email: data.email,
-                password: data.password
+                password: data.password,
+                email_confirm: true,
             });
 
             if (authError) throw authError;
@@ -21,22 +25,22 @@ export const registerSlice = createAsyncThunk('authSlice/registerSlice',
             const file = data.profile_image;
             if (file) {
                 const fileName = `${userId}_${Date.now()}.${file.name.split(".").pop()}`;
-                const { data: uploadData, error: uploadError } = await supabase.storage.from(userType == 'student' ? "student" : "instructor/image").upload(fileName, file, { upsert: true });
+                const { data: uploadData, error: uploadError } = await supabaseAdmin.storage.from(userType == 'student' ? "student" : "instructor/image").upload(fileName, file, { upsert: true });
                 // console.log('Uploading image data', uploadData, ' error', uploadError);
 
                 if (uploadError) throw uploadError;
 
-                const { data: publicUrlData } = supabase.storage.from(userType == 'student' ? "student" : "instructor/image").getPublicUrl(fileName);
+                const { data: publicUrlData } = supabaseAdmin.storage.from(userType == 'student' ? "student" : "instructor/image").getPublicUrl(fileName);
 
                 imageUrl = publicUrlData.publicUrl;
                 imageId = uploadData.path;
             }
 
-            // Insert into public.users table 
+            // Insert into public.users table using admin client to bypass RLS
             let res;
 
             if (userType == 'admin') {
-                res = await supabase.from("admins").insert([{
+                res = await supabaseAdmin.from("admins").insert([{
                     id: userId,
                     name: data.name,
                     email: data.email,
@@ -49,7 +53,7 @@ export const registerSlice = createAsyncThunk('authSlice/registerSlice',
                 }]);
             }
             else if (userType == 'student') {
-                res = await supabase.from("students").insert([{
+                res = await supabaseAdmin.from("students").insert([{
                     id: userId,
                     name: data.name,
                     email: data.email,
@@ -64,7 +68,7 @@ export const registerSlice = createAsyncThunk('authSlice/registerSlice',
                 }]);
             }
             else {
-                res = await supabase.from("instructors").insert([{
+                res = await supabaseAdmin.from("instructors").insert([{
                     id: userId,
                     name: data.name,
                     email: data.email,
@@ -86,9 +90,26 @@ export const registerSlice = createAsyncThunk('authSlice/registerSlice',
             }
             if (res.error) throw res.error;
 
-            // console.log('Response for user registration', res.data);
+            // Generate a 6-digit OTP, store in otp_tokens, send via EmailJS
+            const otp = generateOTP();
 
-            return res.data;
+            // Delete any existing OTPs for this email to keep it clean
+            await supabaseAdmin.from('otp_tokens').delete().eq('email', data.email);
+
+            const { error: otpInsertError } = await supabaseAdmin.from('otp_tokens').insert([{
+                email: data.email,
+                otp,
+                user_type: userType,
+                expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+            }]);
+
+            if (otpInsertError) throw otpInsertError;
+
+            // Send OTP email via EmailJS
+            await sendOTPEmail(data.email, data.name, otp);
+            console.log(`[DEV ONLY] OTP for ${data.email} is: ${otp}`);
+
+            return { userId, email: data.email };
         } catch (err) {
             if (err.response && err.response.data) {
                 return rejectWithValue(err.response.data);
@@ -99,36 +120,43 @@ export const registerSlice = createAsyncThunk('authSlice/registerSlice',
     }
 )
 
-// verify-email action
+// verify-email action — checks OTP against our own otp_tokens table
 export const emailVerifySlice = createAsyncThunk('authSlice/emailVerifySlice',
     async ({ data: verificationData, userType }, { rejectWithValue }) => {
         try {
-            // Verify OTP with Supabase
-            const { data, error } = await supabase.auth.verifyOtp({
-                email: verificationData?.email,
-                token: verificationData?.otp,
-                type: 'email',
-            });
+            const table = userType === 'student' ? 'students' : userType === 'admin' ? 'admins' : 'instructors';
 
-            if (error) {
-                // On failed OTP verification → mark rejected if still pending
-                const { data: user } = await supabase.from(userType == 'student' ? "students" : userType == 'admin' ? "admins" : "instructors").select("is_verified").eq("email", verificationData?.email).single();
+            // Fetch stored OTP row for this email
+            const { data: tokenRow, error: fetchError } = await supabaseAdmin
+                .from('otp_tokens')
+                .select('*')
+                .eq('email', verificationData?.email)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
 
-                if (user?.is_verified === "pending") {
-                    await supabase.from(userType == 'student' ? "students" : userType == 'admin' ? "admins" : "instructors").update({ is_verified: "rejected" }).eq("email", verificationData?.email);
-                }
-
-                throw error;
+            if (fetchError || !tokenRow) {
+                return rejectWithValue({ message: 'OTP not found. Please request a new one.' });
             }
 
-            // OTP success → mark fulfilled if still pending
-            const { data: user } = await supabase.from(userType == 'student' ? "students" : userType == 'admin' ? "admins" : "instructors").select("is_verified").eq("email", verificationData?.email).single();
-
-            if (user?.is_verified === "pending" || user?.is_verified === "rejected") {
-                await supabase.from(userType == 'student' ? "students" : userType == 'admin' ? "admins" : "instructors").update({ is_verified: "fulfilled" }).eq("email", verificationData?.email);
+            // Check expiry
+            if (new Date(tokenRow.expires_at) < new Date()) {
+                await supabaseAdmin.from('otp_tokens').delete().eq('email', verificationData?.email);
+                return rejectWithValue({ message: 'OTP has expired. Please request a new one.' });
             }
 
-            return data;
+            // Check OTP match
+            if (tokenRow.otp !== verificationData?.otp) {
+                return rejectWithValue({ message: 'Incorrect OTP. Please try again.' });
+            }
+
+            // OTP correct — clean up token row
+            await supabaseAdmin.from('otp_tokens').delete().eq('email', verificationData?.email);
+
+            // Mark user as verified
+            await supabaseAdmin.from(table).update({ is_verified: 'fulfilled' }).eq('email', verificationData?.email);
+
+            return { email: verificationData?.email };
         } catch (err) {
             return rejectWithValue({ message: err.message });
         }
@@ -164,7 +192,10 @@ export const loginSlice = createAsyncThunk('authSlice/loginSlice',
             else {
                 userData = null, userError = null;
             }
-            // console.log('Response for user login', res);
+            if (userData && userData.is_verified !== 'fulfilled' && userData.is_verified !== 'verified') {
+                await supabase.auth.signOut();
+                return rejectWithValue({ message: "Please verify your email first" });
+            }
 
             return { ...res.data, userData: userData };
 
@@ -209,10 +240,9 @@ export const updateLastSignInAt = createAsyncThunk("authSlice/updateLastSignInAt
 export const forgetPasswordSlice = createAsyncThunk('authSlice/forgetPasswordSlice',
     async ({ data, userType }, { rejectWithValue }) => {
         try {
-            // console.log('Data received for forget password', data);
-
             // Check if user exists 
-            const { data: existingUser, error: fetchError } = await supabase.from(userType == 'student' ? "students" : "instructors").select("email").eq("email", data.email).single();
+            const table = userType === 'student' ? "students" : "instructors";
+            const { data: existingUser, error: fetchError } = await supabase.from(table).select("email, name").eq("email", data.email).single();
 
             if (!existingUser) {
                 return rejectWithValue({
@@ -220,15 +250,28 @@ export const forgetPasswordSlice = createAsyncThunk('authSlice/forgetPasswordSli
                 });
             }
 
-            const res = await supabase.auth.signInWithOtp({
-                email: data.email,
-                options: {
-                    emailRedirectTo: undefined,
-                }
-            });
-            // console.log('Response for forget password', res);
+            // Generate a 6-digit OTP, store in otp_tokens, send via EmailJS
+            const otp = generateOTP();
 
-            return res.data;
+            await supabaseAdmin.from('otp_tokens').delete().eq('email', data.email);
+
+            const { data: otpInsertData, error: otpInsertError } = await supabaseAdmin.from('otp_tokens').insert([{
+                email: data.email,
+                otp,
+                user_type: userType,
+                expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 mins expiry
+            }]).select('id').single();
+
+            if (otpInsertError) throw otpInsertError;
+
+            // Construct secure confirm/reset link
+            const resetLink = `${window.location.origin}${userType === 'student' ? '' : '/instructor'}/reset-password?token=${otpInsertData.id}&email=${encodeURIComponent(data.email)}`;
+
+            // Send password reset link email via EmailJS
+            await sendForgetPasswordEmail(data.email, existingUser.name, resetLink);
+            console.log(`[DEV ONLY] Forget Password reset link for ${data.email} is: ${resetLink}`);
+
+            return { email: data.email };
         } catch (err) {
             if (err.response && err.response.data) {
                 return rejectWithValue(err.response.data);
@@ -274,89 +317,99 @@ export const forgetPasswordSlice = createAsyncThunk('authSlice/forgetPasswordSli
 // )
 
 
-// verify OTP action
-export const verifyOtpForReset = createAsyncThunk("authSlice/verifyOtpForReset",
-    async (data, { rejectWithValue }) => {
-        // console.log('Received data for OTP verification in slice', data);
-
-        const { data: verifyData, error } = await supabase.auth.verifyOtp({
-            type: "email",
-            email: data.email,
-            token: data.otp,
-        });
-
-        if (error) {
-            return rejectWithValue({ message: "Invalid or expired OTP" });
-        }
-
-        // Return session so frontend can store it
-        return verifyData.session;
-    }
-);
-
 // reset password action
 export const resetPasswordSlice = createAsyncThunk("authSlice/resetPasswordSlice",
-    async (data, { rejectWithValue, getState, dispatch }) => {
+    async (data, { rejectWithValue }) => {
         try {
-            let session = getState().auth.otpSession; // stored previously
-            // console.log('session', session);
+            // data contains: email, otp, newPassword, userType
+            const table = data.userType === 'student' ? 'students' : 'instructors';
 
-            // If session is missing → dispatch OTP verification
-            if (!session) {
-                const otpAction = await dispatch(verifyOtpForReset(data));
+            // Fetch stored OTP row for this email
+            const { data: tokenRow, error: fetchError } = await supabaseAdmin
+                .from('otp_tokens')
+                .select('*')
+                .eq('email', data.email)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
 
-                if (otpAction.meta.requestStatus === "rejected") {
-                    return rejectWithValue({ message: "Invalid or expired OTP" });
-                }
-                session = otpAction.payload;
+            if (fetchError || !tokenRow) {
+                return rejectWithValue({ message: 'OTP not found. Please request a new one.' });
             }
 
-            if (!session) {
-                return rejectWithValue({
-                    message: "Session expired. Please request OTP again.",
-                });
+            // Check expiry
+            if (new Date(tokenRow.expires_at) < new Date()) {
+                await supabaseAdmin.from('otp_tokens').delete().eq('email', data.email);
+                return rejectWithValue({ message: 'OTP has expired. Please request a new one.' });
             }
 
-            // Update user password
-            const res = await supabase.auth.updateUser(
+            // Check OTP or Link Token (UUID) match
+            const isMatch = (tokenRow.otp === data.otp) || (tokenRow.id === data.otp);
+            if (!isMatch) {
+                return rejectWithValue({ message: 'Incorrect OTP or link is invalid/expired.' });
+            }
+
+            // OTP correct — clean up token row
+            await supabaseAdmin.from('otp_tokens').delete().eq('email', data.email);
+
+            // Fetch user id from our table
+            const { data: userData, error: userError } = await supabaseAdmin
+                .from(table)
+                .select('id')
+                .eq('email', data.email)
+                .single();
+
+            if (userError || !userData) {
+                return rejectWithValue({ message: "User not found." });
+            }
+
+            // Update user password via admin API
+            const { data: updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+                userData.id,
                 { password: data.newPassword }
             );
-            // console.log('Response for updating password', res);
 
-            if (res.error) {
-                if (res.error.message.includes("New password should be different from the old password.")) {
+            if (updateError) {
+                if (updateError.message.includes("New password should be different from the old password.")) {
                     return rejectWithValue({
                         message: "New password cannot be the same as old password",
                     });
                 }
-
                 return rejectWithValue({
                     message: "An error occurred. Try again.",
                 });
             }
-            return res.data;
+            return updateData;
         } catch (err) {
             return rejectWithValue({ message: err.message });
         }
     }
 );
 
-// resend otp action
+// resend otp action — generates a fresh OTP and resends via EmailJS
 export const resendOTPSlice = createAsyncThunk('authSlice/resendOTPSlice',
     async (data, { rejectWithValue }) => {
         try {
-            // console.log("Resending verification email for:", data.email);
+            // console.log("Resending OTP for:", data.email);
 
-            const { data: resendData, error } = await supabase.auth.resend({
-                type: "signup",
+            const otp = generateOTP();
+
+            // Upsert OTP (delete old, insert new)
+            await supabaseAdmin.from('otp_tokens').delete().eq('email', data.email);
+
+            const { error: insertError } = await supabaseAdmin.from('otp_tokens').insert([{
                 email: data.email,
-            });
+                otp,
+                user_type: data.userType || 'student',
+                expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+            }]);
 
-            if (error) throw error;
+            if (insertError) throw insertError;
 
-            // console.log("Resend email response:", resendData);
+            await sendOTPEmail(data.email, data.name || '', otp);
+            console.log(`[DEV ONLY] Resent OTP for ${data.email} is: ${otp}`);
 
-            return { message: "Verification email resent successfully." };
+            return { message: 'OTP resent successfully.' };
         } catch (err) {
             if (err.response && err.response.data) {
                 return rejectWithValue(err.response.data);
@@ -371,7 +424,6 @@ export const resendOTPSlice = createAsyncThunk('authSlice/resendOTPSlice',
 const initialState = {
     isUserAuthLoading: false,
     getUserAuthData: [],
-    otpSession: null,
     isUserAuthError: null
 }
 
@@ -392,7 +444,7 @@ export const authSlice = createSlice({
             .addCase(registerSlice.rejected, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = [];
-                state.isUserAuthError = action.error?.message;
+                state.isUserAuthError = action.payload?.message || action.error?.message;
             })
 
             // email verify reducer
@@ -407,7 +459,7 @@ export const authSlice = createSlice({
             .addCase(emailVerifySlice.rejected, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = [];
-                state.isUserAuthError = action.error?.message;
+                state.isUserAuthError = action.payload?.message || action.error?.message;
             })
 
             // login reducer
@@ -422,7 +474,7 @@ export const authSlice = createSlice({
             .addCase(loginSlice.rejected, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = [];
-                state.isUserAuthError = action.error?.message;
+                state.isUserAuthError = action.payload?.message || action.error?.message;
             })
 
             // update last-login reducer
@@ -437,7 +489,7 @@ export const authSlice = createSlice({
             .addCase(updateLastSignInAt.rejected, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = [];
-                state.isUserAuthError = action.error?.message;
+                state.isUserAuthError = action.payload?.message || action.error?.message;
             })
 
             // forget password reducer
@@ -452,7 +504,7 @@ export const authSlice = createSlice({
             .addCase(forgetPasswordSlice.rejected, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = [];
-                state.isUserAuthError = action.error?.message;
+                state.isUserAuthError = action.payload?.message || action.error?.message;
             })
 
             // reset password reducer
@@ -462,26 +514,12 @@ export const authSlice = createSlice({
             .addCase(resetPasswordSlice.fulfilled, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = action.payload;
-                state.otpSession = null;
                 state.isUserAuthError = null;
             })
             .addCase(resetPasswordSlice.rejected, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = [];
-                state.isUserAuthError = action.error?.message;
-            })
-
-            // verify OTP reducer
-            .addCase(verifyOtpForReset.pending, (state, action) => {
-                state.isUserAuthLoading = true;
-            })
-            .addCase(verifyOtpForReset.fulfilled, (state, action) => {
-                state.isUserAuthLoading = false;
-                state.otpSession = action.payload;
-            })
-            .addCase(verifyOtpForReset.rejected, (state, action) => {
-                state.isUserAuthLoading = false;
-                state.otpSession = null;
+                state.isUserAuthError = action.payload?.message || action.error?.message;
             })
 
             // resend OTP reducer
@@ -496,7 +534,7 @@ export const authSlice = createSlice({
             .addCase(resendOTPSlice.rejected, (state, action) => {
                 state.isUserAuthLoading = false;
                 state.getUserAuthData = [];
-                state.isUserAuthError = action.error?.message;
+                state.isUserAuthError = action.payload?.message || action.error?.message;
             })
     }
 });

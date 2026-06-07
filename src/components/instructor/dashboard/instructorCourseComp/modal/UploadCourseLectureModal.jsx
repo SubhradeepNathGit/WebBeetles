@@ -180,7 +180,7 @@ const UploadCourseLectureModal = ({ setShowUploadModal, uploadForm, updateData, 
                                 </label>
 
                                 <label onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}
-                                    className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-purple-500 transition-colors cursor-pointer block"
+                                    className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-rose-500 transition-colors cursor-pointer block"
                                 >
                                     <Upload className="w-12 h-12 mx-auto mb-3 text-gray-500" />
 
@@ -209,7 +209,7 @@ const UploadCourseLectureModal = ({ setShowUploadModal, uploadForm, updateData, 
                     {/* ACTION BUTTONS */}
                     <div className="flex gap-3 pt-4">
                         <button type="submit" disabled={isVideoLoading}
-                            className={`flex-1 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors ${isVideoLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                            className={`flex-1 py-3 bg-rose-600 hover:bg-rose-700 rounded-lg font-semibold transition-colors ${isVideoLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                             {isVideoLoading ? <Loader2 className="w-4 h-4 animate-spin inline" /> : ''} {isEdit ? 'Update' : 'Upload'}
                         </button>
                         <button type="button" onClick={() => setShowUploadModal(null)} disabled={isVideoLoading}

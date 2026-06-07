@@ -86,7 +86,7 @@ const CoursesSection = () => {
           </h1>
 
           {/* Search Bar */}
-          <div className="flex w-full lg:w-auto max-w-md justify-center lg:justify-end">
+          <div className="flex w-full lg:w-auto max-w-xs sm:max-w-md justify-center lg:justify-end">
             <div className="relative flex-1 lg:w-72">
               <input
                 type="text"

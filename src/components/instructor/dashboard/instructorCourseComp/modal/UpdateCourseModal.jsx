@@ -84,7 +84,7 @@ const UpdateCourseModal = ({ setShowEditModal, editForm, setEditForm }) => {
                         <label className="block text-sm font-medium mb-2">Course Title</label>
                         <input
                             {...register('title', { required: 'Title is required' })}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"
+                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-rose-500 transition-colors"
                         />
                         {errors.title && (
                             <p className="text-red-400 text-sm mt-1">{errors.title.message}</p>
@@ -101,7 +101,7 @@ const UpdateCourseModal = ({ setShowEditModal, editForm, setEditForm }) => {
                                     required: 'Price is required',
                                     min: { value: 0, message: 'Price must be positive' }
                                 })}
-                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"
+                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-rose-500 transition-colors"
                             />
                             {errors.revenue && (
                                 <p className="text-red-400 text-sm mt-1">{errors.revenue.message}</p>
@@ -112,7 +112,7 @@ const UpdateCourseModal = ({ setShowEditModal, editForm, setEditForm }) => {
                             <label className="block text-sm font-medium mb-2">Status</label>
                             <select
                                 {...register('status', { required: true })}
-                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"
+                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-rose-500 transition-colors"
                             >
                                 <option value="draft">Draft</option>
                                 <option value="published">Published</option>
@@ -134,7 +134,7 @@ const UpdateCourseModal = ({ setShowEditModal, editForm, setEditForm }) => {
                                             required: 'Feature is required'
                                         })}
                                         placeholder={`Feature ${index + 1}`}
-                                        className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors"
+                                        className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-rose-500 transition-colors"
                                     />
 
                                     {index !== 0 && (
@@ -153,7 +153,7 @@ const UpdateCourseModal = ({ setShowEditModal, editForm, setEditForm }) => {
                                 <button
                                     type="button"
                                     onClick={() => append({ value: '' })}
-                                    className="text-sm text-purple-400 hover:text-purple-300 cursor-pointer"
+                                    className="text-sm text-rose-400 hover:text-rose-300 cursor-pointer"
                                 >
                                     + Add Feature
                                 </button>
@@ -171,7 +171,7 @@ const UpdateCourseModal = ({ setShowEditModal, editForm, setEditForm }) => {
                     <div className="flex gap-3 pt-4">
                         <button
                             type="submit"
-                            className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors"
+                            className="flex-1 py-3 bg-rose-600 hover:bg-rose-700 rounded-lg font-semibold transition-colors"
                         >
                             {isCourseLoading ? <Loader2 className="w-4 h-4 animate-spin inline" /> : ''} Save Changes
                         </button>

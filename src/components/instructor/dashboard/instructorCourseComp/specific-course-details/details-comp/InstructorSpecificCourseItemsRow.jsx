@@ -36,8 +36,8 @@ const InstructorSpecificCourseItemsRow = ({ lectureData, selectedCourse, setUpda
                     className={`flex items-center gap-4 flex-1 ${canExpand ? "cursor-pointer" : "cursor-not-allowed opacity-70"}`} >
                     {canExpand ? (
                         expandedSections[section.id] ? (
-                            <ChevronDown className="w-5 h-5 text-purple-400" />) : (
-                            <ChevronRight className="w-5 h-5 text-purple-400" />)) : (
+                            <ChevronDown className="w-5 h-5 text-rose-400" />) : (
+                            <ChevronRight className="w-5 h-5 text-rose-400" />)) : (
                         <LockKeyhole className="w-5 h-5 text-white" />
                     )}
 
@@ -68,7 +68,7 @@ const InstructorSpecificCourseItemsRow = ({ lectureData, selectedCourse, setUpda
 
                     {section?.type != 'demo' && section?.type != 'exam' && (
                         <div className="p-4 border-t border-gray-800">
-                            <button onClick={!selectedCourse?.is_completed ? () => { setUploadForm({ course_id: selectedCourse?.id, category_id: selectedCourse?.category?.id, sectionType: section?.type }); setShowUploadModal(true); setUpdateData(null); } : undefined} className={`w-full py-3 bg-purple-600/20 border border-purple-600/50 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-purple-400 ${selectedCourse?.is_completed ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-purple-600/30'}`}>
+                            <button onClick={!selectedCourse?.is_completed ? () => { setUploadForm({ course_id: selectedCourse?.id, category_id: selectedCourse?.category?.id, sectionType: section?.type }); setShowUploadModal(true); setUpdateData(null); } : undefined} className={`w-full py-3 bg-rose-600/20 border border-rose-600/50 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-rose-400 ${selectedCourse?.is_completed ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-rose-600/30'}`}>
                                 <Upload className="w-5 h-5" />
                                 {section?.type == 'video' ? 'Upload / Add Video' : section?.type == 'document' ? 'Upload / Add Document' : 'Upload / Add Content'}
                             </button>

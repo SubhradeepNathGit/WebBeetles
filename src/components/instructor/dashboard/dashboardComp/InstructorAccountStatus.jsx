@@ -18,7 +18,7 @@ const InstructorAccountStatus = ({ instructorDetails }) => {
             <div className="space-y-3">
                 <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs sm:text-sm text-purple-200 font-medium">Verification</span>
+                        <span className="text-xs sm:text-sm text-rose-200 font-medium">Verification</span>
                         {isVerified ? (
                             <span className="flex items-center gap-1 text-xs font-bold text-green-300 bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"><CheckCircle2 size={12} /> Verified</span>
                         ) : (
@@ -28,7 +28,7 @@ const InstructorAccountStatus = ({ instructorDetails }) => {
                 </div>
                 <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs sm:text-sm text-purple-200 font-medium">Application</span>
+                        <span className="text-xs sm:text-sm text-rose-200 font-medium">Application</span>
                         {isApproved ? (
                             <span className="flex items-center gap-1 text-xs font-bold text-green-300 bg-green-500/20 px-2 py-1 rounded-full border border-green-400/30"><CheckCircle2 size={12} /> Approved</span>
                         ) : (
@@ -39,8 +39,8 @@ const InstructorAccountStatus = ({ instructorDetails }) => {
                 {updatedAt && (
                     <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs sm:text-sm text-purple-200 font-medium">Last Updated</span>
-                            <span className="text-xs font-bold text-purple-200">{formatDate(updatedAt)}</span>
+                            <span className="text-xs sm:text-sm text-rose-200 font-medium">Last Updated</span>
+                            <span className="text-xs font-bold text-rose-200">{formatDate(updatedAt)}</span>
                         </div>
                     </div>
                 )}

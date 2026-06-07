@@ -68,28 +68,28 @@ const InstructorExpertise = ({ instructorDetails }) => {
         <div className="bg-white/10 backdrop-blur-xl rounded-xl lg:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-5 lg:p-6">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white flex items-center gap-2">
-                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-purple-500/30 flex items-center justify-center border border-purple-400/30"><Code size={18} className="text-purple-300" /></div>
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-rose-500/30 flex items-center justify-center border border-rose-400/30"><Code size={18} className="text-rose-300" /></div>
                     Expertise
                 </h2>
-                {!editingExpertise && <button onClick={() => { setTempExpertise([...expertise]); setEditingExpertise(true); }} className="text-xs sm:text-sm text-purple-200 hover:text-white font-semibold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all border border-white/20 cursor-pointer"><Edit3 size={14} className="inline mr-1" /> Edit</button>}
+                {!editingExpertise && <button onClick={() => { setTempExpertise([...expertise]); setEditingExpertise(true); }} className="text-xs sm:text-sm text-rose-200 hover:text-white font-semibold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all border border-white/20 cursor-pointer"><Edit3 size={14} className="inline mr-1" /> Edit</button>}
             </div>
 
             {!editingExpertise ? (
                 <div className="flex flex-wrap gap-2">
                     {expertise?.length > 0 ? expertise?.map((skill, idx) => (
-                        <span key={idx} className="inline-flex items-center gap-1.5 bg-gradient-to-r from-purple-500/30 to-blue-500/30 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold border border-white/20">
+                        <span key={idx} className="inline-flex items-center gap-1.5 bg-gradient-to-r from-rose-500/30 to-blue-500/30 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold border border-white/20">
                             <Tag size={12} />{skill}
                         </span>
-                    )) : <p className="text-purple-200 text-sm">No skills added.</p>}
+                    )) : <p className="text-rose-200 text-sm">No skills added.</p>}
                 </div>
             ) : (
                 <div className="space-y-3">
                     <div className="flex gap-2">
                         <input type="text" value={newSkill} onChange={(e) => setNewSkill(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-                            placeholder="Add skill..." className="flex-1 bg-white/10 text-purple-100 placeholder:text-purple-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400/50" />
+                            placeholder="Add skill..." className="flex-1 bg-white/10 text-rose-100 placeholder:text-rose-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-rose-400/50" />
                         <button onClick={addSkill}
-                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"><Plus size={16} /></button>
+                            className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"><Plus size={16} /></button>
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {tempExpertise.map((skill, idx) => (

@@ -1,5 +1,5 @@
-import React from 'react'
-import { Clock, Play, Star, Users } from "lucide-react";
+import React from 'react';
+import { Clock, Play, Star, Users, ChevronRight } from "lucide-react";
 import { useCourseDetails } from '../../../../tanstack/query/fetchSpecificCourseDetails';
 import { useCourseVideos } from '../../../../tanstack/query/fetchLectureVideo';
 import { formatToHHMMSS } from '../../../../util/timeFormat/timeFormat';
@@ -8,69 +8,98 @@ import { useCoursePurchases } from '../../../../tanstack/query/fetchCoursePurcha
 import { useLectureProgress } from '../../../../tanstack/query/fetchVideoProgressDetails';
 
 const StudentDashboardCourseContinueCard = ({ course, userAuthData }) => {
+  const { data: courseDetails } = useCourseDetails(course?.id);
+  const { data: lectureData } = useCourseVideos({ courseId: course?.id });
+  const { data: students } = useCoursePurchases(course?.id);
+  const { data: progressData } = useLectureProgress({ student_id: userAuthData?.id, course_id: course?.id });
 
-    const { isLoading: isCourseDetailsLoading, data: courseDetails, error: hasCourseDetailsError } = useCourseDetails(course?.id);
-    const { isLoading, data: lectureData, error } = useCourseVideos({ courseId: course?.id });
-    const { data: students, isLoading: isStudentLoading } = useCoursePurchases(course?.id);
-    const { isLoading: isCourseProgressLoading, data: progressData, error: hasCourseProgressError } = useLectureProgress({ student_id: userAuthData?.id, course_id: course?.id });
+  const totalSeconds = lectureData?.reduce((acc, v) => acc + Number(v?.duration || 0), 0) || 0;
+  const totalLectureTiming = formatToHHMMSS(totalSeconds);
 
-    const totalSeconds = lectureData?.reduce((acc, value) => acc + Number(value?.duration || 0), 0) || 0;
-    const totalLectureTiming = formatToHHMMSS(totalSeconds);
+  const completedLectures = progressData?.filter(p => p?.completed)?.length ?? 0;
+  const watchedSeconds = progressData?.reduce((acc, v) => acc + Math.min(v.watched_seconds || 0, v.total_seconds || 0), 0) || 0;
 
-    const completedCourse = progressData?.filter(course => course?.completed);
-
-    const watchedSeconds = progressData?.reduce((acc, v) => acc + Math.min(v.watched_seconds || 0, v.total_seconds || 0), 0) || 0;
-
-    const calculateCourseProgress = () => {
-        if (!totalSeconds) return 0;
-
+  const progressPercent = totalSeconds
+    ? (() => {
         const raw = (watchedSeconds / totalSeconds) * 100;
-        if (raw >= 100) {
-            if (!courseDetails?.is_completed) return 99;
-            return 100;
-        }
+        if (raw >= 100) return courseDetails?.is_completed ? 100 : 99;
         return Math.floor(raw);
-    };
+      })()
+    : 0;
 
-    const progressPercent = calculateCourseProgress();
+  const progressColor = progressPercent === 100 ? "bg-emerald-500" : progressPercent >= 50 ? "bg-purple-500" : "bg-blue-500";
+  const progressTextColor = progressPercent === 100 ? "text-emerald-500" : progressPercent >= 50 ? "text-purple-500" : "text-blue-500";
 
-    // console.log('Course details',courseDetails);
-
-    return (
-        <div className="group bg-white/5 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/15 transition-all duration-300 border border-white/10 hover:border-white/30 hover:shadow-2xl">
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-shrink-0">
-                    <img src={course?.thumbnail} alt={course?.title} className="w-full sm:w-40 h-32 sm:h-28 rounded-xl object-cover ring-2 ring-white/20" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                        <button className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-2xl transform scale-90 group-hover:scale-100 transition-transform">
-                            <Play size={20} className="text-purple-600 ml-1" fill="currentColor" />
-                        </button>
-                    </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-white text-lg mb-2 group-hover:text-purple-200 transition-colors line-clamp-1">{course?.title ?? 'N/A'}</h3>
-                    <p className="text-sm text-purple-200 mb-3">by {courseDetails?.instructor?.name ?? 'N/A'}</p>
-                    <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs text-purple-200 mb-4">
-                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Star size={14} className="text-yellow-400" fill="currentColor" /><CourseRating courseId={courseDetails?.id} /></span>
-                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Users size={14} />{students?.length ?? 0}</span>
-                        <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg"><Clock size={14} />{totalLectureTiming}</span>
-                    </div>
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-purple-200">Progress: {completedCourse?.length ?? 0}/{lectureData?.length ?? 0} lessons</span>
-                            <span className="font-bold text-white bg-white/20 px-3 py-1 rounded-lg">{progressPercent}%</span>
-                        </div>
-                        <div className="h-3 bg-white/20 rounded-full overflow-hidden shadow-inner">
-                            <div className="h-full bg-gradient-to-r from-purple-400 via-pink-500 to-purple-500 rounded-full transition-all duration-500 shadow-lg" style={{ width: `${progressPercent}%` }} />
-                        </div>
-                        <p className="text-xs text-purple-200 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>Category: <span className="font-semibold text-white">{courseDetails?.category?.name ?? 'N/A'}</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="group relative rounded-lg bg-transparent border border-white/8 hover:bg-white/4 p-4 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col sm:flex-row gap-4">
+      
+      {/* Thumbnail */}
+      <div className="relative flex-shrink-0">
+        <img
+          src={course?.thumbnail}
+          alt={course?.title}
+          className="w-full sm:w-36 h-28 sm:h-24 rounded-md object-cover border border-white/10"
+        />
+        {/* Play overlay on hover */}
+        <div className="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center">
+            <Play size={14} className="text-white ml-0.5" fill="white" />
+          </div>
         </div>
-    )
-}
+        {/* Progress pill on thumbnail */}
+        <div className={`absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded border border-black/20 bg-black/80 ${progressTextColor} backdrop-blur-sm`}>
+          {progressPercent}%
+        </div>
+      </div>
 
-export default StudentDashboardCourseContinueCard
+      {/* Info */}
+      <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <h3 className="font-semibold text-white text-sm mb-1 line-clamp-1 group-hover:text-purple-300 transition-colors">
+          {course?.title ?? 'N/A'}
+        </h3>
+        <p className="text-xs text-white/40 mb-3">
+          by {courseDetails?.instructor?.name ?? 'N/A'}
+        </p>
+
+        {/* Meta row */}
+        <div className="flex flex-wrap items-center gap-2 text-xs mb-3">
+          <span className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-white/60">
+            <Star size={12} className="text-amber-400" fill="#fbbf24" />
+            <CourseRating courseId={courseDetails?.id} />
+          </span>
+          <span className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-white/60">
+            <Users size={12} className="text-purple-400" />
+            {students?.length ?? 0}
+          </span>
+          <span className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-white/60">
+            <Clock size={12} className="text-blue-400" />
+            {totalLectureTiming}
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div>
+          <div className="flex items-center justify-between text-[10px] mb-1">
+            <span className="text-white/40">
+              {completedLectures}/{lectureData?.length ?? 0} lessons
+            </span>
+            <span className={`font-bold ${progressTextColor}`}>{progressPercent}%</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Arrow indicator */}
+      <div className="hidden sm:flex items-center self-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <ChevronRight size={18} className="text-white/30 group-hover:text-white/60" />
+      </div>
+    </div>
+  );
+};
+
+export default StudentDashboardCourseContinueCard;

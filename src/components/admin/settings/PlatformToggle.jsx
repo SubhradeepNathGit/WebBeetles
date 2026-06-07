@@ -11,7 +11,7 @@ function Toggle({ value, onChange, label, description }) {
             </div>
             <button
                 onClick={() => onChange(!value)}
-                className={`w-11 h-6 rounded-full relative transition-colors duration-200 flex-shrink-0 cursor-pointer ${value ? "bg-purple-600" : "bg-gray-700"}`}
+                className={`w-11 h-6 rounded-full relative transition-colors duration-200 flex-shrink-0 cursor-pointer ${value ? "bg-emerald-600" : "bg-gray-700"}`}
             >
                 <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-all ${value ? "left-6" : "left-1"}`} />
             </button>

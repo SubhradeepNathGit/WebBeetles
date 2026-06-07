@@ -21,7 +21,7 @@ const RecentStudents = () => {
                 {isAllStudentLoading ? <Loader2 className='inline mx-auto animate-spin w-10 h-10' /> : getAllStudentData?.length > 0 ?
                     getAllStudentData?.slice(0, 4)?.map(s => (
                         <div key={s?.id} className="flex items-center gap-3 py-2 border-b border-white/5 last:border-0">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-700 to-purple-900 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-700 to-emerald-900 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                 {s?.name?.charAt(0)}
                             </div>
                             <div className="flex-1 min-w-0">

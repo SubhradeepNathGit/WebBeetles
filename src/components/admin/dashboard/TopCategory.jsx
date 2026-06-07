@@ -7,7 +7,7 @@ const TopCategory = () => {
             <SectionHeader title="Top Course Categories" />
             <div className="space-y-4">
                 {[
-                    { label: "Web Development", pct: 38, color: "bg-purple-500" },
+                    { label: "Web Development", pct: 38, color: "bg-emerald-500" },
                     { label: "Data Science", pct: 27, color: "bg-yellow-500" },
                     { label: "Design (UI/UX)", pct: 18, color: "bg-fuchsia-500" },
                     { label: "Marketing", pct: 10, color: "bg-blue-500" },

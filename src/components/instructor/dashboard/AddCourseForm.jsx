@@ -295,7 +295,7 @@ const AddCourseForm = () => {
   const inputClass = useCallback(
     (err) =>
       `w-full px-4 py-3 rounded-xl bg-white/5 border ${err ? "border-red-400/60" : "border-white/10"
-      } focus:outline-none focus:border-purple-400/60 focus:bg-white/10 text-white placeholder:text-white/40 transition-all duration-200 hover:border-white/20`,
+      } focus:outline-none focus:border-rose-400/60 focus:bg-white/10 text-white placeholder:text-white/40 transition-all duration-200 hover:border-white/20`,
     []
   );
 
@@ -310,7 +310,7 @@ const AddCourseForm = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-rose-500 animate-spin mx-auto mb-4" />
           <p className="text-white/60 text-sm">Loading categories...</p>
         </div>
       </div>
@@ -339,7 +339,7 @@ const AddCourseForm = () => {
       <div className="max-w-7xl mx-auto">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-gradient-to-br from-purple-700 to-black/30 border border-purple-500 rounded-2xl shadow-2xl overflow-hidden"
+          className="bg-gradient-to-br from-rose-700 to-black/30 border border-rose-500 rounded-2xl shadow-2xl overflow-hidden"
         >
 
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
@@ -347,7 +347,7 @@ const AddCourseForm = () => {
             <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
               <div className="pb-3 sm:pb-4 border-b border-white/10">
                 <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
-                  <span className="bg-purple-500/20 text-purple-300 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">01</span>
+                  <span className="bg-rose-500/20 text-rose-300 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">01</span>
                   Course Details
                 </h2>
               </div>
@@ -376,7 +376,7 @@ const AddCourseForm = () => {
                   <select {...register("category", { required: "Category is required" })} className={inputClass(errors.category)}>
                     <option value="">Choose category</option>
                     {getCategoryData?.map(cat => (
-                      <option key={cat?.id} value={cat?.id} className="bg-purple-900">{cat?.name}</option>
+                      <option key={cat?.id} value={cat?.id} className="bg-rose-900">{cat?.name}</option>
                     ))}
                   </select>
                   <ErrorMsg msg={errors?.category?.message} />
@@ -388,8 +388,8 @@ const AddCourseForm = () => {
                 {!thumbnailFile ? (
                   <>
                     <input type="file" accept="image/*" id="thumbnail-upload" className="hidden" onChange={handleThumbnailChange} />
-                    <label htmlFor="thumbnail-upload" className={`group flex flex-col items-center justify-center w-full h-32 sm:h-40 rounded-xl bg-purple-500/10 border-2 border-dashed ${errors.thumbnail ? "border-red-400/60" : "border-purple-400/30"} hover:border-purple-400/60 hover:bg-purple-500/20 cursor-pointer transition-all duration-200`}>
-                      <MdImage className="text-4xl sm:text-5xl text-purple-400/60 group-hover:text-purple-300 transition-colors mb-2 sm:mb-3" />
+                    <label htmlFor="thumbnail-upload" className={`group flex flex-col items-center justify-center w-full h-32 sm:h-40 rounded-xl bg-rose-500/10 border-2 border-dashed ${errors.thumbnail ? "border-red-400/60" : "border-rose-400/30"} hover:border-rose-400/60 hover:bg-rose-500/20 cursor-pointer transition-all duration-200`}>
+                      <MdImage className="text-4xl sm:text-5xl text-rose-400/60 group-hover:text-rose-300 transition-colors mb-2 sm:mb-3" />
                       <p className="text-white/60 group-hover:text-white/80 font-medium text-sm sm:text-base">Click to upload thumbnail</p>
                       <p className="text-white/40 text-xs mt-1">PNG, JPG, JPEG up to 500KB</p>
                     </label>
@@ -412,7 +412,7 @@ const AddCourseForm = () => {
                           {thumbnailProgress >= 0 && thumbnailProgress < 100 && (
                             <>
                               <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                                <div className="bg-gradient-to-r from-purple-500 to-purple-400 h-full transition-all duration-300 ease-out" style={{ width: `${thumbnailProgress}%` }} />
+                                <div className="bg-gradient-to-r from-rose-500 to-rose-400 h-full transition-all duration-300 ease-out" style={{ width: `${thumbnailProgress}%` }} />
                               </div>
                               <div className="flex justify-between items-center">
                                 <span className="text-white/60 text-xs">Uploading...</span>
@@ -440,7 +440,7 @@ const AddCourseForm = () => {
             <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
               <div className="pb-3 sm:pb-4 border-b border-white/10">
                 <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
-                  <span className="bg-purple-500/20 text-purple-300 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">02</span>
+                  <span className="bg-rose-500/20 text-rose-300 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">02</span>
                   Course Content
                 </h2>
               </div>
@@ -484,7 +484,7 @@ const AddCourseForm = () => {
                   <button
                     type="button"
                     onClick={() => addFeature({ value: "" })}
-                    className="flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm font-medium cursor-pointer"
+                    className="flex items-center gap-2 text-rose-400 hover:text-rose-300 text-sm font-medium cursor-pointer"
                   >
                     <MdAdd />
                     Add Feature
@@ -513,15 +513,15 @@ const AddCourseForm = () => {
                       [&::-webkit-scrollbar-track]:bg-white/5
                       [&::-webkit-scrollbar-track]:backdrop-blur-md
                       [&::-webkit-scrollbar-thumb]:bg-gradient-to-b
-                      [&::-webkit-scrollbar-thumb]:from-purple-500/70
-                      [&::-webkit-scrollbar-thumb]:to-purple-700/70
+                      [&::-webkit-scrollbar-thumb]:from-rose-500/70
+                      [&::-webkit-scrollbar-thumb]:to-rose-700/70
                       [&::-webkit-scrollbar-thumb]:backdrop-blur-lg
                       [&::-webkit-scrollbar-thumb]:border
                       [&::-webkit-scrollbar-thumb]:border-white/10
                       [&::-webkit-scrollbar-thumb]:rounded-full
                       [&::-webkit-scrollbar-thumb]:shadow-[0_0_8px_rgba(168,85,247,0.6)]
-                      [&::-webkit-scrollbar-thumb]:hover:from-purple-400/80
-                      [&::-webkit-scrollbar-thumb]:hover:to-purple-600/80
+                      [&::-webkit-scrollbar-thumb]:hover:from-rose-400/80
+                      [&::-webkit-scrollbar-thumb]:hover:to-rose-600/80
                       [&::-webkit-scrollbar-thumb]:hover:shadow-[0_0_10px_rgba(192,132,252,0.8)]
                     ">
 
@@ -529,7 +529,7 @@ const AddCourseForm = () => {
 
                     {/* Title */}
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-purple-300 font-medium text-xs sm:text-sm">
+                      <span className="text-rose-300 font-medium text-xs sm:text-sm">
                         Demo Lecture
                       </span>
                     </div>
@@ -561,11 +561,11 @@ const AddCourseForm = () => {
 
                           <label
                             htmlFor="video"
-                            className={`group flex items-center gap-2 sm:gap-3 w-full p-3 sm:p-4 rounded-xl bg-purple-500/10 border
-                                  ${videoError ? "border-red-400/60" : "border-purple-400/30"}
-                                  hover:border-purple-400/60 hover:bg-purple-500/20 cursor-pointer transition-all duration-200`}
+                            className={`group flex items-center gap-2 sm:gap-3 w-full p-3 sm:p-4 rounded-xl bg-rose-500/10 border
+                                  ${videoError ? "border-red-400/60" : "border-rose-400/30"}
+                                  hover:border-rose-400/60 hover:bg-rose-500/20 cursor-pointer transition-all duration-200`}
                           >
-                            <MdVideoLibrary className="text-purple-400/60 group-hover:text-purple-300 text-xl sm:text-2xl" />
+                            <MdVideoLibrary className="text-rose-400/60 group-hover:text-rose-300 text-xl sm:text-2xl" />
 
                             <div className="flex-1 text-left">
                               <p className="text-white/70 group-hover:text-white/90 text-xs sm:text-sm font-medium">
@@ -576,15 +576,15 @@ const AddCourseForm = () => {
                               </p>
                             </div>
 
-                            <MdUpload className="text-purple-400/60 group-hover:text-purple-300 text-lg sm:text-xl" />
+                            <MdUpload className="text-rose-400/60 group-hover:text-rose-300 text-lg sm:text-xl" />
                           </label>
                         </>
                       ) : (
                         <div className="bg-white/5 border border-white/20 rounded-xl p-3 sm:p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                              <div className="bg-purple-500/20 p-1.5 sm:p-2 rounded-lg">
-                                <MdVideoLibrary className="text-purple-300 text-lg sm:text-xl" />
+                              <div className="bg-rose-500/20 p-1.5 sm:p-2 rounded-lg">
+                                <MdVideoLibrary className="text-rose-300 text-lg sm:text-xl" />
                               </div>
 
                               <div className="flex-1 min-w-0">
@@ -612,7 +612,7 @@ const AddCourseForm = () => {
                               <>
                                 <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                                   <div
-                                    className="bg-gradient-to-r from-purple-500 to-purple-400 h-full transition-all duration-300"
+                                    className="bg-gradient-to-r from-rose-500 to-rose-400 h-full transition-all duration-300"
                                     style={{ width: `${videoProgress}%` }}
                                   />
                                 </div>
@@ -664,7 +664,7 @@ const AddCourseForm = () => {
 
           {/* Submit Button */}
           <div className="p-4 sm:p-8 bg-white/5 border-t border-white/10">
-            <button type="submit" disabled={isCourseLoading || isVideoLoading} className={`w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:from-purple-800 disabled:to-indigo-800 disabled:cursor-not-allowed px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-white font-semibold  transition-all duration-200 hover:scale-[1.02]  flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg ${(isCourseLoading || isVideoLoading) ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+            <button type="submit" disabled={isCourseLoading || isVideoLoading} className={`w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 disabled:from-rose-800 disabled:to-pink-800 disabled:cursor-not-allowed px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-white font-semibold  transition-all duration-200 hover:scale-[1.02]  flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg ${(isCourseLoading || isVideoLoading) ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
               {(isCourseLoading || isVideoLoading) ? (
                 <>
                   <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />

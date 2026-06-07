@@ -1,43 +1,91 @@
-import React, { useEffect, useState } from 'react'
-import { Target } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { Target, Flame } from "lucide-react";
 
 const StudentDashboardWeeklyGoal = () => {
-
   const [weeklyGoal, setWeeklyGoal] = useState({ current: 0, target: 15 });
 
-  const fetchDashboardData = async () => {
-    try {
-      setWeeklyGoal({ current: 12, target: 15 });
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchDashboardData();
+    setWeeklyGoal({ current: 12, target: 15 });
   }, []);
 
-  const goalPercentage = (weeklyGoal.current / weeklyGoal.target) * 100;
+  const pct       = Math.min((weeklyGoal.current / weeklyGoal.target) * 100, 100);
+  const isDone    = pct >= 100;
+  const remaining = weeklyGoal.target - weeklyGoal.current;
+
+  const r  = 36;
+  const circ = 2 * Math.PI * r;
+  const dash = circ * (1 - pct / 100);
 
   return (
-    <div className="bg-gradient-to-br from-purple-500/40 to-pink-500/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 border border-white/30">
-      <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2"><Target size={28} />Weekly Goal</h2>
-      <div className="space-y-5">
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-white font-medium">Learning Time</span>
-            <span className="font-bold text-white text-lg">{weeklyGoal.current} / {weeklyGoal.target} hours</span>
+    <div className="rounded-xl bg-[#111] border border-white/8 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-white/8">
+        <div className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
+          <Target size={14} className="text-purple-400" />
+        </div>
+        <h2 className="text-sm font-semibold text-white">Weekly Goal</h2>
+      </div>
+
+      <div className="p-5">
+        {/* Circular progress + stats */}
+        <div className="flex items-center gap-5 mb-4">
+          <div className="relative flex-shrink-0">
+            <svg width="88" height="88" viewBox="0 0 88 88">
+              {/* Track */}
+              <circle cx="44" cy="44" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" />
+              {/* Progress */}
+              <circle
+                cx="44" cy="44" r={r}
+                fill="none"
+                stroke={isDone ? "#34d399" : "#a78bfa"}
+                strokeWidth="7"
+                strokeLinecap="round"
+                strokeDasharray={circ}
+                strokeDashoffset={dash}
+                transform="rotate(-90 44 44)"
+                style={{ transition: "stroke-dashoffset 0.9s ease" }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-lg font-bold text-white">{Math.round(pct)}%</span>
+            </div>
           </div>
-          <div className="h-4 bg-white/20 rounded-full overflow-hidden shadow-inner">
-            <div className="h-full bg-gradient-to-r from-white to-purple-200 rounded-full shadow-lg" style={{ width: `${goalPercentage}%` }} />
+
+          <div>
+            <p className="text-xs text-white/40 mb-0.5">Learning Time</p>
+            <p className="text-2xl font-bold text-white">
+              {weeklyGoal.current}
+              <span className="text-sm font-normal text-white/30">/{weeklyGoal.target}h</span>
+            </p>
+            <p className="text-xs text-white/35 mt-0.5">
+              {isDone ? "Goal achieved this week! 🎉" : `${remaining}h to go`}
+            </p>
           </div>
         </div>
-        <div className="bg-white/20 rounded-2xl p-4 border border-white/30">
-          <p className="text-sm text-white font-medium">🎯 {goalPercentage >= 100 ? "Congratulations! You've achieved your weekly goal!" : `You're doing great! Just ${weeklyGoal.target - weeklyGoal.current} more hours to reach your weekly goal.`}</p>
+
+        {/* Progress bar */}
+        <div className="h-1.5 rounded-full bg-white/6 overflow-hidden mb-3">
+          <div
+            className="h-full rounded-full transition-all duration-1000"
+            style={{
+              width: `${pct}%`,
+              background: isDone ? "#34d399" : "#a78bfa",
+            }}
+          />
+        </div>
+
+        {/* Message */}
+        <div className="flex items-center gap-2 bg-white/3 border border-white/6 rounded-lg px-3 py-2">
+          <Flame size={13} className={isDone ? "text-emerald-400" : "text-orange-400"} />
+          <p className="text-xs text-white/50">
+            {isDone
+              ? "Congratulations! You've hit your weekly goal!"
+              : `You're doing great! Just ${remaining} more hour${remaining !== 1 ? "s" : ""} to go!`}
+          </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default StudentDashboardWeeklyGoal
+export default StudentDashboardWeeklyGoal;

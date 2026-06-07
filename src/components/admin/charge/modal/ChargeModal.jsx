@@ -67,7 +67,7 @@ const ChargeModal = ({ isOpen, onClose, onSave, editData, isChargesLoading }) =>
                             {...register("charge_type", {
                                 required: "Charge type is required"
                             })}
-                            className="w-full bg-black border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
+                            className="w-full bg-black border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
                         />
 
                         {errors.charge_type && (
@@ -97,7 +97,7 @@ const ChargeModal = ({ isOpen, onClose, onSave, editData, isChargesLoading }) =>
                                     message: "Cannot exceed 100%"
                                 }
                             })}
-                            className="w-full bg-black border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
+                            className="w-full bg-black border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
                         />
 
                         {errors.percentage && (
@@ -119,7 +119,7 @@ const ChargeModal = ({ isOpen, onClose, onSave, editData, isChargesLoading }) =>
 
                         <button
                             type="submit" disabled={isChargesLoading}
-                            className={`px-4 py-2 text-sm text-white rounded ${isChargesLoading ? 'cursor-not-allowed bg-purple-700' : 'cursor-pointer bg-purple-600 hover:bg-purple-700'}`}
+                            className={`px-4 py-2 text-sm text-white rounded ${isChargesLoading ? 'cursor-not-allowed bg-emerald-700' : 'cursor-pointer bg-emerald-600 hover:bg-emerald-700'}`}
                         >
                             {isChargesLoading && <Loader2 className="inline animate-spin w-4 h-4 mb-1 mr-1" />}
                             {editData ? "Update Charge" : "Add Charge"}

@@ -3,9 +3,9 @@ import { TrendingUp, Users, DollarSign, BookOpen, ShoppingCart, Star } from "luc
 
 function KpiCard({ icon: Icon, label, value, trend, up = true }) {
     return (
-        <div className="bg-[#111] p-5 rounded-2xl border border-white/5 shadow-xl hover:border-purple-500/20 transition-all">
+        <div className="bg-[#111] p-5 rounded-2xl border border-white/5 shadow-xl hover:border-emerald-500/20 transition-all">
             <div className="flex items-start justify-between mb-4">
-                <div className="p-2.5 bg-[#1a1a1a] rounded-xl border border-white/5 text-purple-400"><Icon size={20} /></div>
+                <div className="p-2.5 bg-[#1a1a1a] rounded-xl border border-white/5 text-emerald-400"><Icon size={20} /></div>
                 <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${up ? "bg-yellow-500/10 text-yellow-500" : "bg-red-500/10 text-red-500"}`}>{trend}</span>
             </div>
             <div className="text-2xl font-bold text-white">{value}</div>

@@ -136,7 +136,7 @@ const PromocodeModal = ({ isOpen, onClose, editData, onSave, isCodeLoading }) =>
 
                     {/* Submit Button */}
                     <button type="submit" disabled={isCodeLoading}
-                        className="w-full bg-purple-600 hover:bg-purple-700 py-2 rounded text-white text-sm font-medium transition cursor-pointer"
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 py-2 rounded text-white text-sm font-medium transition cursor-pointer"
                     >
                         {isCodeLoading ? "Saving..." : editData ? "Update Promocode" : "Add Promocode"}
                     </button>

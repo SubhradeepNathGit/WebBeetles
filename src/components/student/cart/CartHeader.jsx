@@ -29,7 +29,7 @@ const CartHeader = ({ cartItems, total }) => {
                         <p className="text-4xl font-bold">₹{total ? total?.toLocaleString('en-IN') : '0'}</p>
                         <p className="text-white/70 text-xs mt-1">Inclusive of all taxes</p>
                     </div>
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-full bg-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(147,51,234,0.3)]">
                         <CheckCircle className="w-10 h-10 text-white" />
                     </div>
                 </div>

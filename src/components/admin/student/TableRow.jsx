@@ -70,7 +70,7 @@ const TableRow = ({ u }) => {
             <tr className="hover:bg-white/[0.02] transition-colors group text-center">
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-700 to-purple-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-700 to-emerald-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
                             {u?.profile_image_url ? <img className='rounded-full' src={u?.profile_image_url} alt={u?.name?.charAt(0)} /> : u?.name?.charAt(0)}
                         </div>
                         <div>
@@ -81,7 +81,7 @@ const TableRow = ({ u }) => {
                 </td>
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-1.5 text-gray-400 text-sm">
-                        <Shield size={13} className="text-purple-400" /> {(u?.role?.charAt(0)?.toUpperCase() + u?.role?.slice(1)?.toLowerCase()) ?? 'N/A'}
+                        <Shield size={13} className="text-emerald-400" /> {u?.role ? (u.role.charAt(0).toUpperCase() + u.role.slice(1).toLowerCase()) : 'N/A'}
                     </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-300 font-medium">{isLoading ? <Loader2 className='animate-spin w-4 h-4 inline mb-1' /> : data?.length ?? 0} course{data?.length > 1 ? 's' : ''}</td>

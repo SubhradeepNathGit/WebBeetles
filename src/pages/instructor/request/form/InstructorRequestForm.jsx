@@ -129,10 +129,10 @@ const InstructorRequestForm = () => {
                 </div>
             )}
 
-            <div className="w-full max-w-7xl rounded-2xl sm:rounded-3xl shadow-2xl bg-gradient-to-br from-red-700 to-black/30 border border-red-500 p-5 sm:p-7 md:p-8 backdrop-blur-md">
+            <div className="w-full max-w-7xl rounded-2xl sm:rounded-3xl  bg-black p-5 sm:p-7 md:p-8 backdrop-blur-md">
                 <div className="text-center mb-4 sm:mb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-white">Become an Instructor</h2>
-                    <p className="text-purple-300 font-semibold text-xs sm:text-sm">Join Webbeetles and share your knowledge with learners worldwide</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-white">Become an Instructor at WebBeetles</h2>
+                    <p className="text-red-400 font-semibold text-xs sm:text-sm">Join Webbeetles and share your knowledge with learners worldwide</p>
                 </div>
 
                 <div className="space-y-4">
@@ -203,7 +203,7 @@ const InstructorRequestForm = () => {
 
                     {/* Submit */}
                     <div className="pt-2">
-                        <button type="button" onClick={handleSubmit(onSubmit)} disabled={isSubmitting || isUploading} className={`border px-6 py-3 rounded-full text-white font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] ${isInstructorLoading ? 'bg-purple-700 border-purple-600 cursor-not-allowed' : 'bg-white/10 border-white/30 hover:bg-purple-700 hover:border-purple-600 cursor-pointer'}`}>
+                        <button type="button" onClick={handleSubmit(onSubmit)} disabled={isSubmitting || isUploading} className={`border px-6 py-3 rounded-xl text-white font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all w-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] ${isInstructorLoading ? 'bg-red-700  cursor-not-allowed' : 'bg-white/10 border-white/30 hover:bg-red-600 cursor-pointer'}`}>
                             {isInstructorLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline' /> : <MdArrowOutward className="text-base sm:text-lg" />} {isSubmitting ? "Submitting..." : "Submit Application"}
                         </button>
                         <p className="text-white/60 text-[10px] sm:text-xs text-center mt-3">We'll review your application within 5-7 business days</p>

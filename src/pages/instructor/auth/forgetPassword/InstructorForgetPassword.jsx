@@ -24,7 +24,7 @@ const InstructorForgetPassword = () => {
             email: data.email
         }
 
-        dispatch(forgetPasswordSlice({ data: login_obj, userType: 'student' }))
+        dispatch(forgetPasswordSlice({ data: login_obj, userType: 'instructor' }))
             .then(res => {
                 // console.log('Response in form after forget password', res);
 
@@ -45,67 +45,66 @@ const InstructorForgetPassword = () => {
     }
 
     return (
-        <div className="relative h-screen overflow-hidden">
-            {/* Background layer that replaces .background::after */}
-            <Link to='/signin'
-                className="absolute lg:top-15 lg:left-15 md:top-8 md:left-8 top-5 left-5 back-btn p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors" >
-                <FaArrowLeft className="text-gray-700 text-lg" />
+        <div className="flex flex-col md:flex-row h-screen w-full relative bg-gradient-to-b from-rose-900 to-black">
+            {/* Back Button */}
+            <Link to='/instructor/signin'
+                className="absolute z-20 top-5 left-5 md:top-8 md:left-8 p-3 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 transition-colors" >
+                <FaArrowLeft className="text-white text-lg" />
             </Link>
 
-            <div aria-hidden="true" className="absolute inset-0 -z-10"
-                style={{
-                    backgroundImage:
-                        `linear-gradient(rgba(44,6,159,0.8), #25004D), url('/auth/forgetPassword/verification.img.png')`,
-                    backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'top', transform: 'scaleX(1)'
-                }} />
-            <div className="container mx-auto px-4 lg:px-6 h-full max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6">
-
-                <div className="hidden md:flex w-full md:w-1/2 flex-col justify-center items-center md:items-start text-white text-center md:text-left">
-                    <h1 className="font-display text-4xl lg:text-7xl xl:text-8xl leading-tight mb-4 select-none font-bold">
+            {/* Left Panel — Branding with Crimson/Rose Gradient */}
+            <div className="hidden md:flex w-1/2 h-screen relative overflow-hidden items-center justify-center">
+                <div className="relative z-10 px-10 lg:px-16 xl:px-20 text-left">
+                    <h1 className="text-5xl lg:text-7xl xl:text-8xl leading-tight mb-6 select-none font-bold text-white">
                         WebBeetles
                     </h1>
-                    <p className="max-w-[600px] font-normal text-sm lg:text-base xl:text-lg leading-relaxed">
+                    <p className="max-w-md font-normal text-sm lg:text-base xl:text-lg leading-relaxed text-white/80">
                         Taking the first step towards building a great career is such an exciting journey!
                     </p>
                 </div>
+            </div>
 
-                <div className="w-full md:w-1/2 flex flex-col justify-center md:justify-end h-full items-center">
-                    <div className="w-full max-w-[500px] lg:max-w-[500px] bg-white/10 backdrop-blur-sm rounded-2xl lg:rounded-3xl p-6 lg:p-8 shadow-2xl my-auto">
-                        <h2 className="text-2xl lg:text-3xl xl:text-4xl font-semibold text-white text-center mb-6">
-                            Forget Password
-                        </h2>
+            {/* Right Panel — Forget Password Form */}
+            <div className="w-full md:w-1/2 h-screen bg-transparent flex items-center justify-center relative overflow-hidden">
+                {/* Subtle ambient glow */}
+                <div aria-hidden="true" className="md:hidden absolute inset-0 bg-gradient-to-br from-rose-950/40 via-transparent to-black pointer-events-none" />
+                <div aria-hidden="true" className="absolute top-0 right-0 w-72 h-72 bg-rose-600/10 rounded-full filter blur-[100px] pointer-events-none" />
 
-                        <p className="text-white text-[14px] lg:text-[18px] xl:text-[20px] text-center mb-10">
-                            Please enter your email address we will sent you a confirmation code to set a new password
-                        </p>
+                <div className="relative z-10 w-full max-w-md mx-auto px-6 sm:px-10 py-10 lg:py-14">
+                    <h2 className="text-2xl lg:text-3xl text-white text-center mb-6 font-light tracking-wide">
+                        Forgot Password
+                    </h2>
 
-                        <form className="space-y-2" onSubmit={handleSubmit(forgetPasswordDataHandler)}>
-                            <div className="flex flex-col">
-                                <label htmlFor="emailId" className="block text-sm lg:text-base text-white mb-1">
-                                    Email Address
-                                </label>
-                                <input type="email" id="emailId" autoComplete='email' placeholder="Enter email address" {...register('email', {
-                                    required: 'Required*',
-                                    pattern: {
-                                        value: /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-zA-Z.]{2,}$/,
-                                        message: 'Invalid email'
-                                    }
-                                })} className="w-full rounded-full px-6 py-2 lg:py-3 text-sm text-gray-800 bg-white outline-0 mb-0" />
-                                <p className="text-xs text-red-400 mb-2 mt-1">{errors.email?.message}</p>
-                            </div>
+                    <p className="text-white/60 text-[14px] lg:text-[16px] text-center mb-8">
+                        Please enter your email address and we will send you a confirmation code to set a new password
+                    </p>
 
-                            <button type="submit" disabled={isUserAuthLoading} className={`w-full text-white py-2 rounded-full text-base font-semibold mt-0 transition-colors
-                                ${isUserAuthLoading ? "bg-blue-400 cursor-not-allowed" : "cursor-pointer bg-blue-500 hover:bg-blue-600"}`}>
-                                {isUserAuthLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline' /> : ''} {isUserAuthLoading ? "Processing..." : "Get OTP"}
-                            </button>
-                        </form>
-
-                        <div className="text-center text-white mt-6 text-[14px] lg:text-[16px] xl:text-[18px]">
-                            Don&apos;t have an account?{" "}
-                            <Link to="/signup" className="text-blue-300 hover:text-[#b97fff] font-semibold">
-                                Sign Up
-                            </Link>
+                    <form className="space-y-4" onSubmit={handleSubmit(forgetPasswordDataHandler)}>
+                        <div className="flex flex-col">
+                            <label htmlFor="emailId" className="block text-sm lg:text-base text-rose-100/80 mb-2 font-medium">
+                                Email Address
+                            </label>
+                            <input type="email" id="emailId" autoComplete='email' placeholder="Enter email address" {...register('email', {
+                                required: 'Required*',
+                                pattern: {
+                                    value: /^[a-z0-9._-]+@[a-z0-9.-]+\.[a-zA-Z.]{2,}$/,
+                                    message: 'Invalid email'
+                                }
+                            })} className="w-full rounded-xl px-5 py-3 text-sm lg:text-base text-white placeholder-gray-500 bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all mb-0" />
+                            <p className="text-xs text-red-400 mt-1">{errors.email?.message}</p>
                         </div>
+
+                        <button type="submit" disabled={isUserAuthLoading} className={`w-full mt-6 py-3 rounded-xl text-base lg:text-lg font-semibold text-white transition-all duration-300
+                            ${isUserAuthLoading ? "bg-rose-500/50 cursor-not-allowed opacity-70" : "cursor-pointer bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-lg hover:shadow-rose-500/25"}`}>
+                            {isUserAuthLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline mr-2' /> : ''} {isUserAuthLoading ? "Processing..." : "Get OTP"}
+                        </button>
+                    </form>
+
+                    <div className="text-center text-rose-200/60 mt-8 text-sm">
+                        Don&apos;t have an account?{" "}
+                        <Link to="/instructor/signup" className="text-rose-300 hover:text-rose-100 font-semibold transition-colors">
+                            Sign Up
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -103,7 +103,7 @@ const ChargeManager = ({ toggleCharge, setOpenMarkModal, setChargeId, setType })
 
                 <button
                     onClick={() => setModalOpen(true)}
-                    className="text-center w-full gap-2 bg-purple-600 hover:bg-purple-700 text-white text-sm px-3 py-2 rounded-xl cursor-pointer"
+                    className="text-center w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-3 py-2 rounded-xl cursor-pointer"
                 >
                     <Plus size={16} className="inline mb-1 mr-1" />
                     Add Charge

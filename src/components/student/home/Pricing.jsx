@@ -1,9 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import { loadRazorpay } from "../../../util/razorpay/razorpayLoader";
+import getSweetAlert from "../../../util/alert/sweetAlert";
+import { checkLoggedInUser } from "../../../redux/slice/authSlice/checkUserAuthSlice";
+import { Loader2 } from "lucide-react";
+import supabase from "../../../util/supabase/supabase";
 
 const PricingSection = () => {
   const [visibleCards, setVisibleCards] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [loadingPlan, setLoadingPlan] = useState(null);
   const sectionRef = useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { isUserAuth, userAuthData } = useSelector((state) => state.checkAuth);
 
   // Trigger animation on scroll
   useEffect(() => {
@@ -58,13 +70,13 @@ const PricingSection = () => {
       priceINR: 2400,
       period: "/ Month",
       savings: "Save 15%",
+      level: 1,
       features: [
-        "Access to selected beginner",
-        "Standard digital certificates",
-        "Community support",
-        "Up to 3 active courses",
-        "Custom Automations",
-        "Voice Assistant Integration",
+        "Access to all basic course lectures",
+        "Standard digital certificate of completion",
+        "Up to 2 active course enrollments",
+        "Peer community support forums",
+        "Mobile and tablet access",
       ],
     },
     {
@@ -74,13 +86,13 @@ const PricingSection = () => {
       period: "/ Month",
       savings: "Save 45%",
       isExpert: true,
+      level: 3,
       features: [
-        "Access to selected beginner",
-        "Standard digital certificates",
-        "Community support",
-        "Up to 3 active courses",
-        "Personalized learning paths",
-        "Access to exclusive webinars",
+        "Unlimited access to all premium courses",
+        "Co-branded certificates & resume reviews",
+        "Unlimited active course enrollments",
+        "Instant 24/7 dedicated support",
+        "Access to exclusive weekly live webinars",
       ],
     },
     {
@@ -89,19 +101,154 @@ const PricingSection = () => {
       priceINR: 4000,
       period: "/ Month",
       savings: "Save 35%",
+      level: 2,
       features: [
-        "Access to selected beginner",
-        "Standard digital certificates",
-        "Community support",
-        "Up to 3 active courses",
-        "Monthly progress reports",
-        "Voice Assistant Integration",
+        "Access to all basic & intermediate courses",
+        "Verified digital certificates",
+        "Unlimited active course enrollments",
+        "Priority instructor Q&A assistance",
+        "1-on-1 monthly progress review",
       ],
     },
   ];
 
+  const handleChoosePackage = async (plan) => {
+    // 1. Authenticate user
+    if (!isUserAuth || !userAuthData || userAuthData.role !== 'student') {
+      getSweetAlert("Authentication Required", "Please sign in as a student to subscribe to a package.", "warning");
+      navigate("/signin");
+      return;
+    }
+
+    const currentPlanName = userAuthData.subscription_plan;
+    const currentPlan = plans.find(p => p.name === currentPlanName);
+    const currentLevel = currentPlan ? currentPlan.level : 0;
+
+    // 2. Check upgrade logic
+    if (currentPlanName === plan.name) {
+      getSweetAlert("Plan Already Active", `You already have the ${plan.name} plan active. You cannot purchase the same plan again.`, "info");
+      return;
+    }
+
+    if (currentLevel > plan.level) {
+      getSweetAlert("Downgrade Restricted", `You are currently subscribed to the higher ${currentPlanName} plan. Downgrades are not permitted.`, "warning");
+      return;
+    }
+
+    // 3. Initiate payment
+    setLoadingPlan(plan.name);
+    try {
+      // Get a fresh, valid access token — try multiple strategies
+      let token = null;
+      
+      // Strategy 1: getSession (cached but auto-refreshes if expired)
+      const { data: { session } } = await supabase.auth.getSession();
+      token = session?.access_token;
+      
+      // Strategy 2: Force refresh if no valid session
+      if (!token) {
+        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+        token = refreshedSession?.access_token;
+      }
+
+      // Strategy 3: Fallback to sessionStorage (legacy)
+      if (!token) {
+        token = sessionStorage.getItem("student_token");
+      }
+
+      // No valid token at all — redirect to sign in
+      if (!token) {
+        getSweetAlert("Session Expired", "Your session has expired. Please sign in again.", "warning");
+        navigate("/signin");
+        setLoadingPlan(null);
+        return;
+      }
+
+      await loadRazorpay();
+
+      const res = await fetch(import.meta.env.VITE_CREATE_ORDER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          total: plan.priceINR,
+          planName: plan.name,
+          isSubscription: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("Create order error:", res.status, errText);
+        throw new Error("Failed to initiate order");
+      }
+
+      const orderData = await res.json();
+      
+      const rzp = new window.Razorpay({
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.orderId,
+        name: "WebBeetles",
+        description: `${plan.name} Subscription Plan`,
+        theme: { color: "#7C3AED" },
+        handler: async (response) => {
+          try {
+            // Get fresh token for verification call too
+            const { data: { session: verifySession } } = await supabase.auth.getSession();
+            const verifyToken = verifySession?.access_token || token;
+
+            const verifyRes = await fetch(import.meta.env.VITE_VERIFY_PAYMENT_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${verifyToken}`,
+              },
+              body: JSON.stringify({
+                ...response,
+                purchaseId: orderData.purchaseId,
+              }),
+            });
+
+            if (!verifyRes.ok) throw new Error("Payment verification failed");
+
+            // Refresh user session & data
+            await dispatch(checkLoggedInUser());
+
+            getSweetAlert("Success!", `Successfully subscribed to the ${plan.name} plan!`, "success");
+            navigate("/student/dashboard");
+          } catch (err) {
+            getSweetAlert("Error", "Something went wrong during payment verification.", "error");
+          } finally {
+            setLoadingPlan(null);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setLoadingPlan(null);
+          }
+        }
+      });
+
+      rzp.on("payment.failed", () => {
+        getSweetAlert("Payment Failed", "The transaction could not be completed. Please try again.", "error");
+        setLoadingPlan(null);
+      });
+
+      rzp.open();
+    } catch (error) {
+      console.error("Subscription payment error:", error);
+      getSweetAlert("Oops!", "Could not initiate payment. Please try again later.", "error");
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <div
+      id="pricing"
       className="min-h-screen bg-black text-white py-12 sm:py-16 lg:py-24"
       ref={sectionRef}
     >
@@ -122,11 +269,12 @@ const PricingSection = () => {
           {[0, 2, 1].map((originalIndex, displayIndex) => {
             const plan = plans[originalIndex];
             const isHovered = hoveredCard === displayIndex;
+            const isPlanLoading = loadingPlan === plan.name;
             
             return (
             <div
               key={originalIndex}
-              className={`relative h-full transition-all duration-700 max-w-md mx-auto md:max-w-none md:mx-0 ${
+              className={`relative h-full transition-all duration-700 max-w-xl mx-auto md:max-w-none md:mx-0 ${
                 visibleCards.includes(displayIndex) ? "animate-flip-in" : "opacity-0"
               }`}
               style={{
@@ -185,15 +333,20 @@ const PricingSection = () => {
 
                 {/* CTA Button */}
                 <button
-                  className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center text-sm sm:text-base md:text-sm lg:text-base
+                  onClick={() => handleChoosePackage(plan)}
+                  disabled={isPlanLoading}
+                  className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center text-sm sm:text-base md:text-sm lg:text-base cursor-pointer
                     ${
                       isHovered
                         ? "bg-gradient-to-r from-purple-500/60 to-purple-700/40 backdrop-blur-md border border-purple-300 text-white hover:from-purple-500 hover:to-purple-700/60"
                         : "bg-purple-500 text-white hover:bg-purple-700"
-                    }`}
+                    } ${isPlanLoading ? "opacity-60 cursor-not-allowed" : ""}`}
                 >
-                  Choose Package
-                  <ArrowIcon />
+                  {isPlanLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : null}
+                  {isPlanLoading ? "Processing..." : "Choose Package"}
+                  {!isPlanLoading && <ArrowIcon />}
                 </button>
               </div>
             </div>

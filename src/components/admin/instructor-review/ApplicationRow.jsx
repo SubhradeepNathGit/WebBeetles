@@ -7,7 +7,7 @@ const ApplicationRow = ({ app, setModal, setDocViewer, setOpenMarkModal, setInst
     const EMAIL_VERIFICATION_COLOR = {
         Verified: "bg-green-500/10 text-green-400 border-green-500/20",
         Failed: "bg-red-500/10 text-red-400 border-red-500/20",
-        pending: "bg-purple-500/10 text-purple-400 border-purple-500/20"
+        pending: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
     }
 
     return (
@@ -15,7 +15,7 @@ const ApplicationRow = ({ app, setModal, setDocViewer, setOpenMarkModal, setInst
             <tr className="hover:bg-white/[0.02] transition-colors group text-center">
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-purple-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
                             {app?.name?.charAt(0)}
                         </div>
                         <div>
@@ -51,8 +51,8 @@ const ApplicationRow = ({ app, setModal, setDocViewer, setOpenMarkModal, setInst
                 <td className="px-6 py-4">
                     <button
                         onClick={() => app?.application_complete ? setDocViewer(app) : ''}
-                        className={`flex items-center gap-2 px-3 py-1.5 border ${app?.application_complete ? 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/20 cursor-pointer' :
-                            'bg-purple-300/20 text-purple-300 border-purple-300/20 cursor-not-allowed'} rounded-lg transition-colors text-xs font-semibold`}
+                        className={`flex items-center gap-2 px-3 py-1.5 border ${app?.application_complete ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20 cursor-pointer' :
+                            'bg-emerald-300/20 text-emerald-300 border-emerald-300/20 cursor-not-allowed'} rounded-lg transition-colors text-xs font-semibold`}
                     >
                         <FileText size={13} /> View Document
                     </button>

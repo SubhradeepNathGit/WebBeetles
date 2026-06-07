@@ -36,7 +36,7 @@ const InstructorThisMonthsStats = ({ instructorDetails }) => {
     }
 
     return (
-        <div className="bg-gradient-to-br from-blue-500/40 via-purple-500/40 to-pink-500/40 backdrop-blur-xl rounded-xl lg:rounded-2xl shadow-2xl p-4 sm:p-5 lg:p-6 border border-white/30">
+        <div className="bg-gradient-to-br from-rose-500/40 via-red-500/40 to-pink-500/40 backdrop-blur-xl rounded-xl lg:rounded-2xl shadow-2xl p-4 sm:p-5 lg:p-6 border border-white/30">
             <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6 flex items-center gap-2">
                 <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-white/20 flex items-center justify-center border border-white/30">
                     <TrendingUp size={18} />

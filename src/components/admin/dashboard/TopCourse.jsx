@@ -36,7 +36,7 @@ const TopCourse = ({ TOP_COURSES }) => {
         <div className="bg-[#111] rounded-2xl border border-white/5 shadow-xl lg:col-span-3 overflow-hidden">
             <div className="p-5 flex items-center justify-between border-b border-white/5">
                 <h2 className="text-base font-semibold text-white">Top Performing Courses</h2>
-                <Link to="/admin/approve-courses" className="text-xs text-purple-400 hover:text-yellow-400 flex items-center gap-1 transition-colors">
+                <Link to="/admin/approve-courses" className="text-xs text-emerald-400 hover:text-yellow-400 flex items-center gap-1 transition-colors">
                     Manage <ChevronRight size={14} />
                 </Link>
             </div>

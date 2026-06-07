@@ -28,7 +28,7 @@ const NavItem = ({ to, icon: Icon, children, collapsed, onClick, badge }) => (
             <>
                 <span className="truncate flex-1">{children}</span>
                 {badge && (
-                    <span className="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                    <span className="bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
                         {badge}
                     </span>
                 )}
@@ -37,7 +37,7 @@ const NavItem = ({ to, icon: Icon, children, collapsed, onClick, badge }) => (
         {collapsed && (
             <div className="absolute left-full ml-2 px-3 py-2 bg-black/80 backdrop-blur-xl text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-2xl border border-white/5">
                 {children}
-                {badge && <span className="ml-2 text-purple-400">({badge})</span>}
+                {badge && <span className="ml-2 text-emerald-400">({badge})</span>}
             </div>
         )}
     </NavLink>
@@ -60,16 +60,7 @@ export default function Sidebar({ onNavigate }) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-    useEffect(() => {
-        dispatch(checkLoggedInUser())
-            .then(res => {
-                // console.log('Response for fetching user profile', res);
-            })
-            .catch((err) => {
-                getSweetAlert('Oops...', 'Something went wrong!', 'error');
-                console.log("Error occurred", err);
-            });
-    }, [dispatch]);
+    // Removed redundant checkLoggedInUser dispatch as ProtectedRoute handles it
 
     useEffect(() => {
         const handleEscape = (e) => {
@@ -176,7 +167,7 @@ export default function Sidebar({ onNavigate }) {
                 <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-3 min-w-0">
                         <div
-                            className={`w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-black backdrop-blur-sm flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0 transition-all shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent ${collapsed ? "scale-95" : "scale-100"
+                            className={`w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-black backdrop-blur-sm flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0 transition-all shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent ${collapsed ? "scale-95" : "scale-100"
                                 }`}
                         >
                             <span className="text-white text-lg font-bold">W</span>

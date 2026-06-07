@@ -34,16 +34,7 @@ export default function Navbar() {
 
     const { isUserLoading, userAuthData: getAdminData, userError } = useSelector(state => state.checkAuth);
     
-    useEffect(() => {
-        dispatch(checkLoggedInUser())
-          .then(res => {
-            // console.log('Response for fetching user profile', res);
-          })
-          .catch((err) => {
-            getSweetAlert('Oops...', 'Something went wrong!', 'error');
-            console.log("Error occurred", err);
-          });
-      }, [dispatch]);
+    // Removed redundant checkLoggedInUser dispatch as ProtectedRoute handles it
 
     useEffect(() => {
         const checkMobile = () => {
@@ -175,7 +166,7 @@ export default function Navbar() {
                                     }
                                 }}
                                 placeholder="Search"
-                                className="w-full pl-9 pr-4 py-2 md:py-2.5 text-sm bg-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.5)] border border-white/5 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                                className="w-full pl-9 pr-4 py-2 md:py-2.5 text-sm bg-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.5)] border border-white/5 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all"
                             />
                         </div>
                     </div>
@@ -222,7 +213,7 @@ export default function Navbar() {
                                         {unreadCount > 0 && (
                                             <button
                                                 onClick={markAllAsRead}
-                                                className="text-xs text-purple-400 hover:text-purple-300 transition-colors cursor-pointer"
+                                                className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
                                             >
                                                 Mark all read
                                             </button>
@@ -233,12 +224,12 @@ export default function Navbar() {
                                             <button
                                                 key={notification.id}
                                                 onClick={() => handleNotificationClick(notification.id)}
-                                                className={`w-full p-4 text-left hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 ${notification.unread ? "bg-purple-500/5" : ""
+                                                className={`w-full p-4 text-left hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 ${notification.unread ? "bg-emerald-500/5" : ""
                                                     }`}
                                             >
                                                 <div className="flex items-start gap-3">
                                                     {notification.unread && (
-                                                        <span className="w-2 h-2 bg-purple-500 rounded-full mt-1.5 flex-shrink-0" />
+                                                        <span className="w-2 h-2 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
                                                     )}
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-white text-sm font-medium truncate">
@@ -258,7 +249,7 @@ export default function Navbar() {
                                                 navigate("/admin/notification");
                                                 setShowNotifications(false);
                                             }}
-                                            className="w-full text-center text-sm text-purple-400 hover:text-purple-300 transition-colors cursor-pointer"
+                                            className="w-full text-center text-sm text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
                                         >
                                             View all notifications
                                         </button>
@@ -336,7 +327,7 @@ export default function Navbar() {
                                     }
                                 }}
                                 placeholder="Search..."
-                                className="w-full pl-9 pr-4 py-2 text-sm bg-white/5 shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                                className="w-full pl-9 pr-4 py-2 text-sm bg-white/5 shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all"
                             />
                         </div>
                     </div>

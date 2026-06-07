@@ -20,7 +20,7 @@ const ImageViewerModal = ({ imageUrl, title, onClose, setImageTitle }) => {
                             <ChevronLeft size={18} />
                         </button>
 
-                        <Image size={18} className="text-purple-400" />
+                        <Image size={18} className="text-emerald-400" />
 
                         <p className="text-sm font-semibold text-white">
                             {title || "Image Preview"}
