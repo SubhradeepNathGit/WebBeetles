@@ -60,15 +60,46 @@ const CourseCard = ({ course, setDeletedData, setSelectedCourse, setExpandedSect
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => { setEditForm(course); setShowEditModal(true); }} disabled={course?.status != 'approved'} className={`flex-1 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${course?.status != 'approved' ? 'cursor-not-allowed bg-rose-500' : 'cursor-pointer bg-rose-600 hover:bg-rose-700'}`}>
+                        {/* Edit */}
+                        <button
+                            onClick={() => { setEditForm(course); setShowEditModal(true); }}
+                            disabled={course?.status != 'approved'}
+                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 border
+                                ${course?.status != 'approved'
+                                    ? 'cursor-not-allowed opacity-40 bg-white/5 border-white/10 text-white/40'
+                                    : 'cursor-pointer bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/30 hover:border-rose-500/60 text-rose-400 hover:text-rose-300'
+                                }`}
+                        >
                             <Edit2 className="w-4 h-4" />
                             Edit
                         </button>
-                        <button onClick={() => { setOpenMarkModal(true); setMarkCourse(course); }} disabled={course?.status != 'approved'} className={`flex-1 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${course?.status != 'approved' ? 'cursor-not-allowed bg-yellow-200 text-black' : course?.is_active ? 'bg-yellow-600 hover:bg-yellow-700 text-black cursor-pointer' : 'bg-green-600 hover:bg-green-700 cursor-pointer'}`}>
+
+                        {/* Draft / Active toggle */}
+                        <button
+                            onClick={() => { setOpenMarkModal(true); setMarkCourse(course); }}
+                            disabled={course?.status != 'approved'}
+                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 border
+                                ${course?.status != 'approved'
+                                    ? 'cursor-not-allowed opacity-40 bg-white/5 border-white/10 text-white/40'
+                                    : course?.is_active
+                                        ? 'cursor-pointer bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 hover:border-amber-500/60 text-amber-400 hover:text-amber-300'
+                                        : 'cursor-pointer bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/30 hover:border-emerald-500/60 text-emerald-400 hover:text-emerald-300'
+                                }`}
+                        >
                             {course?.is_active ? <CircleOff className="w-4 h-4" /> : <CircleCheckBig className="w-4 h-4" />}
                             {!course?.is_active ? 'Active' : 'Draft'}
                         </button>
-                        <button onClick={() => { setShowDeleteModal(true); setDeletedData({ lectureId: course?.id, lectureName: course?.title, doc_type: course?.type, courseId: null, video_title: null }); }} disabled={course?.status != 'approved'} className={`flex-1 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2  ${course?.status != 'approved' ? 'cursor-not-allowed bg-red-400' : 'cursor-pointer bg-red-600 hover:bg-red-700'}`}>
+
+                        {/* Delete */}
+                        <button
+                            onClick={() => { setShowDeleteModal(true); setDeletedData({ lectureId: course?.id, lectureName: course?.title, doc_type: course?.type, courseId: null, video_title: null }); }}
+                            disabled={course?.status != 'approved'}
+                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 border
+                                ${course?.status != 'approved'
+                                    ? 'cursor-not-allowed opacity-40 bg-white/5 border-white/10 text-white/40'
+                                    : 'cursor-pointer bg-red-500/15 hover:bg-red-500/25 border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300'
+                                }`}
+                        >
                             <Trash2 className="w-4 h-4" />
                             Delete
                         </button>

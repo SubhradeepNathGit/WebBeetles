@@ -219,6 +219,12 @@ export const checkUserAuthSlice = createSlice({
         state.isUserLoading = false;
         state.userError = action.payload || "Failed to fetch user details";
         state.isAuthChecked = true;
+      })
+      .addCase("authSlice/updateLastSignInAt/fulfilled", (state, action) => {
+        const updatedRow = Array.isArray(action.payload) ? action.payload[0] : action.payload;
+        if (updatedRow && state.userAuthData && state.userAuthData.id === updatedRow.id) {
+          state.userAuthData.last_login = updatedRow.last_login;
+        }
       });
   },
 })

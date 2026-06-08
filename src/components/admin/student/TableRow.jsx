@@ -71,7 +71,7 @@ const TableRow = ({ u }) => {
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-700 to-emerald-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
-                            {u?.profile_image_url ? <img className='rounded-full' src={u?.profile_image_url} alt={u?.name?.charAt(0)} /> : u?.name?.charAt(0)}
+                            {u?.profile_image_url ? <img className='w-full h-full object-cover rounded-full' src={u?.profile_image_url} alt={u?.name?.charAt(0)} /> : u?.name?.charAt(0)}
                         </div>
                         <div>
                             <p className="text-sm font-semibold text-white group-hover:text-yellow-400 transition-colors text-left">{u?.name ?? 'N/A'}</p>

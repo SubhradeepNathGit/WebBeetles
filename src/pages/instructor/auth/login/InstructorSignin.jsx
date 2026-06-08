@@ -27,7 +27,15 @@ const InstructorSignin = () => {
   useEffect(() => {
     if (isUserAuth && userAuthData) {
       if (userAuthData.role === user_type) {
-        navigate(`/${user_type}/dashboard`, { replace: true });
+        if (userAuthData.application_status == 'pending' && !userAuthData.application_complete) {
+          navigate(`/instructor/profile-form`, { replace: true, state: { instructorData: userAuthData } });
+        } else if (userAuthData.application_status != 'approved' && userAuthData.application_complete) {
+          navigate(`/instructor/request-status`, { replace: true, state: { instructorData: userAuthData } });
+        } else if (userAuthData.application_status == 'approved' && userAuthData.last_login == null) {
+          navigate(`/instructor/request-status`, { replace: true, state: { instructorData: userAuthData } });
+        } else {
+          navigate(`/${user_type}/dashboard`, { replace: true });
+        }
       } else {
         navigate(`/${userAuthData.role}/dashboard`, { replace: true });
       }

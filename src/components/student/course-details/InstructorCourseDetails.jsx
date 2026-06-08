@@ -116,7 +116,7 @@ const InstructorCourseDetails = ({ courseData: getSpecificCourseData }) => {
                         <img
                             src={getSpecificCourseData?.instructor?.profile_image_url}
                             alt="Instructor"
-                            className="w-12 h-12 rounded-full"
+                            className="w-12 h-12 rounded-full object-cover"
                         />
                         <div>
                             <p className="font-semibold">{getSpecificCourseData?.instructor?.name ?? 'N/A'}</p>

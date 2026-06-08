@@ -1,245 +1,436 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Clock, CheckCircle, XCircle, AlertCircle, Send, Mail, FileText, Calendar, RefreshCw, Award, Home } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../../../../redux/slice/authSlice/checkUserAuthSlice";
+import {
+  Clock, CheckCircle, XCircle, AlertCircle, Send, Mail,
+  FileText, Calendar, RefreshCw, Award, Home, Shield,
+  ArrowRight, Loader2
+} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser, setUserAuthData } from "../../../../redux/slice/authSlice/checkUserAuthSlice";
 import { formatDateTimeMeridianWithoutSecond } from "../../../../util/dateFormat/dateFormat";
 import { updateLastSignInAt } from "../../../../redux/slice/authSlice/authSlice";
 import getSweetAlert from "../../../../util/alert/sweetAlert";
+import supabase from "../../../../util/supabase/supabase";
 
+/* ─── Progress Steps ─── */
+const TimelineStep = ({ icon: Icon, iconBg, iconColor, borderColor, title, subtitle, detail, isActive, isComplete, isLast }) => (
+  <div className="relative flex gap-4">
+    {/* Connector line */}
+    {!isLast && (
+      <div
+        className="absolute left-[19px] top-[44px] w-0.5"
+        style={{
+          height: "calc(100% - 20px)",
+          background: isComplete
+            ? "linear-gradient(to bottom, rgba(34,197,94,.5), rgba(34,197,94,.3))"
+            : "linear-gradient(to bottom, rgba(255,255,255,.15), rgba(255,255,255,.05))",
+          transition: "background .6s ease",
+        }}
+      />
+    )}
+    {/* Icon */}
+    <div className="relative flex-shrink-0">
+      <div
+        className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center border-2 ${borderColor}`}
+        style={{ transition: "all .4s ease" }}
+      >
+        <Icon size={18} className={iconColor} />
+      </div>
+    </div>
+    {/* Content */}
+    <div className="flex-1 pb-6">
+      <h4 className="text-white font-semibold text-sm mb-0.5">{title}</h4>
+      <p className="text-white/50 text-xs mb-0.5">{subtitle}</p>
+      <p className="text-white/35 text-xs leading-relaxed">{detail}</p>
+    </div>
+  </div>
+);
+
+/* ═══════════════════════════════════════════
+   MAIN COMPONENT
+   ═══════════════════════════════════════════ */
 const InstructorRequestStatus = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { state } = useLocation();
+  const userAuthData = useSelector((state) => state.checkAuth.userAuthData);
+  const requestData = userAuthData || state?.instructorData;
+  const user_type = "instructor";
 
-  const navigate = useNavigate(),
-    dispatch = useDispatch(),
-    { state } = useLocation(),
-    requestData = state?.instructorData,
-    user_type = 'instructor';
+  const [currentStatus, setCurrentStatus] = useState(requestData?.application_status || "pending");
+  const [redirectCountdown, setRedirectCountdown] = useState(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const subscriptionRef = useRef(null);
 
+  const requestDataRef = useRef(requestData);
+  const currentStatusRef = useRef(currentStatus);
+
+  useEffect(() => {
+    requestDataRef.current = requestData;
+  }, [requestData]);
+
+  useEffect(() => {
+    currentStatusRef.current = currentStatus;
+  }, [currentStatus]);
+
+  /* ─── Supabase real-time subscription ─── */
+  useEffect(() => {
+    if (!requestData?.id) return;
+
+    const channel = supabase
+      .channel(`instructor-status-${requestData.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "instructors",
+          filter: `id=eq.${requestData.id}`,
+        },
+        (payload) => {
+          const newStatus = payload.new?.application_status;
+          if (newStatus && newStatus !== currentStatusRef.current) {
+            setCurrentStatus(newStatus);
+            dispatch(setUserAuthData({ ...requestDataRef.current, ...payload.new }));
+          }
+        }
+      )
+      .subscribe();
+
+    subscriptionRef.current = channel;
+
+    return () => {
+      if (subscriptionRef.current) {
+        supabase.removeChannel(subscriptionRef.current);
+      }
+    };
+  }, [requestData?.id, dispatch]);
+
+  /* ─── Auto-redirect on approval ─── */
+  useEffect(() => {
+    if (currentStatus !== "approved" || !requestData?.id || isRedirecting) return;
+
+    setRedirectCountdown(5);
+    setIsRedirecting(true);
+
+    // Start countdown
+    let count = 5;
+    const interval = setInterval(() => {
+      count -= 1;
+      setRedirectCountdown(count);
+      if (count <= 0) {
+        clearInterval(interval);
+        // Navigate to dashboard
+        dispatch(updateLastSignInAt({ id: requestData.id, user_type }))
+          .then((res) => {
+            if (res.meta.requestStatus === "fulfilled") {
+              navigate(`/${user_type}/dashboard`, { replace: true });
+            }
+          })
+          .catch(() => {
+            navigate(`/${user_type}/dashboard`, { replace: true });
+          });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [currentStatus]);
+
+  /* ─── Actions ─── */
   const userLogout = async () => {
-
     await dispatch(logoutUser({ user_type: "instructor", status: false }))
-      .then(res => {
-        // console.log('Response for logout', res);
-        navigate("/instructor/");
-      })
-      .catch(err => {
-        console.log('Error occured', err);
-        getSweetAlert({
-          title: "Logout Failed!",
-          text: "Something went wrong.",
-          icon: "error"
-        });
-      });
-  }
+      .then(() => navigate("/instructor/"))
+      .catch(() =>
+        getSweetAlert({ title: "Logout Failed!", text: "Something went wrong.", icon: "error" })
+      );
+  };
 
-  const goToDashboard = (id) => {
-
-    dispatch(updateLastSignInAt({ id, user_type }))
-      .then(res => {
-
+  const goToDashboard = () => {
+    if (!requestData?.id) return;
+    dispatch(updateLastSignInAt({ id: requestData.id, user_type }))
+      .then((res) => {
         if (res.meta.requestStatus === "fulfilled") {
           navigate(`/${user_type}/dashboard`);
-
         } else {
-          getSweetAlert('Oops...', res.payload, 'info');
+          getSweetAlert("Oops...", res.payload, "info");
         }
       })
-      .catch(err => {
-        console.log('Error occured', err);
-        getSweetAlert('Oops...', 'Something went wrong!', 'error');
-      });
-  }
+      .catch(() => getSweetAlert("Oops...", "Something went wrong!", "error"));
+  };
 
-  const statusConfig = {
-    pending: {
-      icon: Clock,
-      color: "orange",
-      bgGradient: "from-orange-500/20 to-yellow-500/20",
-      borderColor: "border-orange-400/30",
-      iconBg: "bg-orange-500/30",
-      iconColor: "text-orange-400",
-      title: "Request Under Review",
-      description: "Your instructor application is being reviewed by our admin team. We'll notify you once a decision is made.",
-      animation: "animate-pulse"
-    },
-    approved: {
-      icon: CheckCircle,
-      color: "green",
-      bgGradient: "from-green-500/20 to-emerald-500/20",
-      borderColor: "border-green-400/30",
-      iconBg: "bg-green-500/30",
-      iconColor: "text-green-400",
-      title: "Request Approved!",
-      description: "Congratulations! Your instructor application has been approved. You can now start creating and managing courses.",
-      animation: "animate-bounce"
-    },
-    rejected: {
-      icon: XCircle,
-      color: "red",
-      bgGradient: "from-red-500/20 to-pink-500/20",
-      borderColor: "border-red-400/30",
-      iconBg: "bg-red-500/30",
-      iconColor: "text-red-400",
-      title: "Request Not Approved",
-      description: "Unfortunately, your instructor application was not approved at this time. You can reapply after reviewing our requirements.",
-      animation: ""
+  const refreshStatus = async () => {
+    if (!requestData?.id) return window.location.reload();
+    const { data, error } = await supabase
+      .from("instructors")
+      .select("*")
+      .eq("id", requestData.id)
+      .single();
+    if (!error && data) {
+      setCurrentStatus(data.application_status);
+      dispatch(setUserAuthData({ ...requestData, ...data }));
     }
   };
 
-  const status = statusConfig[requestData?.application_status] || statusConfig["pending"];
+  /* ─── Status configs ─── */
+  const statusConfig = {
+    pending: {
+      icon: Clock,
+      gradient: "from-amber-500/20 via-orange-500/15 to-yellow-500/10",
+      border: "border-amber-500/25",
+      iconBg: "bg-amber-500/20",
+      iconColor: "text-orange-400",
+      accentColor: "#fb923c",
+      title: "Application Under Review",
+      description: "Our team is carefully reviewing your credentials and expertise. You'll be notified the moment a decision is made.",
+    },
+    approved: {
+      icon: CheckCircle,
+      gradient: "from-emerald-500/25 via-green-500/15 to-teal-500/10",
+      border: "border-emerald-500/30",
+      iconBg: "bg-emerald-500/20",
+      iconColor: "text-green-400",
+      accentColor: "#4ade80",
+      title: "Application Approved!",
+      description: "Congratulations! You've been approved as an instructor. Welcome to the WebBeetles teaching community.",
+    },
+    rejected: {
+      icon: XCircle,
+      gradient: "from-red-500/20 via-rose-500/15 to-pink-500/10",
+      border: "border-red-500/25",
+      iconBg: "bg-red-500/20",
+      iconColor: "text-red-400",
+      accentColor: "#f87171",
+      title: "Application Not Approved",
+      description: "We appreciate your interest. Unfortunately, your application wasn't approved at this time. You're welcome to reapply.",
+    },
+  };
+
+  const cfg = statusConfig[currentStatus] || statusConfig.pending;
+  const StatusIcon = cfg.icon;
 
   return (
-    <div className="min-h-screen bg-black p-3 sm:p-4">
-      <div className="max-w-5xl mx-auto space-y-3 sm:space-y-4">
-
-        <div className="bg-gradient-to-r from-red-600/30 to-black backdrop-blur-xl rounded-2xl shadow-2xl border  p-3 sm:p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-bold text-red-200 bg-white/20 px-2.5 py-1 rounded-full">INSTRUCTOR APPLICATION</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">Request Status</h1>
-          <p className="text-red-100 text-xs sm:text-sm">Track your instructor application progress</p>
+    <>
+      <div className="min-h-screen bg-[#09090b] relative overflow-hidden">
+        {/* Background ambience */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-[0.04]"
+            style={{ background: `radial-gradient(circle, ${cfg.accentColor}, transparent 70%)` }}
+          />
+          <div
+            className="absolute -bottom-60 -left-40 w-[600px] h-[600px] rounded-full opacity-[0.03]"
+            style={{ background: `radial-gradient(circle, ${cfg.accentColor}, transparent 70%)` }}
+          />
         </div>
 
-        <div className={`bg-gradient-to-br ${status?.bgGradient} backdrop-blur-xl rounded-2xl shadow-2xl border ${status?.borderColor} p-4 sm:p-6 relative overflow-hidden`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+        <div className="relative z-10 max-w-3xl mx-auto px-4 py-6 sm:py-10 space-y-5">
 
-          <div className="relative z-10 flex flex-col items-center text-center">
-            <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${status?.iconBg} flex items-center justify-center mb-3 shadow-2xl border-4 ${status?.borderColor} ${status?.animation}`}>
-              <status.icon className={`${status?.iconColor}`} size={36} />
-            </div>
-
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">{status?.title}</h2>
-            <p className="text-red-100 text-xs sm:text-sm max-w-2xl mb-3">{status?.description}</p>
-
-            <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl border border-white/20 backdrop-blur-sm">
-              <FileText size={14} className="text-red-300" />
-              <span className="text-white text-xs font-semibold">Request ID: {requestData?.id}</span>
-            </div>
-
-            {requestData?.application_status === "pending" && (
-              <div className="mt-4 flex items-center gap-2">
-                <div className="flex space-x-1.5">
-                  <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                  <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                  <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                </div>
-                <span className="text-orange-300 text-xs font-medium">Processing...</span>
+          {/* ─── Header ─── */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                <Shield size={20} className="text-white/60" />
               </div>
-            )}
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">Application Status</h1>
+                <p className="text-white/40 text-xs">Instructor Verification</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono text-white/25 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+              ID: {requestData?.id?.slice(0, 8)}…
+            </span>
           </div>
-        </div>
 
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-5">
-          <h3 className="text-lg sm:text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <Calendar className="text-blue-400" size={20} />
-            Application Timeline
-          </h3>
+          {/* ─── Status Hero Card ─── */}
+          <div className={`relative rounded-2xl border ${cfg.border} overflow-hidden`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${cfg.gradient}`} />
 
-          <div className="space-y-0 relative">
-            <div className="relative flex gap-3">
-              <div className="absolute left-[15px] top-8 h-[calc(100%-16px)] w-0.5 bg-gradient-to-b from-green-400/50 to-orange-400/50"></div>
-
-              <div className="flex flex-col items-center z-10">
-                <div className="w-8 h-8 rounded-full bg-green-500/30 border-2 border-green-400 flex items-center justify-center">
-                  <CheckCircle size={16} className="text-green-400" />
+            <div className="relative z-10 p-6 sm:p-8 flex flex-col items-center text-center">
+              {/* Icon */}
+              <div className="relative mb-5">
+                <div className={`w-20 h-20 rounded-full ${cfg.iconBg} flex items-center justify-center border-2 ${cfg.border}`}>
+                  {currentStatus === "pending" ? (
+                    <Clock size={36} className="text-orange-400" />
+                  ) : currentStatus === "approved" ? (
+                    <CheckCircle size={36} className="text-green-400" />
+                  ) : (
+                    <XCircle size={36} className="text-red-400" />
+                  )}
                 </div>
               </div>
 
-              <div className="flex-1 pb-4">
-                <h4 className="text-white font-bold text-xs sm:text-sm mb-0.5">Application Submitted</h4>
-                <p className="text-red-200 text-xs mb-1">{formatDateTimeMeridianWithoutSecond(requestData?.created_at)}</p>
-                <p className="text-red-300 text-xs">Your application has been successfully submitted and received.</p>
-              </div>
-            </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">{cfg.title}</h2>
+              <p className="text-white/50 text-sm max-w-md leading-relaxed mb-4">{cfg.description}</p>
 
-            <div className="relative flex gap-3">
-              {(requestData?.application_status === "approved" || requestData?.application_status === "rejected") && (
-                <div className={`absolute left-[15px] top-8 h-[calc(100%-16px)] w-0.5 ${requestData?.application_status === "approved"
-                  ? "bg-gradient-to-b from-green-400/50 to-green-400/50"
-                  : "bg-gradient-to-b from-orange-400/50 to-red-400/50"
-                  }`}></div>
+              {/* Pending: Live indicator */}
+              {currentStatus === "pending" && (
+                <div className="flex items-center gap-2.5 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-400" />
+                  </span>
+                  <span className="text-white/60 text-xs font-medium">Listening for updates in real-time</span>
+                </div>
               )}
 
-              <div className="flex flex-col items-center z-10">
-                <div className={`w-8 h-8 rounded-full ${requestData?.application_status === "pending" ? "bg-orange-500/30 border-2 border-orange-400 animate-pulse" : "bg-green-500/30 border-2 border-green-400"} flex items-center justify-center`}>
-                  {requestData?.application_status === "pending" ? <RefreshCw size={16} className="text-orange-400 animate-spin" /> : <CheckCircle size={16} className="text-green-400" />}
+              {/* Approved: Countdown */}
+              {currentStatus === "approved" && redirectCountdown !== null && (
+                <div className="flex items-center gap-3 bg-emerald-500/10 px-5 py-3 rounded-xl border border-emerald-500/20 mt-1">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 text-emerald-400 font-bold text-lg">
+                    {redirectCountdown}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-emerald-300 text-sm font-semibold">Redirecting to Dashboard</p>
+                    <p className="text-emerald-400/50 text-xs">Your instructor portal is ready</p>
+                  </div>
+                  <Loader2 size={18} className="text-emerald-400 animate-spin ml-auto" />
                 </div>
-              </div>
-
-              <div className="flex-1 pb-4">
-                <h4 className="text-white font-bold text-xs sm:text-sm mb-0.5">Under Review</h4>
-                <p className="text-red-200 text-xs mb-1">{requestData?.application_status === "pending" ? "In Progress" : "Completed"}</p>
-                <p className="text-red-300 text-xs">{requestData?.application_status === "pending" ? `Our team is reviewing your application. Expected response 5-7 business days` : "Review completed successfully."}</p>
-              </div>
-            </div>
-
-            <div className="relative flex gap-3">
-              <div className="flex flex-col items-center z-10">
-                <div className={`w-8 h-8 rounded-full ${requestData?.application_status === "pending" ? "bg-white/10 border-2 border-white/30" : requestData?.application_status === "approved" ? "bg-green-500/30 border-2 border-green-400" : "bg-red-500/30 border-2 border-red-400"} flex items-center justify-center`}>
-                  {requestData?.application_status === "pending" ? <AlertCircle size={16} className="text-white/50" /> : requestData?.application_status === "approved" ? <Award size={16} className="text-green-400" /> : <XCircle size={16} className="text-red-400" />}
-                </div>
-              </div>
-
-              <div className="flex-1">
-                <h4 className="text-white font-bold text-xs sm:text-sm mb-0.5">{requestData?.application_status === "pending" ? "Decision Pending" : requestData?.application_status === "approved" ? "Application Approved" : "Application Declined"}</h4>
-                <p className="text-red-200 text-xs mb-1">{requestData?.application_status === "pending" ? "Awaiting admin decision" : "Process Complete"}</p>
-                <p className="text-red-300 text-xs">{requestData?.application_status === "pending" ? "You'll receive an email notification once a decision is made." : requestData?.application_status === "approved" ? "You can now access the instructor dashboard and start creating courses!" : "Please review the requirements and consider reapplying in the future."}</p>
-              </div>
+              )}
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          {requestData?.application_status === "pending" && (
-            <>
-              <button className="flex-1 bg-red-700  hover:from-red-400  text-white font-semibold py-2.5 px-4 rounded-xl border border-blue-400/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer" onClick={() => window?.location?.reload()}>
-                <RefreshCw size={16} />
-                Refresh Status
-              </button>
-              <button onClick={() => userLogout()} className="flex-1 bg-purple-700  hover:from-purple-400  text-white font-semibold py-2.5 px-4 rounded-xl border border-blue-400/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer">
-                <Home size={16} />
-                Go to Home
-              </button>
-            </>
-          )}
-          {requestData?.application_status === "approved" && (
-            <button onClick={() => goToDashboard(requestData?.id)} className="flex-1 bg-gradient-to-r from-green-500/30 to-emerald-500/30 hover:from-green-500/40 hover:to-emerald-500/40 text-white font-semibold py-2.5 px-4 rounded-xl border border-green-400/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer">
-              <Award size={16} />
-              Go to Instructor Dashboard
-            </button>
-          )}
-          {requestData?.application_status === "rejected" && (
-            <>
-              <Link to='/instructor/signup' className="flex-1 bg-gradient-to-r from-red-500/30 to-pink-500/30 hover:from-red-500/40 hover:to-pink-500/40 text-white font-semibold py-2.5 px-4 rounded-xl border border-red-400/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer">
-                <Send size={16} />
-                Submit New Application
-              </Link>
-              <button onClick={() => userLogout()} className="flex-1 bg-purple-700  hover:from-purple-400  text-white font-semibold py-2.5 px-4 rounded-xl border border-blue-400/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer">
-                <Home size={16} />
-                Go to Home
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => navigate("/instructor/contact")}
-            className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-2.5 px-4 rounded-xl border border-white/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer"
-          >
-            <Mail size={16} />
-            Contact Support
-          </button>
-        </div>
+          {/* ─── Timeline Card ─── */}
+          <div className="rounded-2xl border border-white/[.08] bg-white/[.02] p-5 sm:p-6">
+            <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-5 flex items-center gap-2">
+              <Calendar size={14} className="text-white/40" />
+              Application Timeline
+            </h3>
 
-        <div className="bg-blue-500/10 backdrop-blur-xl rounded-xl border border-blue-400/30 p-3 sm:p-4">
-          <div className="flex gap-2.5">
-            <AlertCircle className="text-blue-400 flex-shrink-0 mt-0.5" size={16} />
             <div>
-              <h4 className="text-white font-semibold text-xs sm:text-sm mb-0.5">Need Help?</h4>
-              <p className="text-blue-200 text-xs">If you have any questions about your application status or the instructor program, feel free to contact our support team. We typically respond within 24 hours.</p>
+              <TimelineStep
+                icon={CheckCircle}
+                iconBg="bg-emerald-500/20"
+                iconColor="text-green-400"
+                borderColor="border-emerald-500/30"
+                title="Application Submitted"
+                subtitle={formatDateTimeMeridianWithoutSecond(requestData?.created_at) || "N/A"}
+                detail="Your application has been received and queued for review."
+                isActive={false}
+                isComplete={true}
+                isLast={false}
+              />
+
+              <TimelineStep
+                icon={currentStatus === "pending" ? RefreshCw : CheckCircle}
+                iconBg={currentStatus === "pending" ? "bg-amber-500/20" : "bg-emerald-500/20"}
+                iconColor={currentStatus === "pending" ? "text-orange-400" : "text-green-400"}
+                borderColor={currentStatus === "pending" ? "border-amber-500/30" : "border-emerald-500/30"}
+                title="Under Review"
+                subtitle={currentStatus === "pending" ? "In Progress" : "Completed"}
+                detail={currentStatus === "pending"
+                  ? "Our team is reviewing your credentials. Expected: 5–7 business days."
+                  : "Review completed successfully."
+                }
+                isActive={currentStatus === "pending"}
+                isComplete={currentStatus !== "pending"}
+                isLast={false}
+              />
+
+              <TimelineStep
+                icon={
+                  currentStatus === "pending" ? AlertCircle
+                    : currentStatus === "approved" ? Award
+                      : XCircle
+                }
+                iconBg={
+                  currentStatus === "pending" ? "bg-white/5"
+                    : currentStatus === "approved" ? "bg-emerald-500/20"
+                      : "bg-red-500/20"
+                }
+                iconColor={
+                  currentStatus === "pending" ? "text-white/30"
+                    : currentStatus === "approved" ? "text-green-400"
+                      : "text-red-400"
+                }
+                borderColor={
+                  currentStatus === "pending" ? "border-white/10"
+                    : currentStatus === "approved" ? "border-emerald-500/30"
+                      : "border-red-500/30"
+                }
+                title={
+                  currentStatus === "pending" ? "Decision Pending"
+                    : currentStatus === "approved" ? "Application Approved"
+                      : "Application Declined"
+                }
+                subtitle={currentStatus === "pending" ? "Awaiting decision" : "Process Complete"}
+                detail={
+                  currentStatus === "pending"
+                    ? "You'll receive a notification once a decision is made."
+                    : currentStatus === "approved"
+                      ? "Welcome aboard! You can now create and manage courses."
+                      : "Please review the requirements and consider reapplying."
+                }
+                isActive={false}
+                isComplete={currentStatus !== "pending"}
+                isLast={true}
+              />
             </div>
           </div>
+
+          {/* ─── Action Buttons ─── */}
+          <div className="flex flex-col sm:flex-row gap-2.5">
+            {currentStatus === "pending" && (
+              <>
+                <button
+                  onClick={refreshStatus}
+                  className="flex-1 group relative bg-white/[.04] hover:bg-white/[.08] text-white font-medium py-3 px-5 rounded-xl border border-white/[.08] hover:border-white/15 transition-all duration-300 flex items-center justify-center gap-2 text-sm cursor-pointer"
+                >
+                  <RefreshCw size={16} className="group-hover:rotate-180 transition-transform duration-500" />
+                  Check Status
+                </button>
+                <button
+                  onClick={userLogout}
+                  className="flex-1 bg-white/[.04] hover:bg-white/[.08] text-white/60 hover:text-white font-medium py-3 px-5 rounded-xl border border-white/[.08] hover:border-white/15 transition-all duration-300 flex items-center justify-center gap-2 text-sm cursor-pointer"
+                >
+                  <Home size={16} />
+                  Go Home
+                </button>
+              </>
+            )}
+            {currentStatus === "approved" && (
+              <button
+                onClick={goToDashboard}
+                className="flex-1 group bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 font-semibold py-3.5 px-5 rounded-xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 flex items-center justify-center gap-2 text-sm cursor-pointer"
+              >
+                <Award size={16} />
+                Go to Instructor Dashboard
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            )}
+            {currentStatus === "rejected" && (
+              <>
+                <Link
+                  to="/instructor/signup"
+                  className="flex-1 bg-white/[.04] hover:bg-white/[.08] text-white font-medium py-3 px-5 rounded-xl border border-white/[.08] hover:border-white/15 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                >
+                  <Send size={16} />
+                  Submit New Application
+                </Link>
+                <button
+                  onClick={userLogout}
+                  className="flex-1 bg-white/[.04] hover:bg-white/[.08] text-white/60 hover:text-white font-medium py-3 px-5 rounded-xl border border-white/[.08] hover:border-white/15 transition-all duration-300 flex items-center justify-center gap-2 text-sm cursor-pointer"
+                >
+                  <Home size={16} />
+                  Go Home
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* ─── Help Card ─── */}
+          <div className="rounded-xl border border-white/[.06] bg-white/[.02] p-4 flex gap-3">
+            <Mail size={16} className="text-white/30 mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="text-white/60 font-medium text-xs mb-0.5">Need assistance?</h4>
+              <p className="text-white/30 text-xs leading-relaxed">
+                Contact our support team if you have questions about your application. We typically respond within 24 hours.
+              </p>
+            </div>
+          </div>
+
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

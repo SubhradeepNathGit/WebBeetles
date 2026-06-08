@@ -35,7 +35,7 @@ const TableRow = ({ inst,setOpenMarkModal, setInstructorId, setChangeStatus }) =
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
-                            {inst?.profile_image_url ? <img className='rounded-full' src={inst?.profile_image_url} alt={inst?.name?.charAt(0)} /> : inst?.name?.charAt(0)}
+                            {inst?.profile_image_url ? <img className='w-full h-full object-cover rounded-full' src={inst?.profile_image_url} alt={inst?.name?.charAt(0)} /> : inst?.name?.charAt(0)}
                         </div>
                         <div>
                             <p className="text-sm font-semibold text-white group-hover:text-yellow-400 transition-colors text-left">{inst?.name ?? 'N/A'}</p>

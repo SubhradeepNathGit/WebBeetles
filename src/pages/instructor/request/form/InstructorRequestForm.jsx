@@ -131,8 +131,10 @@ const InstructorRequestForm = () => {
 
             <div className="w-full max-w-7xl rounded-2xl sm:rounded-3xl  bg-black p-5 sm:p-7 md:p-8 backdrop-blur-md">
                 <div className="text-center mb-4 sm:mb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-white">Become an Instructor at WebBeetles</h2>
-                    <p className="text-red-400 font-semibold text-xs sm:text-sm">Join Webbeetles and share your knowledge with learners worldwide</p>
+                    <h2 className="text-2xl lg:text-3xl text-white text-center mb-2 font-light tracking-wide">
+                        Become an <span className="font-semibold text-rose-300">Instructor</span> at <span className="text-rose-400 font-bold">WebBeetles</span>
+                    </h2>
+                    <p className="text-rose-200/60 text-xs sm:text-sm font-medium">Join WebBeetles and share your knowledge with learners worldwide</p>
                 </div>
 
                 <div className="space-y-4">
@@ -190,7 +192,7 @@ const InstructorRequestForm = () => {
                                         </div>
                                         {(isUploading || uploadProgress > 0) && uploadedFile && (
                                             <div className="space-y-1">
-                                                <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden"><div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full transition-all duration-300 ease-out" style={{ width: `${uploadProgress}%` }}></div></div>
+                                                <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden"><div className="bg-red-600 h-full transition-all duration-300 ease-out" style={{ width: `${uploadProgress}%` }}></div></div>
                                                 <p className="text-white/70 text-xs text-right">{uploadProgress}% uploaded</p>
                                             </div>
                                         )}

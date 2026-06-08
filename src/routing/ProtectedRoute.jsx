@@ -45,6 +45,21 @@ const ProtectedRoute = ({ role }) => {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
+  // Check instructor onboarding flow before allowing them to access the dashboard
+  if (role === "instructor") {
+    const isDashboardRoute = location.pathname.includes("/dashboard");
+
+    if (isDashboardRoute) {
+      if (userAuthData.application_status === "pending" && !userAuthData.application_complete) {
+        return <Navigate to="/instructor/profile-form" state={{ instructorData: userAuthData }} replace />;
+      } else if (userAuthData.application_status !== "approved" && userAuthData.application_complete) {
+        return <Navigate to="/instructor/request-status" state={{ instructorData: userAuthData }} replace />;
+      } else if (userAuthData.application_status === "approved" && userAuthData.last_login === null) {
+        return <Navigate to="/instructor/request-status" state={{ instructorData: userAuthData }} replace />;
+      }
+    }
+  }
+
   // 4. Authorized
   return <Outlet />;
 };
