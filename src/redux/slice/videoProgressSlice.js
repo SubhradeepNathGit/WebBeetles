@@ -13,12 +13,12 @@ export const upsertVideoProgress = createAsyncThunk("videoProgress/upsert",
                     updated_at: new Date().toISOString(),
                 }, {
                 onConflict: "student_id,lesson_id",
-            }).select().single();
+            }).select();
             // console.log('Response for adding or updating video progress', res);
 
             if (res?.error) throw res?.error;
 
-            return res?.data;
+            return res?.data?.[0];
         } catch (err) {
             return rejectWithValue(err.message);
         }
@@ -37,12 +37,12 @@ export const updateWatchedSeconds = createAsyncThunk("videoProgress/updateWatche
                 watched_seconds,
                 completed: isCompleted,
                 updated_at: new Date().toISOString(),
-            }).eq("student_id", student_id).eq("lesson_id", lesson_id).select().single();
+            }).eq("student_id", student_id).eq("lesson_id", lesson_id).select();
             // console.log('Response for updating video progress watched seconds', res);
 
             if (res?.error) throw res?.error;
 
-            return res?.data;
+            return res?.data?.[0];
         } catch (err) {
             return rejectWithValue(err.message);
         }
@@ -58,12 +58,12 @@ export const markDocAsRead = createAsyncThunk("videoProgress/markDocAsRead",
             const res = await supabase.from("video_progress").update({
                 read_doc: true,
                 updated_at: new Date().toISOString(),
-            }).eq("student_id", student_id).eq("lesson_id", lesson_id).select().single();
+            }).eq("student_id", student_id).eq("lesson_id", lesson_id).select();
             // console.log('Response for updating mark as read', res);
 
             if (res?.error) throw res?.error;
 
-            return res?.data;
+            return res?.data?.[0];
         } catch (err) {
             return rejectWithValue(err.message);
         }
