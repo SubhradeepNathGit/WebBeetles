@@ -26,6 +26,17 @@ const MyCoursesPage = ({ userData }) => {
           getSweetAlert('Oops...', 'Something went wrong!', 'error');
         });
     }
+
+    const specificCourseStr = sessionStorage.getItem('openSpecificCourse');
+    if (specificCourseStr) {
+      try {
+        const course = JSON.parse(specificCourseStr);
+        setSelectedCourse(course);
+      } catch (e) {
+        console.error("Failed to parse specific course", e);
+      }
+      sessionStorage.removeItem('openSpecificCourse');
+    }
   }, [userAuthData]);
 
   // console.log('Purchased course list', purchaseItems);
@@ -46,9 +57,11 @@ const MyCoursesPage = ({ userData }) => {
 
         <StudentMyCourseStats purchaseItems={purchaseItems} userAuthData={userAuthData} />
 
-        {purchaseItems?.length > 0 ? purchaseItems?.map(course => (
-          <CourseCard key={course?.id} course={course} setSelectedCourse={setSelectedCourse} userData={userData} />
-        )) : <p className='text-center py-4'>No course available</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {purchaseItems?.length > 0 ? purchaseItems?.map(course => (
+            <CourseCard key={course?.id} course={course} setSelectedCourse={setSelectedCourse} userData={userData} />
+          )) : <p className='text-center py-4 col-span-full'>No course available</p>}
+        </div>
       </div>
     </div>
   );

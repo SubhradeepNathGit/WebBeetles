@@ -4,17 +4,8 @@ const DashboardSkeleton = ({ role }) => {
   const isStudent = role === 'student';
   const isInstructor = role === 'instructor';
   
-  const accentColor = isStudent 
-    ? 'bg-purple-500/20' 
-    : isInstructor 
-    ? 'bg-gray-500/20' 
-    : 'bg-emerald-500/20';
-    
-  const pulseColor = isStudent 
-    ? 'bg-purple-500/10' 
-    : isInstructor 
-    ? 'bg-gray-500/10' 
-    : 'bg-emerald-500/10';
+  const accentColor = 'bg-white/[0.06]';
+  const pulseColor = 'bg-white/[0.03]';
 
   return (
     <div className="min-h-screen bg-black flex w-full fixed inset-0 z-50">

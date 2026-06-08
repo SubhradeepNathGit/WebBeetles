@@ -30,8 +30,16 @@ const StudentDashboardCourseContinueCard = ({ course, userAuthData }) => {
   const progressColor = progressPercent === 100 ? "bg-emerald-500" : progressPercent >= 50 ? "bg-purple-500" : "bg-blue-500";
   const progressTextColor = progressPercent === 100 ? "text-emerald-500" : progressPercent >= 50 ? "text-purple-500" : "text-blue-500";
 
+  const handleOpenCourse = () => {
+    sessionStorage.setItem('openSpecificCourse', JSON.stringify(course));
+    window.dispatchEvent(new CustomEvent("open-user-course"));
+  };
+
   return (
-    <div className="group relative rounded-lg bg-transparent border border-white/8 hover:bg-white/4 p-4 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col sm:flex-row gap-4">
+    <div 
+      onClick={handleOpenCourse}
+      className="group relative rounded-lg bg-transparent border border-white/8 hover:bg-white/4 p-4 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col sm:flex-row gap-4"
+    >
       
       {/* Thumbnail */}
       <div className="relative flex-shrink-0">

@@ -4,11 +4,15 @@ export const fetchLectureProgress = async ({ student_id, course_id, lesson_id, t
 
     // console.log('Receive data for fetching lecture progress', student_id, course_id, lesson_id, type);
 
-    if (!student_id || !course_id) {
-        throw new Error("student_id and course_id are required");
+    if (!student_id) {
+        throw new Error("student_id is required");
     }
 
-    let query = supabase.from("video_progress").select("*").eq("student_id", student_id).eq("course_id", course_id);
+    let query = supabase.from("video_progress").select("*").eq("student_id", student_id);
+
+    if (course_id) {
+        query = query.eq("course_id", course_id);
+    }
 
     if (lesson_id) {
         query = query.eq("lesson_id", lesson_id);

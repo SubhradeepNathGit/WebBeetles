@@ -36,7 +36,7 @@ const CourseCard = ({ course, setSelectedCourse, userData }) => {
     // console.log('Course progress details', progressData);
 
     return (
-        <div className="bg-[#111827]/80 backdrop-blur-md rounded-2xl overflow-hidden border border-white/5 hover:border-purple-500/40 shadow-lg hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)] transition-all duration-300 group hover:-translate-y-1 flex flex-col">
+        <div className="h-full bg-[#111827]/80 backdrop-blur-md rounded-2xl overflow-hidden border border-white/5 hover:border-purple-500/40 shadow-lg hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)] transition-all duration-300 group hover:-translate-y-1 flex flex-col">
             <div className="relative h-48 overflow-hidden">
                 <img src={courseDetails?.thumbnail} alt={courseDetails?.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-transparent to-transparent opacity-90" />
