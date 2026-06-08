@@ -17,6 +17,7 @@ import Signup from "../pages/student/auth/register/Signup";
 import Error404 from "../pages/common/Error404";
 import ForgetPassword from "../pages/student/auth/forgetPassword/ForgetPassword";
 import ResetPassword from "../pages/student/auth/resetPassword/ResetPassword";
+import PasswordResetEmailSent from "../pages/common/auth/PasswordResetEmailSent";
 import Otp from "../pages/student/auth/otp/Otp";
 import Cart from "../pages/student/cart/Cart";
 import Course from "../pages/student/Course";
@@ -115,6 +116,7 @@ const Routing = () => {
         <Route path="/signin" element={<MaintenanceGuard isMaintenance={isMaintenance}><Signin /></MaintenanceGuard>} />
         <Route path="/signup" element={<MaintenanceGuard isMaintenance={isMaintenance}><Signup /></MaintenanceGuard>} />
         <Route path="/forget-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><ForgetPassword /></MaintenanceGuard>} />
+        <Route path="/password-reset-email-sent" element={<MaintenanceGuard isMaintenance={isMaintenance}><PasswordResetEmailSent userType="student" /></MaintenanceGuard>} />
         <Route path="/reset-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><ResetPassword /></MaintenanceGuard>} />
         <Route path="/otp" element={<MaintenanceGuard isMaintenance={isMaintenance}><Otp /></MaintenanceGuard>} />
         
@@ -131,6 +133,7 @@ const Routing = () => {
         <Route path="/instructor/signin" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorSignin /></MaintenanceGuard>} />
         <Route path="/instructor/signup" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorSignup /></MaintenanceGuard>} />
         <Route path="/instructor/forget-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorForgetPassword /></MaintenanceGuard>} />
+        <Route path="/instructor/password-reset-email-sent" element={<MaintenanceGuard isMaintenance={isMaintenance}><PasswordResetEmailSent userType="instructor" /></MaintenanceGuard>} />
         <Route path="/instructor/reset-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorResetPassword /></MaintenanceGuard>} />
         <Route path="/instructor/otp" element={<MaintenanceGuard isMaintenance={isMaintenance}><InstructorOtp /></MaintenanceGuard>} />
         

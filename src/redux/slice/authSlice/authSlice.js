@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../../util/supabase/supabase";
 import supabaseAdmin from "../../../util/supabase/supabaseAdmin";
-import getSweetAlert from "../../../util/alert/sweetAlert";
 import { generateOTP, sendOTPEmail, sendForgetPasswordEmail } from "../../../util/email/emailService";
 
 // register action
@@ -242,9 +241,10 @@ export const forgetPasswordSlice = createAsyncThunk('authSlice/forgetPasswordSli
         try {
             // Check if user exists 
             const table = userType === 'student' ? "students" : "instructors";
-            const { data: existingUser, error: fetchError } = await supabase.from(table).select("email, name").eq("email", data.email).single();
+            const normalizedEmail = data.email.trim().toLowerCase();
+            const { data: existingUser, error: fetchError } = await supabaseAdmin.from(table).select("email, name").eq("email", normalizedEmail).single();
 
-            if (!existingUser) {
+            if (fetchError || !existingUser) {
                 return rejectWithValue({
                     message: "No account found with this email."
                 });
@@ -265,13 +265,13 @@ export const forgetPasswordSlice = createAsyncThunk('authSlice/forgetPasswordSli
             if (otpInsertError) throw otpInsertError;
 
             // Construct secure confirm/reset link
-            const resetLink = `${window.location.origin}${userType === 'student' ? '' : '/instructor'}/reset-password?token=${otpInsertData.id}&email=${encodeURIComponent(data.email)}`;
+            const resetLink = `${window.location.origin}${userType === 'student' ? '' : '/instructor'}/reset-password?token=${otpInsertData.id}&email=${encodeURIComponent(normalizedEmail)}`;
 
             // Send password reset link email via EmailJS
-            await sendForgetPasswordEmail(data.email, existingUser.name, resetLink);
-            console.log(`[DEV ONLY] Forget Password reset link for ${data.email} is: ${resetLink}`);
+            await sendForgetPasswordEmail(normalizedEmail, existingUser.name, resetLink);
+            console.log(`[DEV ONLY] Forget Password reset link for ${normalizedEmail} is: ${resetLink}`);
 
-            return { email: data.email };
+            return { email: normalizedEmail };
         } catch (err) {
             if (err.response && err.response.data) {
                 return rejectWithValue(err.response.data);
@@ -323,40 +323,46 @@ export const resetPasswordSlice = createAsyncThunk("authSlice/resetPasswordSlice
         try {
             // data contains: email, otp, newPassword, userType
             const table = data.userType === 'student' ? 'students' : 'instructors';
+            const normalizedEmail = data.email?.trim().toLowerCase();
+
+            if (!normalizedEmail || !data.otp) {
+                return rejectWithValue({ message: 'Reset link is invalid. Please request a new one.' });
+            }
 
             // Fetch stored OTP row for this email
             const { data: tokenRow, error: fetchError } = await supabaseAdmin
                 .from('otp_tokens')
                 .select('*')
-                .eq('email', data.email)
+                .eq('email', normalizedEmail)
+                .eq('user_type', data.userType)
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .single();
 
             if (fetchError || !tokenRow) {
-                return rejectWithValue({ message: 'OTP not found. Please request a new one.' });
+                return rejectWithValue({ message: 'Reset link not found. Please request a new one.' });
             }
 
             // Check expiry
             if (new Date(tokenRow.expires_at) < new Date()) {
-                await supabaseAdmin.from('otp_tokens').delete().eq('email', data.email);
-                return rejectWithValue({ message: 'OTP has expired. Please request a new one.' });
+                await supabaseAdmin.from('otp_tokens').delete().eq('email', normalizedEmail).eq('user_type', data.userType);
+                return rejectWithValue({ message: 'Reset link has expired. Please request a new one.' });
             }
 
             // Check OTP or Link Token (UUID) match
-            const isMatch = (tokenRow.otp === data.otp) || (tokenRow.id === data.otp);
+            const isMatch = tokenRow.id === data.otp;
             if (!isMatch) {
-                return rejectWithValue({ message: 'Incorrect OTP or link is invalid/expired.' });
+                return rejectWithValue({ message: 'Reset link is invalid or expired.' });
             }
 
             // OTP correct — clean up token row
-            await supabaseAdmin.from('otp_tokens').delete().eq('email', data.email);
+            await supabaseAdmin.from('otp_tokens').delete().eq('email', normalizedEmail).eq('user_type', data.userType);
 
             // Fetch user id from our table
             const { data: userData, error: userError } = await supabaseAdmin
                 .from(table)
                 .select('id')
-                .eq('email', data.email)
+                .eq('email', normalizedEmail)
                 .single();
 
             if (userError || !userData) {

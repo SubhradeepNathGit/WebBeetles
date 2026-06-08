@@ -50,21 +50,22 @@ export async function sendOTPEmail(toEmail, toName, otp) {
 }
 
 /**
- * Sends a password reset OTP email using EmailJS.
+ * Sends a password reset link email using EmailJS.
  * @param {string} toEmail  - Recipient email address
  * @param {string} toName   - Recipient name (for personalisation)
- * @param {string} otp      - The OTP code
+ * @param {string} resetLink - The password reset link
  */
-export async function sendForgetPasswordEmail(toEmail, toName, otp) {
+export async function sendForgetPasswordEmail(toEmail, toName, resetLink) {
   const templateParams = {
     to_email: toEmail,
     email: toEmail,
     to: toEmail,
     to_name: toName || 'User',
-    otp_code: otp,
-    otp: otp,
+    reset_link: resetLink,
+    confirmation_link: resetLink,
+    link: resetLink,
     app_name: 'WebBeetles',
-    expiry_minutes: '10',
+    expiry_minutes: '15',
   };
 
   try {

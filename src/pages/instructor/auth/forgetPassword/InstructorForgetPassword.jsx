@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { FaArrowLeft } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
@@ -29,8 +29,8 @@ const InstructorForgetPassword = () => {
                 // console.log('Response in form after forget password', res);
 
                 if (res.meta.requestStatus === "fulfilled") {
-                    hotToast('OTP sent successfully. Please check your email.');
-                    navigate('/instructor/reset-password', {
+                    hotToast('Password reset link sent. Please check your email.');
+                    navigate('/instructor/password-reset-email-sent', {
                         state: { email: data.email }
                     });
                 }
@@ -76,7 +76,7 @@ const InstructorForgetPassword = () => {
                     </h2>
 
                     <p className="text-white/60 text-[14px] lg:text-[16px] text-center mb-8">
-                        Please enter your email address and we will send you a confirmation code to set a new password
+                        Please enter your email address and we will send you a confirmation link to set a new password.
                     </p>
 
                     <form className="space-y-4" onSubmit={handleSubmit(forgetPasswordDataHandler)}>
@@ -96,7 +96,7 @@ const InstructorForgetPassword = () => {
 
                         <button type="submit" disabled={isUserAuthLoading} className={`w-full mt-6 py-3 rounded-xl text-base lg:text-lg font-semibold text-white transition-all duration-300
                             ${isUserAuthLoading ? "bg-rose-500/50 cursor-not-allowed opacity-70" : "cursor-pointer bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-lg hover:shadow-rose-500/25"}`}>
-                            {isUserAuthLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline mr-2' /> : ''} {isUserAuthLoading ? "Processing..." : "Get OTP"}
+                            {isUserAuthLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline mr-2' /> : ''} {isUserAuthLoading ? "Processing..." : "Send Reset Link"}
                         </button>
                     </form>
 
