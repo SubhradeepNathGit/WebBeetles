@@ -4,7 +4,7 @@ import SummaryStats from "../../components/admin/instructor/SummaryStats";
 import InstructorTable from "../../components/admin/instructor/InstructorTable";
 import { allInstructor, updateInstructorBlockUnblockStatus } from "../../redux/slice/instructorSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2 } from "lucide-react";
+import TableSkeleton from "../../components/admin/common/TableSkeleton";
 import { allCourse } from "../../redux/slice/couseSlice";
 import { useTotalRevenue } from "../../tanstack/query/fetchTotalRevenue";
 import getSweetAlert from "../../util/alert/sweetAlert";
@@ -20,30 +20,23 @@ export default function Instructors() {
     const [changeStatus, setChangeStatus] = useState(null);
 
     const dispatch = useDispatch(),
-        { isInstructorLoading, getInstructorData, isInstructorError } = useSelector(state => state?.instructor),
-        { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state?.course),
-        { isLoading: isRevenueLoading, data: revenueData, error: hasRevenueError } = useTotalRevenue();
+        { isInstructorLoading, getInstructorData } = useSelector(state => state?.instructor),
+        { isCourseLoading, getCourseData } = useSelector(state => state?.course),
+        { isLoading: isRevenueLoading, data: revenueData } = useTotalRevenue();
 
     const activeCourse = getCourseData?.filter(course => course?.status == 'approved' && course?.is_active && !course?.is_admin_block);
 
-    const noPendingData = getInstructorData?.filter(ins => ins?.application_status != "pending");
-
-    const filtered = noPendingData?.filter(i => i?.name?.toLowerCase()?.includes(search?.toLowerCase()) || i?.email?.toLowerCase()?.includes(search?.toLowerCase()));
+    const filtered = getInstructorData?.filter(i => i?.name?.toLowerCase()?.includes(search?.toLowerCase()) || i?.email?.toLowerCase()?.includes(search?.toLowerCase()));
 
     useEffect(() => {
         dispatch(allInstructor())
-            .then(res => {
-                // console.log('Response for fetching all instructor', res)
-            }).catch(err => {
+            .catch(err => {
                 console.log('Error occured', err);
             })
     }, [dispatch]);
 
     useEffect(() => {
         dispatch(allCourse())
-            .then(res => {
-                // console.error("response from course section", res);
-            })
             .catch((err) => {
                 getSweetAlert('Oops...', 'Something went wrong!', 'error');
                 console.error("Error occurred", err);
@@ -75,13 +68,13 @@ export default function Instructors() {
                 <InstructorHeader search={search} setSearch={setSearch} />
 
                 {/* Summary */}
-                <SummaryStats isInstructorLoading={isInstructorLoading} getInstructorData={noPendingData} getCourseData={activeCourse}
+                <SummaryStats isInstructorLoading={isInstructorLoading} getInstructorData={getInstructorData} getCourseData={activeCourse}
                     isCourseLoading={isCourseLoading} isRevenueLoading={isRevenueLoading} revenueData={revenueData} />
 
                 {/* Table + Expandable Course Rows */}
-                {isInstructorLoading ? <Loader2 className="inline animate-spin my-5 mx-50 w-12 h-12" /> :
+                {isInstructorLoading ? <TableSkeleton columns={9} rows={5} /> :
                     <InstructorTable filtered={filtered} setOpenMarkModal={setOpenMarkModal} setInstructorId={setInstructorId}
-                    setChangeStatus={setChangeStatus} />}
+                    setChangeStatus={setChangeStatus} allInstructorData={getInstructorData} />}
             </div>
 
             {openMarkModal && (

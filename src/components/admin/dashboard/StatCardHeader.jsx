@@ -52,14 +52,14 @@ const StatCardHeader = () => {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <StatCard icon={Users} label="Total Students" value={(isAllStudentLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : getAllStudentData?.length) ?? 0} trend="+15.5%" sub="Registered users" />
-      <StatCard icon={BookOpenCheck} label="Active Courses" value={(isCourseLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : activeCourse?.length) ?? 0} trend="+5.3%" sub="Published & live" />
-      <StatCard icon={UserStar} label="Total Instructors" value={(isInstructorLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : approvedInstructor?.length) ?? 0} trend="+2.2%" iconColor="text-yellow-400" sub="Approved experts" />
-      <StatCard icon={IndianRupee} label="Total Revenue" value={(isRevenueLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : totalRevenue?.toLocaleString()) ?? 0} trend="+18.4%" sub="This financial year (without tax)" />
-      <StatCard icon={ShoppingCart} label="Active Cart Sessions" value={(isCartLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : cartItems?.length) ?? 0} trend="-3.1%" trendUp={false} iconColor="text-yellow-400" sub="Pending checkout" />
-      <StatCard icon={Blinds} label="Exam Scheduled" value={(isCourseLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : examScheduledCourse?.length) ?? 0} trend="+4.1%" sub="Across all courses" />
-      <StatCard icon={ClipboardCheck} label="Pending Reviews" value={(isInstructorLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : pendingApplication?.length) ?? 0} trend="New" sub="Instructor applications" iconColor="text-yellow-400" />
-      <StatCard icon={BookOpen} label="Courses to Approve" value={(isCourseLoading ? <Loader2 className='inline animate-spin w-5 h-5' /> : pendingCourse?.length) ?? 0} trend="Pending" sub="Awaiting admin review" />
+      <StatCard icon={Users} label="Total Students" value={(isAllStudentLoading ? <span className="inline-block h-6 w-16 bg-white/5 rounded animate-pulse"></span> : getAllStudentData?.length) ?? 0} trend="+15.5%" sub="Registered users" />
+      <StatCard icon={BookOpenCheck} label="Active Courses" value={(isCourseLoading ? <span className="inline-block h-6 w-16 bg-white/5 rounded animate-pulse"></span> : activeCourse?.length) ?? 0} trend="+5.3%" sub="Published & live" />
+      <StatCard icon={UserStar} label="Total Instructors" value={(isInstructorLoading ? <span className="inline-block h-6 w-16 bg-white/5 rounded animate-pulse"></span> : approvedInstructor?.length) ?? 0} trend="+2.2%" iconColor="text-yellow-400" sub="Approved experts" />
+      <StatCard icon={IndianRupee} label="Total Revenue" value={(isRevenueLoading ? <span className="inline-block h-6 w-24 bg-white/5 rounded animate-pulse"></span> : totalRevenue?.toLocaleString()) ?? 0} trend="+18.4%" sub="This financial year (without tax)" />
+      <StatCard icon={ShoppingCart} label="Active Cart Sessions" value={(isCartLoading ? <span className="inline-block h-6 w-16 bg-white/5 rounded animate-pulse"></span> : cartItems?.length) ?? 0} trend="-3.1%" trendUp={false} iconColor="text-yellow-400" sub="Pending checkout" />
+      <StatCard icon={Blinds} label="Exam Scheduled" value={(isCourseLoading ? <span className="inline-block h-6 w-16 bg-white/5 rounded animate-pulse"></span> : examScheduledCourse?.length) ?? 0} trend="+4.1%" sub="Across all courses" />
+      <StatCard icon={ClipboardCheck} label="Pending Reviews" value={(isInstructorLoading ? <span className="inline-block h-6 w-16 bg-white/5 rounded animate-pulse"></span> : pendingApplication?.length) ?? 0} trend="New" sub="Instructor applications" iconColor="text-yellow-400" />
+      <StatCard icon={BookOpen} label="Courses to Approve" value={(isCourseLoading ? <span className="inline-block h-6 w-16 bg-white/5 rounded animate-pulse"></span> : pendingCourse?.length) ?? 0} trend="Pending" sub="Awaiting admin review" />
     </div>
   )
 }

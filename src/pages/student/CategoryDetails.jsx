@@ -12,14 +12,13 @@ const CategoryDetails = () => {
     const { categoryId } = useParams();
     const category_id = decodeBase64Url(categoryId);
 
-    const { isLoading, data: categoryDetails, error } = useCategoryDetails(category_id);
-    console.log(categoryDetails)
+    const { isLoading, data: categoryDetails } = useCategoryDetails(category_id);
 
     return (
-        <>
+        <main className="min-h-screen bg-black text-white overflow-hidden">
             <CategoryDetailsBanner />
             {isLoading ? (
-                <div className="flex justify-center items-center min-h-[70vh]">
+                <div className="flex justify-center items-center min-h-[70vh] bg-black">
                     <Lottie
                         animationData={loaderAnimation}
                         loop={true}
@@ -32,7 +31,7 @@ const CategoryDetails = () => {
                     <RelatedCourse categoryDetails={categoryDetails} />
                 </>
             )}
-        </>
+        </main>
     )
 }
 

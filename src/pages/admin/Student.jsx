@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Users as UsersIcon, Loader2 } from "lucide-react";
+import { Users as UsersIcon } from "lucide-react";
+import TableSkeleton from "../../components/admin/common/TableSkeleton";
 import UserHeader from "../../components/admin/student/UserHeader";
 import SummaryStats from "../../components/admin/student/SummaryStats";
 import UserTable from "../../components/admin/student/UserTable";
@@ -35,7 +36,7 @@ export default function Students() {
             <SummaryStats getAllStudentData={getAllStudentData} />
 
             {/* Table */}
-            {isAllStudentLoading ? <Loader2 className="inline animate-spin my-5 mx-50 w-12 h-12" /> :
+            {isAllStudentLoading ? <TableSkeleton columns={8} rows={5} /> :
                 <UserTable filtered={filtered} allStudentData={getAllStudentData} />}
 
         </div>

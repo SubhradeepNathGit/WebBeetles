@@ -1,7 +1,7 @@
 import React from 'react'
 import TableRow from './TableRow'
 
-const InstructorTable = ({ filtered, setOpenMarkModal, setInstructorId, setChangeStatus }) => {
+const InstructorTable = ({ filtered, setOpenMarkModal, setInstructorId, setChangeStatus, allInstructorData }) => {
     return (
         <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
             <div className="overflow-x-auto">
@@ -28,6 +28,14 @@ const InstructorTable = ({ filtered, setOpenMarkModal, setInstructorId, setChang
                         </tbody>
                     </table>
                 ) : <p className='text-center py-2'>No Instructor available</p>}
+            </div>
+            <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between text-sm text-gray-500 bg-[#151515]">
+                <div>Showing {filtered?.length || 0} of {allInstructorData?.length || 0} instructors</div>
+                <div className="flex items-center gap-2">
+                    <button className="px-3 py-1.5 bg-[#1a1a1a] rounded-lg hover:bg-[#222] transition-colors disabled:opacity-30 text-xs" disabled>Previous</button>
+                    <span className="text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-lg">1</span>
+                    <button className="px-3 py-1.5 bg-[#1a1a1a] rounded-lg hover:bg-[#222] transition-colors text-xs">Next</button>
+                </div>
             </div>
         </div>
     )

@@ -9,10 +9,10 @@ const SummaryStats = ({ isInstructorLoading, getInstructorData, isCourseLoading,
     return (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-                { label: "Total Instructors", value: isInstructorLoading ? <Loader2 className='inline w-4 h-4 animate-spin' /> : getInstructorData?.length ?? 0 },
-                { label: "Active Instructors", value: isInstructorLoading ? <Loader2 className='inline w-4 h-4 animate-spin' /> : activeInstructor?.length ?? 0 },
-                { label: "Total Courses Published", value: isCourseLoading ? <Loader2 className='inline w-4 h-4 animate-spin' /> : getCourseData?.length ?? 0 },
-                { label: "Revenue Attributed (Fee & TAX)", value: isRevenueLoading ? <Loader2 className='inline w-4 h-4 animate-spin' /> : "₹" + (totalRevenue?.toLocaleString() ?? 0) }
+                { label: "Total Instructors", value: isInstructorLoading ? <span className="inline-block h-5 w-12 bg-white/5 rounded animate-pulse"></span> : getInstructorData?.length ?? 0 },
+                { label: "Active Instructors", value: isInstructorLoading ? <span className="inline-block h-5 w-12 bg-white/5 rounded animate-pulse"></span> : activeInstructor?.length ?? 0 },
+                { label: "Total Courses Published", value: isCourseLoading ? <span className="inline-block h-5 w-12 bg-white/5 rounded animate-pulse"></span> : getCourseData?.length ?? 0 },
+                { label: "Revenue Attributed (Fee & TAX)", value: isRevenueLoading ? <span className="inline-block h-5 w-20 bg-white/5 rounded animate-pulse"></span> : "₹" + (totalRevenue?.toLocaleString() ?? 0) }
             ].map((s, i) => (
                 <div key={i} className="bg-[#111] p-4 rounded-xl border border-white/5 shadow-xl">
                     <div className="text-xl font-bold text-white">{s.value}</div>

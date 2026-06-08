@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import CourseCard from "../common/course/CourseCard";
 
 const RelatedCourse = ({ categoryDetails }) => {
+    const MotionDiv = motion.div;
     
     const [isVisible, setIsVisible] = useState(false);
     const sectionRef = useRef(null);
@@ -12,15 +13,6 @@ const RelatedCourse = ({ categoryDetails }) => {
             setIsVisible(true);
         }
     }, [categoryDetails]);
-
-    const headerVariants = {
-        hidden: { opacity: 0, y: 50 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.6, ease: "easeOut" },
-        },
-    };
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -59,7 +51,7 @@ const RelatedCourse = ({ categoryDetails }) => {
                 </div>
 
                 {/* Course Cards */}
-                <motion.div
+                <MotionDiv
                     variants={containerVariants}
                     initial="hidden"
                     animate={isVisible ? "visible" : "hidden"}
@@ -67,20 +59,20 @@ const RelatedCourse = ({ categoryDetails }) => {
                 >
                     {availableCourses.length > 0 ? (
                         availableCourses.map(course => (
-                            <motion.div key={course.id} variants={cardVariants}>
+                            <MotionDiv key={course.id} variants={cardVariants}>
                                 <CourseCard course={course} />
-                            </motion.div>
+                            </MotionDiv>
                         ))
                     ) : (
-                        <motion.div
+                        <MotionDiv
                             className="col-span-full font-semibold text-center py-20 mt-50 text-gray-600 text-md"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                         >
                             No results found
-                        </motion.div>
+                        </MotionDiv>
                     )}
-                </motion.div>
+                </MotionDiv>
             </div>
         </section>
     );

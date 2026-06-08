@@ -1,11 +1,30 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import crypto from "node:crypto";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type, apikey",
 };
+
+// HMAC-SHA256 using native Web Crypto API (works in Deno without node:crypto)
+async function hmacSha256Hex(secret: string, message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(message)
+  );
+  return Array.from(new Uint8Array(signature))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -40,14 +59,17 @@ Deno.serve(async (req) => {
       items 
     } = await req.json();
 
-    // Verify signature
-    const generatedSignature = crypto
-      .createHmac("sha256", Deno.env.get("RAZORPAY_KEY_SECRET"))
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest("hex");
+    // Verify signature using native Web Crypto API
+    const generatedSignature = await hmacSha256Hex(
+      Deno.env.get("RAZORPAY_KEY_SECRET"),
+      `${razorpay_order_id}|${razorpay_payment_id}`
+    );
 
     if (generatedSignature !== razorpay_signature) {
-      return new Response("Invalid signature", { status: 400, headers });
+      return new Response(JSON.stringify({ error: "Invalid signature" }), { 
+        status: 400, 
+        headers: { ...headers, "Content-Type": "application/json" } 
+      });
     }
 
     // Update purchase status and retrieve the metadata
@@ -60,7 +82,10 @@ Deno.serve(async (req) => {
 
     if (updateError) {
       console.error("Update purchase status error:", updateError);
-      return new Response("Purchase update failed", { status: 500, headers });
+      return new Response(JSON.stringify({ error: "Purchase update failed", details: updateError }), { 
+        status: 500, 
+        headers: { ...headers, "Content-Type": "application/json" } 
+      });
     }
 
     if (purchase?.metadata?.is_subscription) {
@@ -72,7 +97,10 @@ Deno.serve(async (req) => {
 
       if (studentPlanError) {
         console.error("Student plan update error:", studentPlanError);
-        return new Response("Plan update failed", { status: 500, headers });
+        return new Response(JSON.stringify({ error: "Plan update failed", details: studentPlanError }), { 
+          status: 500, 
+          headers: { ...headers, "Content-Type": "application/json" } 
+        });
       }
     } else {
       // Call RPC to enroll user in all courses and insert purchase items
@@ -84,7 +112,26 @@ Deno.serve(async (req) => {
 
       if (rpcError) {
         console.error("RPC Error:", rpcError);
-        return new Response("Enrollment failed", { status: 500, headers });
+        return new Response(JSON.stringify({ error: "Enrollment failed", details: rpcError }), { 
+          status: 500, 
+          headers: { ...headers, "Content-Type": "application/json" } 
+        });
+      }
+
+      // Clean up cart (non-blocking — errors here won't fail the payment)
+      try {
+        const { data: cartData, error: cartError } = await supabase.from("carts").select("id").eq("user_id", user.id).maybeSingle();
+        if (cartError) {
+          console.error("Error fetching cart:", cartError);
+        } else if (cartData) {
+          const { error: itemDeleteError } = await supabase.from("cart_items").delete().eq("cart_id", cartData.id);
+          if (itemDeleteError) console.error("Error deleting cart items:", itemDeleteError);
+          
+          const { error: cartDeleteError } = await supabase.from("carts").delete().eq("id", cartData.id);
+          if (cartDeleteError) console.error("Error deleting cart:", cartDeleteError);
+        }
+      } catch (cartErr) {
+        console.error("Error cleaning up cart:", cartErr);
       }
     }
 
@@ -95,6 +142,9 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error(err);
-    return new Response("Verification failed", { status: 500, headers });
+    return new Response(JSON.stringify({ error: err.message || "Verification failed" }), { 
+      status: 500, 
+      headers: { ...headers, "Content-Type": "application/json" } 
+    });
   }
 });

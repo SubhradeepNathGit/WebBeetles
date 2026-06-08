@@ -88,8 +88,8 @@ const InstructorCourse = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-black text-white overflow-x-hidden">
+      <div className="max-w-full mx-auto">
         <div className="flex items-center justify-between mb-8">
           <InstructorCourseListHeader />
         </div>
@@ -99,7 +99,19 @@ const InstructorCourse = () => {
         </div>
 
         {isCourseLoading ? (
-          <Loader2 className='w-15 h-15 animate-spin mx-auto' />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-[#111] border border-white/5 rounded-2xl p-5 space-y-4">
+                <div className="h-40 bg-white/5 rounded-xl w-full"></div>
+                <div className="h-4 bg-white/5 rounded w-3/4"></div>
+                <div className="h-4 bg-white/5 rounded w-1/2"></div>
+                <div className="flex justify-between items-center pt-2">
+                  <div className="h-8 bg-white/5 rounded-lg w-20"></div>
+                  <div className="h-8 bg-white/5 rounded-lg w-20"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         ) :
           (<div className="grid grid-cols-3 gap-6">
             {getCourseData?.map(course => <CourseCard key={course.id} course={course} setDeletedData={setDeletedData} setSelectedCourse={setSelectedCourse} setExpandedSections={setExpandedSections} setEditForm={setEditForm} setShowEditModal={setShowEditModal} setShowDeleteModal={setShowDeleteModal} />)}

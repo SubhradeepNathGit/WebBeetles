@@ -1,16 +1,61 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { FaCheckCircle } from "react-icons/fa";
 import Lottie from "lottie-react";
 import loaderAnimation from "../../../assets/animations/loader.json";
 import { motion } from "framer-motion";
 import { useCourseVideos } from "../../../tanstack/query/fetchLectureVideo";
+import { Lock, PlayCircle } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { checkLoggedInUser } from "../../../redux/slice/authSlice/checkUserAuthSlice";
+import { fetchUserPurchase } from "../../../redux/slice/purchaseSlice";
 
 const AboutCourseDetails = ({ courseData: getSpecificCourseData }) => {
-    const [activeLesson, setActiveLesson] = useState(0);
+    const dispatch = useDispatch();
+    const [activeLesson, setActiveLesson] = useState(null);
+    const { userAuthData } = useSelector(state => state.checkAuth);
+    const { getPurchaseData } = useSelector(state => state.purchase);
+    const MotionImg = motion.img;
 
-    const { isLoading, data: lectureData, error } = useCourseVideos({ courseId: getSpecificCourseData?.id });
-    // console.log(getSpecificCourseData, lectureData);
+    const { isLoading, data: lectureData } = useCourseVideos({ courseId: getSpecificCourseData?.id });
+    const courseVideoLessons = useMemo(
+        () => lectureData?.filter(lesson => lesson?.type === "video") || [],
+        [lectureData]
+    );
+    const hasPurchasedCourse = getPurchaseData?.some(order =>
+        order?.payment_status === "paid" &&
+        order?.purchase_items?.some(item => item?.course_id === getSpecificCourseData?.id)
+    );
+
+    useEffect(() => {
+        dispatch(checkLoggedInUser()).catch(err => {
+            console.error("Error occurred", err);
+        });
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!userAuthData?.id) return;
+
+        dispatch(fetchUserPurchase({ userId: userAuthData.id, status: "paid" })).catch(err => {
+            console.error("Error occurred", err);
+        });
+    }, [dispatch, userAuthData?.id]);
+
+    useEffect(() => {
+        const firstPreview = courseVideoLessons?.find(lesson => lesson?.isPreview);
+
+        if (firstPreview?.id) {
+            setActiveLesson(firstPreview.id);
+        }
+    }, [courseVideoLessons]);
+
+    const handleLessonToggle = (lesson) => {
+        const canOpen = lesson?.isPreview || hasPurchasedCourse;
+
+        if (!canOpen) return;
+
+        setActiveLesson(current => current === lesson?.id ? null : lesson?.id);
+    };
 
     return (
         <>
@@ -27,7 +72,7 @@ const AboutCourseDetails = ({ courseData: getSpecificCourseData }) => {
                     <div className="relative mb-6">
                         <img src="/course-details/course-details.png" alt="Course Laptop" className="w-full object-cover" />
 
-                        <motion.img
+                        <MotionImg
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{
@@ -72,24 +117,59 @@ const AboutCourseDetails = ({ courseData: getSpecificCourseData }) => {
                     {/* Lessons Accordion */}
                     <h3 className="text-xl font-semibold mb-3">Lessons of the Course</h3>
                     <div className="space-y-3">
-                        {lectureData?.map(lesson => (
-                            <button
-                                key={lesson?.id}
-                                onClick={() =>
-                                    setActiveLesson(lesson?.isPreview)
-                                }
-                                className={`flex items-center justify-between w-full px-5 py-3 rounded-xl border transition ${lesson?.isPreview
-                                    ? "bg-purple-600 text-white border-purple-600"
-                                    : "bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800" }`}
-                            >
-                                <span>{lesson?.video_title ?? 'N/A'}</span>
-                                {lesson?.isPreview ? (
-                                    <FiChevronUp className="text-xl" />
-                                ) : (
-                                    <FiChevronDown className="text-xl" />
+                        {courseVideoLessons?.length > 0 ? courseVideoLessons?.map(lesson => (
+                            <div key={lesson?.id} className="overflow-hidden rounded-xl border border-gray-700 bg-gray-900">
+                                <button
+                                    type="button"
+                                    onClick={() => handleLessonToggle(lesson)}
+                                    className={`flex items-center justify-between w-full px-5 py-4 text-left transition ${lesson?.isPreview
+                                        ? "bg-purple-600 text-white border-purple-600"
+                                        : hasPurchasedCourse
+                                            ? "bg-gray-900 text-gray-300 hover:bg-gray-800"
+                                            : "bg-gray-900/80 text-gray-500 cursor-not-allowed"}`}
+                                >
+                                    <span className="flex items-center gap-3">
+                                        {lesson?.isPreview || hasPurchasedCourse ? (
+                                            <PlayCircle className="h-5 w-5 text-white/80" />
+                                        ) : (
+                                            <Lock className="h-5 w-5 text-gray-500" />
+                                        )}
+                                        <span>{lesson?.video_title ?? 'N/A'}</span>
+                                        {lesson?.isPreview && (
+                                            <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs font-semibold text-white">
+                                                Demo
+                                            </span>
+                                        )}
+                                    </span>
+                                    {activeLesson === lesson?.id ? (
+                                        <FiChevronUp className="text-xl" />
+                                    ) : (
+                                        <FiChevronDown className="text-xl" />
+                                    )}
+                                </button>
+
+                                {activeLesson === lesson?.id && (lesson?.isPreview || hasPurchasedCourse) && (
+                                    <div className="border-t border-white/10 bg-black p-4">
+                                        {lesson?.video_url ? (
+                                            <video
+                                                src={lesson.video_url}
+                                                controls
+                                                preload="metadata"
+                                                className="aspect-video w-full rounded-lg bg-black object-contain"
+                                            />
+                                        ) : (
+                                            <p className="py-8 text-center text-sm text-gray-500">
+                                                Video is not available.
+                                            </p>
+                                        )}
+                                    </div>
                                 )}
-                            </button>
-                        ))}
+                            </div>
+                        )) : (
+                            <p className="rounded-xl border border-gray-700 bg-gray-900 px-5 py-4 text-center text-gray-500">
+                                No lecture available
+                            </p>
+                        )}
                     </div>
                 </div>
             )}

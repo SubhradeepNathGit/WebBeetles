@@ -103,6 +103,9 @@ export const deleteCart = createAsyncThunk("cartSlice/deleteCart",
         // console.log('Deleting cart id', cartId);
 
         try {
+            // Delete all cart items first to avoid any foreign key constraint issues
+            await supabase.from("cart_items").delete().eq("cart_id", cartId);
+
             const { error } = await supabase.from("carts").delete().eq("id", cartId);
 
             if (error) throw error;

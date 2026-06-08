@@ -74,9 +74,9 @@ const StudentNavbar = () => {
           <div className="flex justify-between items-center h-16 sm:h-18 lg:h-20">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl lg:rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl lg:rounded-xl flex items-center justify-center">
                 <span className="text-white text-sm sm:text-lg lg:text-2xl font-bold">
-                  W
+                   <img src="/logo.png" alt="WebBeetles" className="h-10 w-10 animate-spin object-contain" />
                 </span>
               </div>
               <span className="text-lg sm:text-xl lg:text-2xl font-bold">
@@ -145,7 +145,7 @@ const StudentNavbar = () => {
                   </span>
                   
                   {/* Round Profile Button */}
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center shadow-md ring-2 ring-white/20 group-hover:ring-purple-400/50 group-hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden">
+                  <div className="w-8 h-8 sm:w-8 sm:h-8 lg:w-9 lg:h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center shadow-md ring-2 ring-white/20 group-hover:ring-purple-400/50 group-hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden">
                     {getStudentData ? (
                       <img className="w-full h-full object-cover"
                         src={

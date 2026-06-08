@@ -7,13 +7,13 @@ const DashboardSkeleton = ({ role }) => {
   const accentColor = isStudent 
     ? 'bg-purple-500/20' 
     : isInstructor 
-    ? 'bg-rose-500/20' 
+    ? 'bg-gray-500/20' 
     : 'bg-emerald-500/20';
     
   const pulseColor = isStudent 
     ? 'bg-purple-500/10' 
     : isInstructor 
-    ? 'bg-rose-500/10' 
+    ? 'bg-gray-500/10' 
     : 'bg-emerald-500/10';
 
   return (

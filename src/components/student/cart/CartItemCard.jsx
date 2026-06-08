@@ -65,8 +65,8 @@ const CartItemCard = ({ item, index, cartId }) => {
                         </div>
                         <button
                             onClick={() => handleRemoveFromCart(item?.course_id)}
-                            className="pointer-events-auto filter-none z-20 relative flex-shrink-0 w-10 h-10 rounded-lg bg-red-500/10 text-red-400
-                                hover:bg-red-500/20 hover:text-red-300 transition-all flex items-center justify-center cursor-pointer border border-red-500/20"
+                            className="pointer-events-auto filter-none z-20 relative flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 text-gray-300
+                                hover:bg-white/10 hover:text-white transition-all flex items-center justify-center cursor-pointer border border-white/10"
                             title="Remove from cart">
                             <Trash2 className="w-4 h-4" />
                         </button>

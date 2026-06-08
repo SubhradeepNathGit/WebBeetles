@@ -22,8 +22,46 @@ export const allCategory = createAsyncThunk('categorySlice/allCategory',
     }
 )
 
+// create category action
+export const createCategory = createAsyncThunk('categorySlice/createCategory',
+    async (categoryName, { rejectWithValue }) => {
+        const res = await supabase
+            .from('categories')
+            .insert([{ name: categoryName, status: 'pending' }])
+            .select()
+            .single();
+
+        if (res?.error) {
+            console.error('Error creating category:', res?.error);
+            return rejectWithValue(res?.error?.message || 'Failed to create category');
+        }
+
+        return res?.data;
+    }
+)
+
+// update category status (approve/reject)
+export const updateCategoryApproveReject = createAsyncThunk('categorySlice/updateCategoryApproveReject',
+    async ({ id, status }, { rejectWithValue }) => {
+        const res = await supabase
+            .from('categories')
+            .update({ status: status })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (res?.error) {
+            console.error(`Error updating category to ${status}:`, res?.error);
+            return rejectWithValue(res?.error?.message || `Failed to ${status} category`);
+        }
+
+        return res?.data;
+    }
+)
+
 const initialState = {
     isCategoryLoading: false,
+    isCreatingCategory: false,
     getCategoryData: [],
     isCategoryError: null
 }
@@ -46,6 +84,20 @@ export const categorySlice = createSlice({
             state.isCategoryLoading = false;
             state.getCategoryData = [];
             state.isCategoryError = action.error?.message;
+        })
+
+        // create category reducer
+        builder.addCase(createCategory.pending, (state) => {
+            state.isCreatingCategory = true;
+        })
+        builder.addCase(createCategory.fulfilled, (state, action) => {
+            state.isCreatingCategory = false;
+            state.getCategoryData = [...state.getCategoryData, action.payload];
+            state.isCategoryError = null;
+        })
+        builder.addCase(createCategory.rejected, (state, action) => {
+            state.isCreatingCategory = false;
+            state.isCategoryError = action.payload || action.error?.message;
         })
 
     }

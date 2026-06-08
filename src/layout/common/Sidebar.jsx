@@ -1,14 +1,62 @@
 import React, { useEffect, useState } from "react";
 import {
-  Home, BookOpen, ChevronLeft, ChevronRight, GraduationCap, LogOut,
-  LayoutDashboard, BookPlus, BookMarked, BookText, SquareStack,
-  ShieldUser, CircleUser, BarChart3, X,
+  BarChart3,
+  BookMarked,
+  BookOpen,
+  BookPlus,
+  BookText,
+  ChevronLeft,
+  ChevronRight,
+  CircleUser,
+  Home,
+  LayoutDashboard,
+  LogOut,
+  ShieldUser,
+  X,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import getSweetAlert from "../../util/alert/sweetAlert";
 import { logoutUser } from "../../redux/slice/authSlice/checkUserAuthSlice";
-import { motion, AnimatePresence } from "framer-motion";
+
+const getMaskedEmail = (email) => {
+  if (!email) return "";
+  if (email.length <= 12) return email;
+
+  const first = email.slice(0, 3);
+  const midStart = Math.max(Math.floor(email.length / 2) - 1, 0);
+  const middle = email.slice(midStart, midStart + 3);
+  const last = email.slice(-6);
+  return `${first}*****${middle}****${last}`;
+};
+
+const NavItem = ({ item, activePage, collapsed, onClick }) => {
+  const Icon = item.icon;
+  const isActive = activePage === item.key;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(item.key)}
+      title={collapsed ? item.name : ""}
+      className={`relative group flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all duration-200
+        ${collapsed ? "justify-center" : ""}
+        ${isActive ? "bg-white/10 text-white shadow-lg" : "text-gray-300 hover:bg-white/5 hover:text-white"}`}
+    >
+      <span className="flex w-6 flex-shrink-0 items-center justify-center">
+        <Icon size={18} />
+      </span>
+
+      {!collapsed && <span className="flex-1 truncate text-left">{item.name}</span>}
+
+      {collapsed && (
+        <span className="pointer-events-none absolute left-full z-50 ml-2 whitespace-nowrap rounded-lg border border-white/5 bg-black/80 px-3 py-2 text-xs text-white opacity-0 shadow-2xl backdrop-blur-xl transition-all duration-200 group-hover:visible group-hover:opacity-100">
+          {item.name}
+        </span>
+      )}
+    </button>
+  );
+};
 
 const DashboardSidebar = ({
   setActivePage,
@@ -19,53 +67,53 @@ const DashboardSidebar = ({
   setIsMobileOpen,
   onCollapseChange,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Derive display values safely from userData prop
-  const userPhoto = userData?.profile_image_url || userData?.profilePhoto || null;
-  const userName  = userData?.name || userData?.fullName || (user_type === "student" ? "Student" : "Instructor");
-  const userEmail = userData?.email || "";
   const isStudent = user_type === "student";
+  const panelLabel = isStudent ? "Student Portal" : "Instructor Panel";
+  const userPhoto = userData?.profile_image_url || userData?.profilePhoto || null;
+  const userName = userData?.name || userData?.fullName || (isStudent ? "Student" : "Instructor");
+  const userEmail = userData?.email || "";
 
-  // Notify parent whenever collapse state changes
   useEffect(() => {
-    if (onCollapseChange) onCollapseChange(isCollapsed);
-  }, [isCollapsed, onCollapseChange]);
+    onCollapseChange?.(collapsed);
+  }, [collapsed, onCollapseChange]);
 
   useEffect(() => {
-    setActivePage(user_type === "student" ? "student-dashboard" : "instructor-dashboard");
-  }, [user_type]);
+    setActivePage(isStudent ? "student-dashboard" : "instructor-dashboard");
+  }, [isStudent, setActivePage]);
 
-  const showMail = (email) => {
-    if (!email) return "";
-    const first = email.slice(0, 3);
-    const midStart = Math.floor(email.length / 2) - 1;
-    const middle  = email.slice(midStart, midStart + 3);
-    const last    = email.slice(-6);
-    return `${first}*****${middle}****${last}`;
-  };
+  useEffect(() => {
+    document.body.style.overflow = isMobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileOpen]);
 
   const studentMenu = [
-    { name: "Dashboard",        icon: LayoutDashboard, key: "student-dashboard" },
-    { name: "Home",             icon: Home,            key: "home" },
-    { name: "Profile",          icon: CircleUser,      key: "profile" },
-    { name: "All Courses",      icon: BookOpen,        key: "allCourses" },
-    { name: "Enrolled Courses", icon: BookText,        key: "student-myCourses" },
+    { name: "Dashboard", icon: LayoutDashboard, key: "student-dashboard" },
+    { name: "Home", icon: Home, key: "home" },
+    { name: "All Courses", icon: BookOpen, key: "allCourses" },
+    { name: "Enrolled Courses", icon: BookText, key: "student-myCourses" },
+    { name: "Profile", icon: CircleUser, key: "profile" },
   ];
 
   const instructorMenu = [
-    { name: "Dashboard",      icon: LayoutDashboard, key: "instructor-dashboard" },
-    { name: "Home",           icon: Home,            key: "home" },
-    { name: "Profile",        icon: ShieldUser,      key: "profile" },
-    { name: "All Category",   icon: SquareStack,     key: "allCategory" },
-    { name: "My Courses",     icon: BookMarked,      key: "instructor-myCourses" },
-    { name: "Add New Course", icon: BookPlus,        key: "instructor-add-myCourses" },
-    { name: "Analytics",      icon: BarChart3,       key: "instructor-analytics" },
+    { name: "Dashboard", icon: LayoutDashboard, key: "instructor-dashboard" },
+    { name: "My Courses", icon: BookMarked, key: "instructor-myCourses" },
+    { name: "Add New Course", icon: BookPlus, key: "instructor-add-myCourses" },
+    { name: "Analytics", icon: BarChart3, key: "instructor-analytics" },
+    { name: "Profile", icon: ShieldUser, key: "profile" },
   ];
 
   const sidebarMenu = isStudent ? studentMenu : instructorMenu;
+
+  const handleMenuClick = (key) => {
+    setActivePage(key);
+    setIsMobileOpen?.(false);
+  };
 
   const userLogout = async () => {
     await dispatch(logoutUser({ user_type, status: true }))
@@ -73,196 +121,149 @@ const DashboardSidebar = ({
       .catch(() => getSweetAlert({ title: "Logout Failed!", text: "Something went wrong.", icon: "error" }));
   };
 
-  const handleMenuClick = (key) => {
-    setActivePage(key);
-    if (setIsMobileOpen) setIsMobileOpen(false);
-  };
+  const SidebarInner = ({ isCollapsed, isMobile = false }) => (
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="flex items-center justify-between p-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className={`flex h-10 w-10 flex-shrink-0`}
+          >
+            <img src="/logo.png" alt="WebBeetles" className="h-10 w-10 animate-spin object-contain" />
+          </div>
 
-  const toggleCollapse = () => setIsCollapsed(prev => !prev);
-
-  // ── Shared inner content ──────────────────────────────────
-  const SidebarInner = ({ collapsed }) => (
-    <div className="flex flex-col h-full overflow-hidden">
-
-      {/* Logo header */}
-      <div 
-        onClick={collapsed ? toggleCollapse : undefined}
-        className={`flex items-center gap-3 px-4 pt-6 pb-5 flex-shrink-0 transition-colors duration-200
-          ${collapsed ? "justify-center px-0 cursor-pointer hover:bg-white/[0.03] group" : ""}`}
-        title={collapsed ? "Expand Sidebar" : ""}
-      >
-        <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg transition-transform duration-300
-          ${collapsed ? "group-hover:scale-105" : ""}
-          ${isStudent ? "bg-purple-600 shadow-purple-600/20" : "bg-rose-600 shadow-rose-600/20"}`}>
-          <GraduationCap size={18} className="text-white" />
-          
-          {/* Chevron indicator when collapsed */}
-          {collapsed && (
-            <div className="absolute -bottom-1.5 -right-1.5 bg-[#1a1a1a] rounded-full p-0.5 border border-white/10 text-white/60 group-hover:text-white shadow-md transition-colors">
-              <ChevronRight size={12} strokeWidth={3} />
+          {!isCollapsed && (
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold text-white">WebBeetles</h1>
+              <p className="text-xs text-gray-400">{panelLabel}</p>
             </div>
           )}
         </div>
-        {!collapsed && (
-          <div className="min-w-0 pr-6"> {/* pr-6 gives space so text doesn't overlap the absolute toggle button */}
-            <p className="text-sm font-bold text-white leading-none mb-0.5 tracking-wide">WebBeetles</p>
-            <p className="text-[10px] text-white/50 tracking-wider uppercase font-medium">{isStudent ? "Student Portal" : "Instructor Panel"}</p>
-          </div>
+
+        {!isCollapsed && !isMobile && (
+          <button
+            type="button"
+            onClick={() => setCollapsed(true)}
+            className="hidden cursor-pointer rounded-lg p-2 text-gray-300 transition-colors hover:bg-white/5 hover:text-white md:flex"
+            aria-label="Collapse sidebar"
+            title="Collapse sidebar"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
+
+        {isMobile && (
+          <button
+            type="button"
+            onClick={() => setIsMobileOpen?.(false)}
+            className="rounded-lg p-2 text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
+          </button>
         )}
       </div>
 
-      {/* User card */}
-      {!collapsed && (
-        <div className="px-4 pb-5 flex-shrink-0">
-          <div className="flex items-center gap-3 bg-white/[0.03] hover:bg-white/[0.06] rounded-2xl px-3 py-3 transition-colors duration-300 cursor-default">
+      {!isCollapsed && (
+        <div className="p-4 pt-0">
+          <div className="flex cursor-default items-center gap-3 rounded-lg bg-white/5 p-3 transition-colors hover:bg-white/10">
             {userPhoto ? (
               <img
                 src={userPhoto}
                 alt={userName}
-                className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10 flex-shrink-0"
-                onError={e => { e.target.onerror = null; e.target.style.display = "none"; }}
+                className="h-10 w-10 flex-shrink-0 rounded-full object-cover ring-2 ring-white/10"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
               />
             ) : (
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-inner
-                ${isStudent ? "bg-purple-700/80" : "bg-rose-700/80"}`}>
-                {userName[0]?.toUpperCase()}
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white">
+                {userName?.[0]?.toUpperCase() || "W"}
               </div>
             )}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate leading-none mb-1">{userName}</p>
-              <p className="text-[10px] text-white/40 truncate">{showMail(userEmail)}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-white">{userName}</p>
+              <p className="truncate text-xs text-gray-400">{getMaskedEmail(userEmail)}</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-2 space-y-1.5 overflow-y-auto overflow-x-hidden
-        scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-        {sidebarMenu.map(({ name, icon: Icon, key }) => {
-          const isActive = activePage === key;
-          return (
-            <button
-              key={key}
-              onClick={() => handleMenuClick(key)}
-              title={collapsed ? name : ""}
-              className={`relative w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-sm font-medium
-                transition-all duration-200 group cursor-pointer overflow-hidden
-                ${collapsed ? "justify-center px-0" : ""}
-                ${isActive
-                  ? `text-white ${isStudent ? "bg-purple-600 shadow-[0_4px_12px_rgba(147,51,234,0.3)]" : "bg-rose-600 shadow-[0_4px_12px_rgba(225,29,72,0.3)]"}`
-                  : "text-white/50 hover:text-white hover:bg-white/[0.06]"
-                }`}
-            >
-              <Icon size={18} className={isActive ? "text-white" : "text-current"} />
+      <nav className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 flex-1 space-y-1 overflow-y-auto overflow-x-hidden p-4 pt-2">
+        {isCollapsed && !isMobile && (
+          <button
+            type="button"
+            onClick={() => setCollapsed(false)}
+            className="mb-2 flex w-full cursor-pointer items-center justify-center rounded-lg p-3 text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+            aria-label="Expand sidebar"
+            title="Expand sidebar"
+          >
+            <ChevronRight size={18} />
+          </button>
+        )}
 
-              {!collapsed && <span className="flex-1 text-left truncate">{name}</span>}
-
-              {/* Hover tooltip when collapsed */}
-              {collapsed && (
-                <span className="pointer-events-none absolute left-[calc(100%+12px)] px-3 py-1.5
-                  bg-[#222] text-white text-xs font-medium rounded-lg border border-white/10
-                  opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                  transition-all duration-200 whitespace-nowrap z-[60] shadow-xl">
-                  {name}
-                </span>
-              )}
-            </button>
-          );
-        })}
+        {sidebarMenu.map((item) => (
+          <NavItem
+            key={item.key}
+            item={item}
+            activePage={activePage}
+            collapsed={isCollapsed}
+            onClick={handleMenuClick}
+          />
+        ))}
       </nav>
 
-      {/* Logout */}
-      <div className="px-3 pb-5 pt-2 flex-shrink-0">
+      <div className="space-y-3 border-t border-transparent p-4 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
         <button
+          type="button"
           onClick={userLogout}
-          title={collapsed ? "Logout" : ""}
-          className={`w-full flex items-center justify-center gap-3.5 px-3 py-3 rounded-xl text-sm font-medium
-            text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 cursor-pointer group
-            ${collapsed ? "px-0" : ""}`}
+          title={isCollapsed ? "Logout" : ""}
+          className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-gray-300 transition-all hover:bg-red-500/10 hover:text-red-400"
+          aria-label="Logout"
         >
-          <LogOut size={18} className="group-hover:scale-110 transition-transform duration-200" />
-          {!collapsed && <span>Logout</span>}
-          {collapsed && (
-            <span className="pointer-events-none absolute left-[calc(100%+12px)] px-3 py-1.5
-              bg-[#222] text-red-400 text-xs font-medium rounded-lg border border-white/10
-              opacity-0 invisible group-hover:opacity-100 group-hover:visible
-              transition-all duration-200 whitespace-nowrap z-[60] shadow-xl">
-              Logout
-            </span>
-          )}
+          <LogOut size={18} className="transition-transform group-hover:scale-110" />
+          {!isCollapsed && <span>Logout</span>}
         </button>
+
+        {!isCollapsed && (
+          <div className="pt-2 text-center text-xs text-gray-500">
+            © {new Date().getFullYear()} WebBeetles {isStudent ? "Student" : "Instructor"}
+          </div>
+        )}
       </div>
     </div>
   );
 
-  // ─────────────────────────────────────────────────────────
   return (
     <>
-      {/* ═══ DESKTOP — Fixed sidebar ═══ */}
-      <aside
-        className={`
-          hidden md:block
-          fixed top-0 left-0 h-screen z-40
-          bg-[#0a0a0a] border-r border-white/5
-          transition-all duration-300 ease-in-out
-          ${isCollapsed ? "w-[80px]" : "w-[280px]"}
-        `}
-      >
-        <SidebarInner collapsed={isCollapsed} />
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity md:hidden"
+          onClick={() => setIsMobileOpen?.(false)}
+          aria-hidden="true"
+        />
+      )}
 
-        {/* ── Premium Toggle Button (Fully inside sidebar) ── */}
-        {!isCollapsed && (
-          <button
-            onClick={toggleCollapse}
-            aria-label="Collapse sidebar"
-            className={`
-              absolute z-50 top-[28px] right-4 w-7 h-7
-              flex items-center justify-center
-              rounded-lg bg-white/[0.04] border border-white/5
-              shadow-sm hover:bg-white/10 hover:border-white/10
-              transition-all duration-300 cursor-pointer text-white/50 hover:text-white
-            `}
-          >
-            <ChevronLeft size={16} strokeWidth={2.5} />
-          </button>
-        )}
+      <aside
+        role="navigation"
+        aria-label={`${panelLabel} navigation`}
+        className={`fixed left-0 top-0 z-50 hidden h-screen flex-col border-r border-white/5 bg-black transition-all duration-300 md:flex ${collapsed ? "w-20" : "w-64"}`}
+        style={{ boxShadow: "inset 0 0 40px rgba(255,255,255,0.02)" }}
+      >
+        <SidebarInner isCollapsed={collapsed} />
       </aside>
 
-      {/* ═══ MOBILE — Slide-in Drawer ═══ */}
-      <AnimatePresence>
-        {isMobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden"
-              onClick={() => setIsMobileOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
-              className="fixed top-0 left-0 h-full w-[280px] sm:w-[320px] bg-[#0a0a0a] border-r border-white/5
-                text-white z-50 md:hidden shadow-2xl flex flex-col"
-            >
-              <button
-                onClick={() => setIsMobileOpen(false)}
-                className="absolute right-4 top-5 w-8 h-8 bg-white/5 hover:bg-white/10
-                  rounded-lg flex items-center justify-center border border-white/10
-                  transition-all z-10 cursor-pointer"
-                aria-label="Close sidebar"
-              >
-                <X size={16} className="text-white/70" />
-              </button>
-              <SidebarInner collapsed={false} />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      <div
+        className={`hidden transition-all duration-300 md:block ${collapsed ? "md:w-20" : "md:w-64"}`}
+        aria-hidden="true"
+      />
+
+      <aside
+        role="navigation"
+        aria-label={`${panelLabel} mobile navigation`}
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-white/5 bg-black text-white shadow-2xl transition-transform duration-300 md:hidden ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <SidebarInner isCollapsed={false} isMobile />
+      </aside>
     </>
   );
 };

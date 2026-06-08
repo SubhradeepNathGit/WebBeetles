@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { allCourse } from '../../../redux/slice/couseSlice';
 import getSweetAlert from "../../../util/alert/sweetAlert";
 import { getInstructorStudentCount } from "../../../function/getStudentCountBasedOnSpecificInstructor";
+import DashboardSkeleton from "../../../layout/common/DashboardSkeleton";
 
 const InstructorDashboard = ({ instructorDetails }) => {
 
@@ -21,18 +22,16 @@ const InstructorDashboard = ({ instructorDetails }) => {
 
   const dispatch = useDispatch(),
     [studentCount, setStudentCount] = useState(0),
-    { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state.course);
+    { isCourseLoading, getCourseData } = useSelector(state => state.course);
 
   useEffect(() => {
+    if (!instructorDetails?.id) return;
+
     dispatch(allCourse({ instructor_id: instructorDetails?.id }))
-      .then(res => {
-        // console.log('Response for fetching instructorwise course', res);
-      })
-      .catch(err => {
-        // console.log('Error occured', err);
+      .catch(() => {
         getSweetAlert("Error", "Something went wrong.", "error");
       })
-  }, [dispatch]);
+  }, [dispatch, instructorDetails?.id]);
 
   useEffect(() => {
     const loadStudentCount = async () => {
@@ -48,7 +47,7 @@ const InstructorDashboard = ({ instructorDetails }) => {
 
 
 
-  const [data, setData] = useState({
+  const [data] = useState({
     stats: { totalCourses: 0, totalStudents: 0 },  tasks:
       [
         { id: 1, task: "Review Assignment Submissions", course: "React Masterclass", date: "Oct 15, 2025", priority: "high", count: 23 },
@@ -70,19 +69,12 @@ const InstructorDashboard = ({ instructorDetails }) => {
   ];
 
   if (isCourseLoading || !instructorDetails || Object.keys(instructorDetails).length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-rose-500 animate-spin" />
-          <p className="text-rose-200 text-sm font-medium">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton role="instructor" />;
   }
 
   return (
-    <div className="min-h-screen bg-black p-3 sm:p-4 lg:p-6 xl:p-8 overflow-x-hidden">
-      <div className="max-w-full mx-auto space-y-4 sm:space-y-5 lg:space-y-6">
+    <div className="bg-black overflow-x-hidden">
+      <div className="max-w-full mx-auto space-y-6">
 
         {/* HEADER */}
         <InstructorDashboardHeader instructorDetails={instructorDetails} />

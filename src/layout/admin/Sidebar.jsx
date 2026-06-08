@@ -125,18 +125,14 @@ export default function Sidebar({ onNavigate }) {
 
     const navItems = [
         { to: "/admin/dashboard", label: "Dashboard", icon: Home },
-        { to: "/admin/profile", label: "Profile", icon: User },
         { to: "/admin/students", label: "Students", icon: Users },
         { to: "/admin/instructors", label: "Instructors", icon: UserStar },
-        { to: "/admin/admin", label: "Admin", icon: ShieldUser },
+       
         { to: "/admin/instructor-reviews", label: "Instructor Reviews", icon: ClipboardCheck, badge: isInstructorLoading ? <Loader2 className="inline h-3 w-3 mb-1 animate-spin" /> : getInstructorData?.filter(inst => inst?.application_status == 'pending' && inst?.application_complete)?.length ?? 0 },
         { to: "/admin/approve-courses", label: "Courses", icon: BookOpenCheck, badge: isCourseLoading ? <Loader2 className="inline h-3 w-3 mb-1 animate-spin" /> : pending?.length ?? 0 },
         { to: "/admin/analytics", label: "Analytics", icon: BarChart2 },
         { to: "/admin/charge", label: "Charge", icon: IndianRupee },
-        { to: "/admin/category", label: "Category", icon: ChartBarStacked },
         { to: "/admin/contact", label: "Message", icon: MessageSquareText, badge: 5 },
-        { to: "/admin/notification", label: "Notification", icon: BellRing, badge: 5 },
-        { to: "/admin/examset", label: "Exam set", icon: Blinds },
         { to: "/admin/settings", label: "Settings", icon: Settings },
     ];
 
@@ -167,10 +163,10 @@ export default function Sidebar({ onNavigate }) {
                 <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-3 min-w-0">
                         <div
-                            className={`w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-black backdrop-blur-sm flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0 transition-all shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent ${collapsed ? "scale-95" : "scale-100"
+                            className={`w-10 h-10 rounded-xl bg-transparent flex items-center justify-center text-white font-bold text-lg  flex-shrink-0"
                                 }`}
                         >
-                            <span className="text-white text-lg font-bold">W</span>
+                            <img src="/logo.png" alt="WebBeetles" className="h-10 w-10 animate-spin object-contain" />
                         </div>
                         {!collapsed && (
                             <div className="min-w-0">

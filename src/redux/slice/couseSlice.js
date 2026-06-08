@@ -174,6 +174,17 @@ export const updateCourseApproveReject = createAsyncThunk('courseSlice/updateCou
 
             if (res.error) throw res.error;
 
+            if (status === 'approved' && res.data?.category_id) {
+                const { error: catError } = await supabase
+                    .from('categories')
+                    .update({ status: 'active' })
+                    .eq('id', res.data.category_id)
+                    .eq('status', 'pending');
+                if (catError) {
+                    console.error('Error auto-approving category:', catError);
+                }
+            }
+
             return res.data;
         } catch (error) {
             return rejectWithValue(error.message);

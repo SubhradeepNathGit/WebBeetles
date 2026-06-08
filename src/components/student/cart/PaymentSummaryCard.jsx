@@ -9,6 +9,7 @@ import { updateCoursePurchaseStatus } from '../../../redux/slice/studentSlice';
 import { loadRazorpay } from '../../../util/razorpay/razorpayLoader';
 import { useDispatch } from 'react-redux';
 import { addActivityRequest } from '../../../redux/slice/activitySlice';
+import supabase from '../../../util/supabase/supabase';
 
 const PaymentSummaryCard = ({
     cartId, cartItems, userAuthData, allCharges, promoCodes, subtotal, tax, total, discountAmount, discount, setDiscount }) => {
@@ -46,19 +47,33 @@ const PaymentSummaryCard = ({
         setPromoApplied(false);
     };
 
+    const getFreshToken = async () => {
+        // Strategy 1: getSession (cached but auto-refreshes if expired)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) return session.access_token;
+
+        // Strategy 2: Force refresh if no valid session
+        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
+        if (refreshedSession?.access_token) return refreshedSession.access_token;
+
+        // Strategy 3: Fallback to sessionStorage (legacy)
+        return sessionStorage.getItem('student_token');
+    };
+
     const verifyPayment = async (razorpayResponse) => {
         try {
-            const token = sessionStorage.getItem('student_token');
+            const token = await getFreshToken();
 
             const res = await fetch(VERIFY_PAYMENT_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
+                    apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
                 },
                 body: JSON.stringify({
                     ...razorpayResponse,
-                    items: cartItems.map(item => ({ course_id: item.course_id, price: item.price })),
+                    items: cartItems.map(item => ({ course_id: item.course_id, price: item.courses?.price || item.price })),
                 }),
             });
 
@@ -109,12 +124,14 @@ const PaymentSummaryCard = ({
             modal: {
                 ondismiss: async () => {
                     razorpayRef.current = null;
+                    const cancelToken = await getFreshToken();
 
                     await fetch(CANCEL_PAYMENT_URL, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${sessionStorage.getItem("student_token")}`,
+                            Authorization: `Bearer ${cancelToken}`,
+                            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
                         },
                         body: JSON.stringify({
                             purchaseId: orderData.purchaseId,
@@ -125,11 +142,13 @@ const PaymentSummaryCard = ({
         });
 
         rzp.on("payment.failed", async (response) => {
+            const failToken = await getFreshToken();
             await fetch(CANCEL_PAYMENT_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${sessionStorage.getItem("student_token")}`,
+                    Authorization: `Bearer ${failToken}`,
+                    apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
                 },
                 body: JSON.stringify({
                     purchaseId: orderData.purchaseId,
@@ -145,12 +164,16 @@ const PaymentSummaryCard = ({
 
     const handlePayment = async () => {
         try {
-            const token = sessionStorage.getItem("student_token");
+            const token = await getFreshToken();
 
             if (!token) {
-                getSweetAlert('Oops!', "User not authenticated. Please sign in.", 'warning');
+                getSweetAlert('Oops!', "Session expired. Please sign in again.", 'warning');
+                navigate('/signin');
                 return;
             }
+
+            // Update sessionStorage with the fresh token
+            sessionStorage.setItem('student_token', token);
 
             if (!numericTotal || Number.isNaN(numericTotal)) {
                 getSweetAlert('Oops!', "Invalid total amount. Please refresh the page.", 'warning');
@@ -164,6 +187,7 @@ const PaymentSummaryCard = ({
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
+                    apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
                 },
                 body: JSON.stringify({
                     total: numericTotal,

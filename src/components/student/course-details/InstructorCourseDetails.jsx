@@ -13,37 +13,50 @@ import { Info, Loader2 } from 'lucide-react';
 import Lottie from "lottie-react";
 import { fetchUserPurchase } from '../../../redux/slice/purchaseSlice';
 import hotToast from '../../../util/alert/hot-toast';
-import { addCartItem, getOrCreateCart } from '../../../redux/slice/cartSlice';
+import { addCartItem, fetchCartItems, getOrCreateCart } from '../../../redux/slice/cartSlice';
 
 const InstructorCourseDetails = ({ courseData: getSpecificCourseData }) => {
     const dispatch = useDispatch(),
         navigate = useNavigate(),
         { userAuthData } = useSelector(state => state.checkAuth),
-        { currentCart, cartItems, isCartLoading, isCartAddLoading, hasCartError } = useSelector(state => state.cart),
-        { isPurchaseLoading, getPurchaseData, hasPurchaseError } = useSelector(state => state.purchase);
+        { cartItems, isCartLoading, isCartAddLoading } = useSelector(state => state.cart),
+        { getPurchaseData } = useSelector(state => state.purchase);
 
     useEffect(() => {
         dispatch(checkLoggedInUser()).catch(err => {
             console.error("Error occurred", err);
             getSweetAlert("Error", "Something went wrong.", "error");
         });
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         if (userAuthData) {
             dispatch(fetchUserPurchase({ userId: userAuthData?.id, status: 'paid' }))
-                .then(res => {
-                    // console.log('Response for fetching user profile', res);
-                })
                 .catch((err) => {
                     console.log("Error occurred", err);
                     getSweetAlert('Oops...', 'Something went wrong!', 'error');
                 });
         }
-    }, [userAuthData]);
+    }, [dispatch, userAuthData]);
+
+    useEffect(() => {
+        if (!userAuthData?.id) return;
+
+        dispatch(getOrCreateCart(userAuthData.id))
+            .then(res => {
+                if (res.meta.requestStatus === "fulfilled" && res?.payload?.id) {
+                    dispatch(fetchCartItems(res.payload.id));
+                }
+            })
+            .catch(err => {
+                console.log("Error occurred", err);
+            });
+    }, [dispatch, userAuthData?.id]);
 
     const purchasedCourse = getPurchaseData?.filter(order => order.payment_status === "paid")
         ?.flatMap(order => order.purchase_items.map(item => item.course_id));
+
+    const isCourseInCart = cartItems?.some(item => item?.course_id === getSpecificCourseData?.id);
 
     // Handle add to cart 
     const addToCart = async (course) => {
@@ -73,12 +86,12 @@ const InstructorCourseDetails = ({ courseData: getSpecificCourseData }) => {
                                 getSweetAlert("Error", "Update failed", "error");
                             }
                         })
-                        .catch(err => {
+                        .catch(() => {
                             // console.log('Error occured', err);
                             getSweetAlert('Oops...', 'Something went wrong!', 'error');
                         })
                 })
-                .catch(err => {
+                .catch(() => {
                     // console.log(err);
                     getSweetAlert('Oops...', 'Something went wrong!', 'error');
                 })
@@ -137,17 +150,19 @@ const InstructorCourseDetails = ({ courseData: getSpecificCourseData }) => {
                             {getSpecificCourseData?.price?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A'}
                         </p>
 
-                        <button disabled={isCartLoading}
+                        <button disabled={isCartLoading || isCartAddLoading}
                             type="button" onClick={() => {
-                                if (userAuthData) addToCart(getSpecificCourseData);
+                                if (isCourseInCart) navigate('/cart');
+                                else if (userAuthData) addToCart(getSpecificCourseData);
                                 else navigate('/signin');
                             }}
                             className={`flex mb-5 mt-1 items-center justify-center gap-2 w-full text-white backdrop-blur-md border 
-                                    border-white/30 px-5 py-3 rounded-full transition ${isCartLoading ?
+                                    border-white/30 px-5 py-3 rounded-full transition ${isCartLoading || isCartAddLoading ?
                                     'cursor-not-allowed bg-gray-500 border-gray-400 opacity-60 hover:bg-gray-500 hover:border-gray-400' :
                                     'cursor-pointer hover:bg-purple-800 hover:border-purple-600 hover:opacity-90 bg-purple-600'}`}>
-                            {isCartLoading ? (
-                                <Loader2 className='animate-spin w-4 h-4' />) : ''} Add To Cart <HiArrowRight className="text-lg" />
+                            {isCartLoading || isCartAddLoading ? (
+                                <Loader2 className='animate-spin w-4 h-4' />) : ''}
+                            {isCourseInCart ? 'Go To Cart' : 'Add To Cart'} <HiArrowRight className="text-lg" />
                         </button>
                     </div>
                 </>

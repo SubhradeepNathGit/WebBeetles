@@ -171,6 +171,7 @@ const PricingSection = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
           total: plan.priceINR,
@@ -206,6 +207,7 @@ const PricingSection = () => {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${verifyToken}`,
+                apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
               },
               body: JSON.stringify({
                 ...response,

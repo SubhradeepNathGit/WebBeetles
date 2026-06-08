@@ -1,125 +1,84 @@
 import React, { useEffect, useState } from "react";
-import DashboardSidebar from "../../../layout/common/Sidebar";
-import StudentDashboard from "../../../components/student/dashboard/StudentDashboard";
+import { Menu } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { Loader2, Menu } from "lucide-react";
+import { useSelector } from "react-redux";
+import DashboardSidebar from "../../../layout/common/Sidebar";
+import DashboardSkeleton from "../../../layout/common/DashboardSkeleton";
+import StudentDashboard from "../../../components/student/dashboard/StudentDashboard";
+import MyCoursesPage from "../../../components/student/dashboard/MyCoursesPage";
+import StudentProfile from "../../../components/student/dashboard/student-profile/StudentProfile";
 import InstructorDashboard from "../../../components/instructor/dashboard/InstructorDashboard";
 import AddCourseForm from "../../../components/instructor/dashboard/AddCourseForm";
-import MyCoursesPage from "../../../components/student/dashboard/MyCoursesPage";
 import InstructorCourse from "../../../components/instructor/dashboard/InstructorCourse";
-import { checkLoggedInUser } from "../../../redux/slice/authSlice/checkUserAuthSlice";
 import AvailableCategory from "../../../components/instructor/dashboard/AvailableCategory";
 import InstructorProfile from "../../../components/instructor/dashboard/InstructorProfile";
-import StudentProfile from "../../../components/student/dashboard/student-profile/StudentProfile";
 import InstructorAnalytics from "../../../components/instructor/dashboard/InstructorAnalytics";
-import getSweetAlert from "../../../util/alert/sweetAlert";
 
 const DashboardLayout = ({ currentPage }) => {
-
   const [activePage, setActivePage] = useState(currentPage ?? "dashboard");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const { user_type } = useParams();
-  const navigate      = useNavigate();
-  const dispatch      = useDispatch();
+  const navigate = useNavigate();
   const { isUserLoading, userAuthData } = useSelector(state => state.checkAuth);
 
-  // Removed redundant checkLoggedInUser dispatch as ProtectedRoute already handles it
+  const isStudent = user_type === "student";
 
-  // Custom event listeners to switch active tab from anywhere in the app
   useEffect(() => {
     const handlers = {
-      "open-user-course":        () => setActivePage("student-myCourses"),
-      "open-add-course":         () => setActivePage("instructor-add-myCourses"),
-      "open-instructor-course":  () => setActivePage("instructor-myCourses"),
+      "open-user-course": () => setActivePage("student-myCourses"),
+      "open-add-course": () => setActivePage("instructor-add-myCourses"),
+      "open-instructor-course": () => setActivePage("instructor-myCourses"),
       "open-instructor-analytics": () => setActivePage("instructor-analytics"),
       "open-request-instructor": () => setActivePage("requestInstructor"),
     };
+
     Object.entries(handlers).forEach(([event, fn]) => window.addEventListener(event, fn));
     return () => Object.entries(handlers).forEach(([event, fn]) => window.removeEventListener(event, fn));
   }, []);
 
-  // Handle navigation side-effects safely outside of render
   useEffect(() => {
-    if (activePage === 'home') {
-      navigate(user_type === "student" ? '/' : '/instructor/');
-    } else if (activePage === 'allCourses') {
-      navigate('/course');
+    if (activePage === "home") {
+      navigate(isStudent ? "/" : "/instructor/");
+    } else if (activePage === "allCourses") {
+      navigate("/course");
     }
-  }, [activePage, navigate, user_type]);
+  }, [activePage, isStudent, navigate]);
 
   const renderContent = () => {
     switch (activePage) {
-      case 'student-dashboard':
+      case "student-dashboard":
         return <StudentDashboard studentDetails={userAuthData} />;
-      case 'home':
+      case "home":
+      case "allCourses":
         return null;
-      case 'profile':
-        return user_type === "student"
+      case "profile":
+        return isStudent
           ? <StudentProfile studentData={userAuthData} />
           : <InstructorProfile instructorDetails={userAuthData} />;
-      case 'allCourses':
-        return null;
-      case 'student-myCourses':
+      case "student-myCourses":
         return <MyCoursesPage userData={userAuthData} />;
-      case 'allCategory':
+      case "allCategory":
         return <AvailableCategory />;
-      case 'instructor-dashboard':
+      case "instructor-dashboard":
         return <InstructorDashboard instructorDetails={userAuthData} />;
-      case 'instructor-myCourses':
+      case "instructor-myCourses":
         return <InstructorCourse instructorDetails={userAuthData} />;
-      case 'instructor-add-myCourses':
+      case "instructor-add-myCourses":
         return <AddCourseForm />;
-      case 'instructor-analytics':
+      case "instructor-analytics":
         return <InstructorAnalytics />;
       default:
-        return user_type === "student"
+        return isStudent
           ? <StudentDashboard studentDetails={userAuthData} />
           : <InstructorDashboard instructorDetails={userAuthData} />;
     }
   };
 
-  const isStudent = user_type === "student";
-
-  if (isUserLoading) return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className={`w-12 h-12 ${isStudent ? 'text-purple-400' : 'text-rose-500'} animate-spin`} />
-        <p className={`${isStudent ? 'text-purple-200' : 'text-rose-200'} text-sm font-medium`}>Loading...</p>
-      </div>
-    </div>
-  );
-
-  // Left margin offset: 280px expanded, 80px (w-20) collapsed. Only applied on md+.
-  const mainMargin = sidebarCollapsed ? "md:ml-20" : "md:ml-[280px]";
+  if (isUserLoading) return <DashboardSkeleton role={user_type} />;
 
   return (
-    <div className="min-h-screen bg-black text-white">
-
-      {/* ── Mobile Top Bar ── */}
-      <div
-        className={`md:hidden flex items-center justify-between p-4 bg-gradient-to-r
-          ${isStudent ? 'from-purple-900/50' : 'from-rose-950/50'} to-black
-          border-b ${isStudent ? 'border-purple-500/20' : 'border-rose-500/20'}
-          sticky top-0 z-30 backdrop-blur-md`}
-      >
-        <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${isStudent ? 'from-purple-400 to-purple-600' : 'from-rose-400 to-rose-600'} flex items-center justify-center shadow-lg`}>
-            <span className="text-white font-bold text-sm">W</span>
-          </div>
-          <h1 className="font-bold text-lg">WebBeetles</h1>
-        </div>
-        <button
-          onClick={() => setIsMobileOpen(true)}
-          className="p-2 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-colors cursor-pointer"
-        >
-          <Menu size={20} />
-        </button>
-      </div>
-
-      {/* ── Fixed Sidebar ── */}
+    <div className="flex h-screen overflow-hidden bg-black text-white">
       <DashboardSidebar
         setActivePage={setActivePage}
         activePage={activePage}
@@ -127,16 +86,22 @@ const DashboardLayout = ({ currentPage }) => {
         userData={userAuthData}
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
-        onCollapseChange={setSidebarCollapsed}
       />
 
-      {/* ── Main content — margin-left matches sidebar width on desktop ── */}
-      <main className={`min-h-screen transition-all duration-300 ${mainMargin}`}>
-        <div className="px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-8">
-          {renderContent()}
-        </div>
-      </main>
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setIsMobileOpen(true)}
+          className="fixed left-4 top-4 z-30 rounded-lg bg-black/80 p-3 text-gray-300 shadow-lg border border-white/10 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white md:hidden"
+          aria-label="Open sidebar"
+        >
+          <Menu size={20} />
+        </button>
 
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-black p-4 sm:p-6 lg:p-8">
+          {renderContent()}
+        </main>
+      </div>
     </div>
   );
 };

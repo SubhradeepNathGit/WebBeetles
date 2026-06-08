@@ -9,7 +9,7 @@ import { allInstructor, updateInstructorApproveRejectStatus } from "../../redux/
 import ConfirmStatusModal from "../../components/admin/common/modal/ConfirmStatusModal";
 import hotToast from "../../util/alert/hot-toast";
 import getSweetAlert from "../../util/alert/sweetAlert";
-import { Loader2 } from "lucide-react";
+import TableSkeleton from "../../components/admin/common/TableSkeleton";
 
 export default function InstructorReviews() {
 
@@ -63,7 +63,7 @@ export default function InstructorReviews() {
             <StatsCounter isInstructorLoading={isInstructorLoading} getInstructorData={getInstructorData} />
 
             {/* Applications Table */}
-            {isInstructorLoading ? <Loader2 className="inline animate-spin my-5 mx-50 w-12 h-12" /> :
+            {isInstructorLoading ? <TableSkeleton columns={6} rows={5} /> :
                 <ApplicationTable filtered={filtered} setModal={setModal} setDocViewer={setDocViewer} setOpenMarkModal={setOpenMarkModal} setInstructor={setInstructorId}
                     setChangeStatus={setChangeStatus} />}
 

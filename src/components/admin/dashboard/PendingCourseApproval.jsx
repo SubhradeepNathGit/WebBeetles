@@ -45,7 +45,16 @@ const PendingCourseApproval = () => {
             <div className="bg-[#111] p-5 rounded-2xl border border-white/5 shadow-xl lg:col-span-2 flex flex-col">
                 <SectionHeader title="Courses Awaiting Approval" linkTo="/admin/approve-courses" />
                 <div className="space-y-3 flex-1">
-                    {isCourseLoading ? <Loader2 className='inline mx-auto animate-spin w-10 h-10' /> : pendingCourse?.length > 0 ?
+                    {isCourseLoading ? (
+                        <div className="space-y-3 animate-pulse">
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="p-3 bg-[#161616] rounded-xl space-y-2">
+                                    <div className="h-4 bg-white/5 rounded w-3/4"></div>
+                                    <div className="h-3 bg-white/5 rounded w-1/2"></div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : pendingCourse?.length > 0 ?
                         pendingCourse?.slice(0, 4)?.map(course => (
                             <div key={course?.id} className="p-3 bg-[#161616] rounded-xl hover:bg-[#1a1a1a] transition-colors group">
                                 <div className="flex items-start justify-between mb-1">

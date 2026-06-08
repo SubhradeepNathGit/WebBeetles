@@ -13,11 +13,14 @@ import RecentStudents from "../../components/admin/dashboard/RecentStudents";
 import PendingInstructorReview from "../../components/admin/dashboard/PendingInstructorReview";
 import TopCourse from "../../components/admin/dashboard/TopCourse";
 import PendingCourseApproval from "../../components/admin/dashboard/PendingCourseApproval";
+import PendingCategoryApproval from "../../components/admin/dashboard/PendingCategoryApproval";
 import TopCategory from "../../components/admin/dashboard/TopCategory";
 import PerformActivity from "../../components/admin/dashboard/PerformActivity";
 import QuickActions from "../../components/admin/dashboard/QuickActions";
 import DashboardHeader from "../../components/admin/dashboard/DashboardHeader";
 import RegistrationChartView from "../../components/admin/dashboard/chart/RegistrationChartView";
+
+
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Filler, Legend);
 
@@ -32,7 +35,6 @@ const TOP_COURSES = [
 
 
 export default function Dashboard() {
-
     return (
         <div className="space-y-6">
             {/* Page Header */}
@@ -68,9 +70,12 @@ export default function Dashboard() {
             </div>
 
             {/* === ROW 5: Top Categories + Platform Activity Feed === */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
                 {/* Category Breakdown */}
                 <TopCategory />
+
+                {/* Pending Category Approval */}
+                <PendingCategoryApproval />
 
                 {/* Activity Feed */}
                 <PerformActivity />

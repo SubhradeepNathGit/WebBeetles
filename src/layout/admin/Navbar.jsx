@@ -24,7 +24,7 @@ export default function Navbar() {
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
     const [unreadCount, setUnreadCount] = useState(2);
-    const [isDarkMode, setIsDarkMode] = useState(true);
+   
     const [isMobile, setIsMobile] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -116,10 +116,7 @@ export default function Navbar() {
         }
     };
 
-    const toggleTheme = useCallback(() => {
-        setIsDarkMode((prev) => !prev);
-        document.documentElement.classList.toggle("dark");
-    }, []);
+ 
 
     const markAllAsRead = useCallback(() => {
         setUnreadCount(0);
@@ -182,14 +179,7 @@ export default function Navbar() {
                             </button>
                         )}
 
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 md:p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all cursor-pointer"
-                            aria-label="Toggle theme"
-                            title="Toggle theme"
-                        >
-                            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-                        </button>
+                    
 
                         <div className="relative" ref={notificationRef}>
                             <button

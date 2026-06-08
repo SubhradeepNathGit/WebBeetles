@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Ban, Calendar, CircleCheck, Eye, Loader2, Mail, MoreVertical, Shield, Trash2 } from 'lucide-react'
+import { Ban, Calendar, CircleCheck, Eye, Mail, MoreVertical, Shield, Trash2 } from 'lucide-react'
 import { formatDateDDMMYY } from '../../../util/dateFormat/dateFormat';
 import { useUserWisePurchaseCourseDetails } from '../../../tanstack/query/fetchUserWisePurchaseCourseDetails';
 import ConfirmStatusModal from '../common/modal/ConfirmStatusModal';
@@ -84,7 +84,7 @@ const TableRow = ({ u }) => {
                         <Shield size={13} className="text-emerald-400" /> {u?.role ? (u.role.charAt(0).toUpperCase() + u.role.slice(1).toLowerCase()) : 'N/A'}
                     </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-300 font-medium">{isLoading ? <Loader2 className='animate-spin w-4 h-4 inline mb-1' /> : data?.length ?? 0} course{data?.length > 1 ? 's' : ''}</td>
+                <td className="px-6 py-4 text-sm text-gray-300 font-medium">{isLoading ? <span className="inline-block h-4 w-12 bg-white/5 rounded animate-pulse"></span> : data?.length ?? 0} course{data?.length > 1 ? 's' : ''}</td>
                 <td className="px-6 py-4 text-sm text-yellow-500 font-semibold">{"₹" + (totalAmount?.toLocaleString() || 0)}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 flex items-center gap-1.5 mt-4">
                     <Calendar size={13} /> {formatDateDDMMYY(u?.created_at)}

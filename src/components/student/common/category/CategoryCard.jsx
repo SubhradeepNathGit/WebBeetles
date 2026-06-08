@@ -53,7 +53,7 @@ const CategoryCard = ({ cat, index }) => {
                         {cat?.name ?? 'N/A'}
                     </h3>
                     <p className="text-sm lg:text-base text-gray-400 group-hover:text-purple-100 transition-colors duration-300 leading-relaxed">
-                        {(cat?.description?.length > 100 ? cat?.description?.slice(0, 100) + "..." : cat?.description) ?? 'N/A'}
+                        {cat?.description ? (cat.description.length > 100 ? cat.description.slice(0, 100) + "..." : cat.description) : ""}
                     </p>
                 </div>
 

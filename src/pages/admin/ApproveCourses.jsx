@@ -7,7 +7,7 @@ import PreviewModal from "../../components/admin/approve-course/modal/PreviewMod
 import RejectedCourseTable from "../../components/admin/approve-course/reject-course/RejectedCourseTable";
 import { useDispatch, useSelector } from "react-redux";
 import { allCourse, updateCourseApproveReject, updateCourseBlockUnblockByAdmin } from "../../redux/slice/couseSlice";
-import { Loader2 } from "lucide-react";
+import TableSkeleton from "../../components/admin/common/TableSkeleton";
 import VideoPlayerModal from "../../components/admin/approve-course/modal/VideoPlayerModal";
 import ImageViewerModal from "../../components/admin/approve-course/modal/ImageViewerModal";
 import ConfirmStatusModal from "../../components/admin/common/modal/ConfirmStatusModal";
@@ -112,17 +112,17 @@ export default function ApproveCourses() {
             <ApproveCourseStats pending={pending} approved={approved} rejected={rejected} isCourseLoading={isCourseLoading} />
 
             {/* Pending Table */}
-            {isCourseLoading ? <Loader2 className="inline animate-spin my-5 mx-50 w-12 h-12" /> : 
+            {isCourseLoading ? <TableSkeleton columns={8} rows={5} /> : 
                 <PendingTable pending={filtered} setPreview={setPreview} setCourseId={setCourseId} setChangeStatus={setChangeStatus}
                     setOpenMarkModal={setOpenMarkModal} />}
 
             {/* Approved Courses List */}
-            {isCourseLoading ? <Loader2 className="inline animate-spin my-5 mx-50 w-12 h-12" /> :
+            {isCourseLoading ? <TableSkeleton columns={8} rows={5} /> :
             <LiveCourseTable approved={approved} setOpenBlockUnblockModal={setOpenBlockUnblockModal} setBlockUnblockCourseId={setBlockUnblockCourseId}
                 setBlockUnblockChangeStatus={setBlockUnblockChangeStatus} />}
 
             {/* Rejected Courses List */}
-            {isCourseLoading ? <Loader2 className="inline animate-spin my-5 mx-50 w-12 h-12" /> : <RejectedCourseTable rejected={rejected} />}
+            {isCourseLoading ? <TableSkeleton columns={8} rows={5} /> : <RejectedCourseTable rejected={rejected} />}
 
             {/* Preview Modal */}
             {preview && (

@@ -45,7 +45,19 @@ const PendingInstructorReview = () => {
             <div className="bg-[#111] p-5 rounded-2xl border border-white/5 lg:col-span-2 shadow-xl flex flex-col">
                 <SectionHeader title="Pending Instructor Reviews" linkTo="/admin/instructor-reviews" />
                 <div className="space-y-3 flex-1">
-                    {isInstructorLoading ? <Loader2 className='inline mx-auto animate-spin w-10 h-10' /> : pendingRequest?.length > 0 ?
+                    {isInstructorLoading ? (
+                        <div className="space-y-3 animate-pulse">
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="flex items-center gap-3 p-3 bg-[#161616] rounded-xl">
+                                    <div className="w-8 h-8 rounded-full bg-white/5 flex-shrink-0"></div>
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-white/5 rounded w-1/2"></div>
+                                        <div className="h-3 bg-white/5 rounded w-3/4"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : pendingRequest?.length > 0 ?
                     pendingRequest?.slice(0, 4)?.map(p => (
                         <div key={p?.id} className="flex items-center gap-3 p-3 bg-[#161616] rounded-xl hover:bg-[#1a1a1a] transition-colors">
                             <div className="w-8 h-8 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 text-xs font-bold flex-shrink-0">

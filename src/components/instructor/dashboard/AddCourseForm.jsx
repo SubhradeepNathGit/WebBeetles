@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { MdArrowOutward, MdCheckCircle, MdAdd, MdDelete, MdUpload, MdClose, MdImage, MdVideoLibrary } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { allCategory } from "../../../redux/slice/categorySlice";
-import { Loader2, TriangleAlert } from "lucide-react";
+import { allCategory, createCategory } from "../../../redux/slice/categorySlice";
+import { Loader2, TriangleAlert, Plus, Check, ChevronDown, Search } from "lucide-react";
 import { createCourse } from "../../../redux/slice/couseSlice";
 import getSweetAlert from "../../../util/alert/sweetAlert";
 import { useForm } from "react-hook-form";
@@ -32,7 +32,7 @@ const AddCourseForm = () => {
     imgType = ['jpeg', 'jpg', 'png'],
     videoType = ['mp4', 'mov', 'avi'];
 
-  const { isCategoryLoading, getCategoryData } = useSelector((state) => state.category),
+  const { isCategoryLoading, isCreatingCategory, getCategoryData } = useSelector((state) => state.category),
     { isUserLoading, userAuthData, userError } = useSelector(state => state.checkAuth),
     { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state.course),
     { isVideoLoading, videoData, hasVideoError } = useSelector(state => state.lecture);
@@ -46,8 +46,16 @@ const AddCourseForm = () => {
   const [videoError, setVideoError] = useState(false);
   const [showThumbnailMsg, setShowThumbnailMsg] = useState(false);
 
+  // Category dropdown state
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [categorySearch, setCategorySearch] = useState("");
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const categoryDropdownRef = useRef(null);
+
   useEffect(() => {
-    dispatch(allCategory('active'))
+    dispatch(allCategory())
       .then((res) => {
         // console.log("Category fetching response", res);
       })
@@ -63,6 +71,65 @@ const AddCourseForm = () => {
       return () => clearTimeout(timer);
     }
   }, [showToast]);
+
+  // Close category dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target)) {
+        setCategoryDropdownOpen(false);
+        setShowNewCategoryInput(false);
+        setNewCategoryName("");
+        setCategorySearch("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle creating a new category inline
+  const handleCreateCategory = async () => {
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) return;
+
+    // Check for duplicates (case-insensitive)
+    const duplicate = getCategoryData?.find(
+      (cat) => cat?.name?.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (duplicate) {
+      toastifyAlert.warn("Category already exists!");
+      setSelectedCategory(duplicate);
+      setValue("category", duplicate.id, { shouldValidate: true });
+      setCategoryDropdownOpen(false);
+      setShowNewCategoryInput(false);
+      setNewCategoryName("");
+      setCategorySearch("");
+      return;
+    }
+
+    try {
+      const res = await dispatch(createCategory(trimmed));
+      if (res.meta.requestStatus === "fulfilled") {
+        const newCat = res.payload;
+        setSelectedCategory(newCat);
+        setValue("category", newCat.id, { shouldValidate: true });
+        toastifyAlert.success(`Category "${trimmed}" created!`);
+        setCategoryDropdownOpen(false);
+        setShowNewCategoryInput(false);
+        setNewCategoryName("");
+        setCategorySearch("");
+      } else {
+        toastifyAlert.error("Failed to create category. Try again.");
+      }
+    } catch (err) {
+      console.error("Error creating category:", err);
+      toastifyAlert.error("Something went wrong.");
+    }
+  };
+
+  // Filter categories based on search
+  const filteredCategories = getCategoryData?.filter((cat) =>
+    cat?.name?.toLowerCase().includes(categorySearch.toLowerCase())
+  ) || [];
 
   const simulateUpload = useCallback((setProgress, onComplete) => {
     return new Promise((resolve) => {
@@ -161,6 +228,7 @@ const AddCourseForm = () => {
     setVideoFile(null);
     setVideoProgress(0);
     setVideoError(false);
+    setSelectedCategory(null);
 
     reset(
       {
@@ -294,8 +362,8 @@ const AddCourseForm = () => {
 
   const inputClass = useCallback(
     (err) =>
-      `w-full px-4 py-3 rounded-xl bg-white/5 border ${err ? "border-red-400/60" : "border-white/10"
-      } focus:outline-none focus:border-rose-400/60 focus:bg-white/10 text-white placeholder:text-white/40 transition-all duration-200 hover:border-white/20`,
+      `w-full px-4 py-3 rounded-xl bg-[#111] border ${err ? "border-red-500/60" : "border-white/5"
+      } focus:outline-none focus:border-white/20 focus:bg-[#161616] text-white placeholder:text-white/40 transition-all duration-200 hover:border-white/10 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]`,
     []
   );
 
@@ -308,17 +376,36 @@ const AddCourseForm = () => {
 
   if (isCategoryLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-rose-500 animate-spin mx-auto mb-4" />
-          <p className="text-white/60 text-sm">Loading categories...</p>
+      <div className="min-h-screen bg-black py-8 px-4 animate-pulse">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="h-8 bg-white/5 rounded-lg w-1/3 mb-8"></div>
+          <div className="bg-[#111] p-6 rounded-2xl border border-white/5 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <div className="h-4 bg-white/5 rounded w-1/4"></div>
+                <div className="h-10 bg-white/5 rounded-lg w-full"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 bg-white/5 rounded w-1/4"></div>
+                <div className="h-10 bg-white/5 rounded-lg w-full"></div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 bg-white/5 rounded w-1/4"></div>
+              <div className="h-28 bg-white/5 rounded-lg w-full"></div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 bg-white/5 rounded w-1/4"></div>
+              <div className="h-40 bg-white/5 rounded-lg w-full"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-4 sm:py-8 px-3 sm:px-4 bg-black">
+    <div className="overflow-x-hidden bg-black">
       {/* Toast */}
       {showToast && (
         <div className="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top duration-300 w-[calc(100%-1.5rem)] sm:w-auto">
@@ -336,18 +423,18 @@ const AddCourseForm = () => {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-full mx-auto">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-gradient-to-br from-rose-700 to-black/30 border border-rose-500 rounded-2xl shadow-2xl overflow-hidden"
+          className="bg-black rounded-2xl overflow-hidden"
         >
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+          <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Left Column */}
             <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
-              <div className="pb-3 sm:pb-4 border-b border-white/10">
+              <div className="pb-2">
                 <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
-                  <span className="bg-rose-500/20 text-rose-300 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">01</span>
+                  <span className="bg-white/5 text-white/70 border border-white/10 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">01</span>
                   Course Details
                 </h2>
               </div>
@@ -360,7 +447,7 @@ const AddCourseForm = () => {
 
               <div>
                 <label className="block text-white/90 text-sm font-medium mb-2">Course Description *</label>
-                <textarea {...register("description", { required: "Description is required", minLength: { value: 400, message: "Minimum 400 characters required" }, maxLength: { value: 600, message: "Maximum 600 characters required" } })} placeholder="Provide a detailed description of what students will learn..." rows={7} className={`${inputClass(errors.description)} resize-none`} />
+                <textarea {...register("description", { required: "Description is required", maxLength: { value: 600, message: "Maximum 600 characters required" } })} placeholder="Provide a detailed description of what students will learn..." rows={7} className={`${inputClass(errors.description)} resize-none`} />
                 <ErrorMsg msg={errors.description?.message} />
               </div>
 
@@ -371,14 +458,112 @@ const AddCourseForm = () => {
                   <ErrorMsg msg={errors.price?.message} />
                 </div>
 
-                <div>
+                <div ref={categoryDropdownRef} className="relative">
                   <label className="block text-white/90 text-sm font-medium mb-2">Category *</label>
-                  <select {...register("category", { required: "Category is required" })} className={inputClass(errors.category)}>
-                    <option value="">Choose category</option>
-                    {getCategoryData?.map(cat => (
-                      <option key={cat?.id} value={cat?.id} className="bg-rose-900">{cat?.name}</option>
-                    ))}
-                  </select>
+
+                  {/* Hidden input for react-hook-form */}
+                  <input
+                    type="hidden"
+                    {...register("category", { required: "Category is required" })}
+                  />
+
+                  {/* Dropdown trigger */}
+                  <div
+                    onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                    className={`w-full px-4 py-3 rounded-xl bg-[#0b0b0d] border ${errors.category ? "border-red-500/60" : "border-transparent"} shadow-[inset_0_1px_0_rgba(255,255,255,0.055),inset_0_-1px_0_rgba(0,0,0,0.75),0_14px_30px_rgba(0,0,0,0.28)] hover:bg-[#101014] focus:ring-2 focus:ring-white/10 text-white transition-all duration-200 cursor-pointer flex items-center justify-between group`}
+                  >
+                    <span className={selectedCategory ? "text-white" : "text-white/36"}>
+                      {selectedCategory ? selectedCategory.name : "Choose category"}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-white/40 group-hover:text-white transition-transform duration-200 ${categoryDropdownOpen ? "rotate-180" : ""}`}
+                    />
+                  </div>
+
+                  {/* Dropdown menu */}
+                  {categoryDropdownOpen && (
+                    <div className="absolute z-50 w-full mt-2 bg-[#0b0b0d] border border-white/10 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                      
+                      {/* Search Bar */}
+                      <div className="p-2 border-b border-white/10 relative">
+                        <Search className="w-4 h-4 text-white/40 absolute left-4 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          autoFocus
+                          placeholder="Search categories..."
+                          value={categorySearch}
+                          onChange={(e) => setCategorySearch(e.target.value)}
+                          className="w-full bg-transparent pl-8 pr-4 py-1.5 text-sm text-white placeholder:text-white/30 focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Category List */}
+                      <div className="max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent p-1.5">
+                        {filteredCategories.length > 0 ? (
+                          filteredCategories.map((cat) => (
+                            <div
+                              key={cat.id}
+                              onClick={() => {
+                                setSelectedCategory(cat);
+                                setValue("category", cat.id, { shouldValidate: true });
+                                setCategoryDropdownOpen(false);
+                                setShowNewCategoryInput(false);
+                                setCategorySearch("");
+                              }}
+                              className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors ${selectedCategory?.id === cat.id ? "bg-white/10 text-white" : "hover:bg-white/5 text-white/80"}`}
+                            >
+                              <span className="text-sm font-medium">{cat.name}</span>
+                              {selectedCategory?.id === cat.id && <Check className="w-4 h-4" />}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-4 text-white/40 text-sm">
+                            No categories found.
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Add New Category Action */}
+                      <div className="p-2 border-t border-white/10 bg-white/[0.02]">
+                        {!showNewCategoryInput ? (
+                          <button
+                            type="button"
+                            onClick={() => setShowNewCategoryInput(true)}
+                            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-white/70 hover:bg-white/5 hover:text-white text-sm font-medium transition-colors"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add new category
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-2 p-1">
+                            <input
+                              type="text"
+                              autoFocus
+                              placeholder="New category name"
+                              value={newCategoryName}
+                              onChange={(e) => setNewCategoryName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  handleCreateCategory();
+                                }
+                              }}
+                              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-white/20"
+                            />
+                            <button
+                              type="button"
+                              onClick={handleCreateCategory}
+                              disabled={isCreatingCategory || !newCategoryName.trim()}
+                              className="bg-[#1a1a1a] hover:bg-[#222] border border-white/10 disabled:bg-white/5 disabled:opacity-50 text-white p-1.5 rounded-lg transition-colors flex items-center justify-center min-w-[32px] cursor-pointer"
+                            >
+                              {isCreatingCategory ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <ErrorMsg msg={errors?.category?.message} />
                 </div>
               </div>
@@ -388,10 +573,10 @@ const AddCourseForm = () => {
                 {!thumbnailFile ? (
                   <>
                     <input type="file" accept="image/*" id="thumbnail-upload" className="hidden" onChange={handleThumbnailChange} />
-                    <label htmlFor="thumbnail-upload" className={`group flex flex-col items-center justify-center w-full h-32 sm:h-40 rounded-xl bg-rose-500/10 border-2 border-dashed ${errors.thumbnail ? "border-red-400/60" : "border-rose-400/30"} hover:border-rose-400/60 hover:bg-rose-500/20 cursor-pointer transition-all duration-200`}>
-                      <MdImage className="text-4xl sm:text-5xl text-rose-400/60 group-hover:text-rose-300 transition-colors mb-2 sm:mb-3" />
-                      <p className="text-white/60 group-hover:text-white/80 font-medium text-sm sm:text-base">Click to upload thumbnail</p>
-                      <p className="text-white/40 text-xs mt-1">PNG, JPG, JPEG up to 500KB</p>
+                    <label htmlFor="thumbnail-upload" className={`group flex flex-col items-center justify-center w-full h-32 sm:h-40 rounded-xl bg-black border ${errors.thumbnail ? "border-red-500/60" : "border-white/5"} hover:border-white/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-200`}>
+                      <MdImage className="text-4xl sm:text-5xl text-white/20 group-hover:text-white/40 transition-colors mb-2 sm:mb-3" />
+                      <p className="text-white/40 group-hover:text-white/60 font-medium text-sm sm:text-base">Click to upload thumbnail</p>
+                      <p className="text-white/30 text-xs mt-1">PNG, JPG, JPEG up to 500KB</p>
                     </label>
                   </>
                 ) : (
@@ -438,9 +623,9 @@ const AddCourseForm = () => {
 
             {/* Right Column */}
             <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
-              <div className="pb-3 sm:pb-4 border-b border-white/10">
+              <div className="pb-2">
                 <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
-                  <span className="bg-rose-500/20 text-rose-300 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">02</span>
+                  <span className="bg-white/5 text-white/70 border border-white/10 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">02</span>
                   Course Content
                 </h2>
               </div>
@@ -484,7 +669,7 @@ const AddCourseForm = () => {
                   <button
                     type="button"
                     onClick={() => addFeature({ value: "" })}
-                    className="flex items-center gap-2 text-rose-400 hover:text-rose-300 text-sm font-medium cursor-pointer"
+                    className="flex items-center gap-2 text-white/70 hover:text-white/90 text-sm font-medium cursor-pointer"
                   >
                     <MdAdd />
                     Add Feature
@@ -508,28 +693,23 @@ const AddCourseForm = () => {
                 {/* Scroll container (kept as-is) */}
                 <div className="max-h-[400px] sm:max-h-[600px] overflow-y-auto pr-2
                       [scrollbar-width:thin]
-                      [scrollbar-color:rgba(168,85,247,0.5)_rgba(255,255,255,0.05)]
+                      [scrollbar-color:rgba(255,255,255,0.2)_rgba(255,255,255,0.05)]
                       [&::-webkit-scrollbar]:w-2.5
                       [&::-webkit-scrollbar-track]:bg-white/5
                       [&::-webkit-scrollbar-track]:backdrop-blur-md
-                      [&::-webkit-scrollbar-thumb]:bg-gradient-to-b
-                      [&::-webkit-scrollbar-thumb]:from-rose-500/70
-                      [&::-webkit-scrollbar-thumb]:to-rose-700/70
+                      [&::-webkit-scrollbar-thumb]:bg-white/20
                       [&::-webkit-scrollbar-thumb]:backdrop-blur-lg
                       [&::-webkit-scrollbar-thumb]:border
-                      [&::-webkit-scrollbar-thumb]:border-white/10
+                      [&::-webkit-scrollbar-thumb]:border-white/5
                       [&::-webkit-scrollbar-thumb]:rounded-full
-                      [&::-webkit-scrollbar-thumb]:shadow-[0_0_8px_rgba(168,85,247,0.6)]
-                      [&::-webkit-scrollbar-thumb]:hover:from-rose-400/80
-                      [&::-webkit-scrollbar-thumb]:hover:to-rose-600/80
-                      [&::-webkit-scrollbar-thumb]:hover:shadow-[0_0_10px_rgba(192,132,252,0.8)]
+                      [&::-webkit-scrollbar-thumb]:hover:bg-white/30
                     ">
 
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4 hover:bg-white/[0.07] transition-colors my-2">
+                  <div className="bg-[#111] border border-white/5 rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4 hover:bg-[#161616] transition-colors my-2">
 
                     {/* Title */}
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-rose-300 font-medium text-xs sm:text-sm">
+                      <span className="text-white/70 font-medium text-xs sm:text-sm">
                         Demo Lecture
                       </span>
                     </div>
@@ -561,22 +741,22 @@ const AddCourseForm = () => {
 
                           <label
                             htmlFor="video"
-                            className={`group flex items-center gap-2 sm:gap-3 w-full p-3 sm:p-4 rounded-xl bg-rose-500/10 border
-                                  ${videoError ? "border-red-400/60" : "border-rose-400/30"}
-                                  hover:border-rose-400/60 hover:bg-rose-500/20 cursor-pointer transition-all duration-200`}
+                            className={`group flex items-center gap-2 sm:gap-3 w-full p-3 sm:p-4 rounded-xl bg-black border
+                                  ${videoError ? "border-red-500/60" : "border-white/5"}
+                                  hover:border-white/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-200`}
                           >
-                            <MdVideoLibrary className="text-rose-400/60 group-hover:text-rose-300 text-xl sm:text-2xl" />
+                            <MdVideoLibrary className="text-white/20 group-hover:text-white/40 text-xl sm:text-2xl transition-colors" />
 
                             <div className="flex-1 text-left">
-                              <p className="text-white/70 group-hover:text-white/90 text-xs sm:text-sm font-medium">
+                              <p className="text-white/40 group-hover:text-white/60 text-xs sm:text-sm font-medium transition-colors">
                                 Upload video file
                               </p>
-                              <p className="text-white/40 text-xs">
+                              <p className="text-white/30 text-xs">
                                 MP4, MOV, AVI up to 500MB
                               </p>
                             </div>
 
-                            <MdUpload className="text-rose-400/60 group-hover:text-rose-300 text-lg sm:text-xl" />
+                            <MdUpload className="text-white/20 group-hover:text-white/40 text-lg sm:text-xl transition-colors" />
                           </label>
                         </>
                       ) : (
@@ -663,7 +843,7 @@ const AddCourseForm = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="p-4 sm:p-8 bg-white/5 border-t border-white/10">
+          <div className="p-4 sm:p-8">
             <button type="submit" disabled={isCourseLoading || isVideoLoading} className={`w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 disabled:from-rose-800 disabled:to-pink-800 disabled:cursor-not-allowed px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-white font-semibold  transition-all duration-200 hover:scale-[1.02]  flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg ${(isCourseLoading || isVideoLoading) ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
               {(isCourseLoading || isVideoLoading) ? (
                 <>
