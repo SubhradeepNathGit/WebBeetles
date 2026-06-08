@@ -5,6 +5,7 @@ import ScrollToTop from "../layout/scrollonTop";
 
 import useAppSettings from "../tanstack/query/fetchAppSettings";
 import MaintenanceGuard from "../layout/common/MaintenanceGuard";
+import BannerSkeleton from "../components/student/home/BannerSkeleton";
 
 // student - Layouts
 import StudentNavbar from "../layout/student/StudentNavbar";
@@ -87,9 +88,21 @@ const StudentLayout = ({ children }) => {
 
 const Routing = () => {
   const { settings, loading } = useAppSettings();
+  const location = useLocation();
 
   if (loading) {
-    return <div className="text-white p-10 h-screen"><Loader2 className="w-15 h-15 mx-auto text-center inline animate-spin my-auto" /></div>;
+    if (location.pathname === "/") {
+      return <BannerSkeleton />;
+    }
+    return (
+      <div className="w-full min-h-screen bg-[#25004D] flex flex-col">
+        <div className="h-20 bg-white/5 animate-pulse w-full"></div>
+        <div className="flex-1 p-8">
+           <div className="h-10 bg-white/5 animate-pulse w-1/3 mb-6 rounded"></div>
+           <div className="h-64 bg-white/5 animate-pulse w-full rounded-lg"></div>
+        </div>
+      </div>
+    );
   }
 
   const isMaintenance = settings?.maintenance_mode;
