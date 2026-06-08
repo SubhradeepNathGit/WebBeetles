@@ -182,6 +182,19 @@ const InstructorOtp = () => {
                                                         .focus();
                                                 }
                                             }}
+                                            onPaste={(e) => {
+                                                e.preventDefault();
+                                                const pastedData = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, 8);
+                                                if (pastedData) {
+                                                    const otpArray = pastedData.split("");
+                                                    otpArray.forEach((char, idx) => {
+                                                        setValue(`otpField.${idx}`, char);
+                                                    });
+                                                    // Focus the last filled input
+                                                    const focusIndex = Math.min(otpArray.length - 1, 7);
+                                                    document.getElementById(`otp-input-${focusIndex}`)?.focus();
+                                                }
+                                            }}
                                         />
                                     )}
                                 />
