@@ -95,7 +95,7 @@ const Routing = () => {
       return <BannerSkeleton />;
     }
     return (
-      <div className="w-full min-h-screen bg-[#25004D] flex flex-col">
+      <div className="w-full min-h-screen bg-black flex flex-col">
         <div className="h-20 bg-white/5 animate-pulse w-full"></div>
         <div className="flex-1 p-8">
            <div className="h-10 bg-white/5 animate-pulse w-1/3 mb-6 rounded"></div>
