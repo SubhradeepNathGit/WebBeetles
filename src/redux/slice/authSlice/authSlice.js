@@ -189,9 +189,17 @@ export const loginSlice = createAsyncThunk('authSlice/loginSlice',
                 ({ data: userData, error: userError } = await supabase.from("admins").select("*").eq("id", userId).single());
             }
             else {
-                userData = null, userError = null;
+                userData = null;
+                userError = null;
             }
-            if (userData && userData.is_verified !== 'fulfilled' && userData.is_verified !== 'verified') {
+
+            // If no record found in the expected role's table, this user doesn't belong here
+            if (!userData) {
+                await supabase.auth.signOut();
+                return rejectWithValue({ message: "Invalid login credentials" });
+            }
+
+            if (userData.is_verified !== 'fulfilled' && userData.is_verified !== 'verified') {
                 await supabase.auth.signOut();
                 return rejectWithValue({ message: "Please verify your email first" });
             }
@@ -208,7 +216,7 @@ export const loginSlice = createAsyncThunk('authSlice/loginSlice',
     }
 )
 
-// update last login slice 
+// update last login slice
 export const updateLastSignInAt = createAsyncThunk("authSlice/updateLastSignInAt",
     async ({ id, user_type }, { rejectWithValue }) => {
         // console.log('update login data', id,user_type);
@@ -239,7 +247,7 @@ export const updateLastSignInAt = createAsyncThunk("authSlice/updateLastSignInAt
 export const forgetPasswordSlice = createAsyncThunk('authSlice/forgetPasswordSlice',
     async ({ data, userType }, { rejectWithValue }) => {
         try {
-            // Check if user exists 
+            // Check if user exists
             const table = userType === 'student' ? "students" : "instructors";
             const normalizedEmail = data.email.trim().toLowerCase();
             const { data: existingUser, error: fetchError } = await supabaseAdmin.from(table).select("email, name").eq("email", normalizedEmail).single();

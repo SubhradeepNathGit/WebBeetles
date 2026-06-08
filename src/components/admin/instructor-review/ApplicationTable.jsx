@@ -1,4 +1,5 @@
 import React from 'react'
+import { ClipboardX } from 'lucide-react'
 import ApplicationRow from './ApplicationRow'
 
 const ApplicationTable = ({ filtered, setModal, setDocViewer, setOpenMarkModal, setInstructor, setChangeStatus }) => {
@@ -26,10 +27,26 @@ const ApplicationTable = ({ filtered, setModal, setDocViewer, setOpenMarkModal, 
                             ))}
                         </tbody>
                     </table>
-                ) : <p className='text-center py-2'>No Application available</p>}
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-24 px-6">
+                        {/* Decorative icon with glow ring */}
+                        <div className="relative mb-6">
+                            <div className="absolute inset-0 rounded-full bg-emerald-500/10 blur-xl scale-150" />
+                            <div className="relative w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+                                <ClipboardX className="w-9 h-9 text-gray-600" strokeWidth={1.5} />
+                            </div>
+                        </div>
+
+                        {/* Text */}
+                        <h3 className="text-white/80 text-lg font-semibold mb-2 tracking-tight">No applications yet</h3>
+                        <p className="text-gray-500 text-sm text-center max-w-xs leading-relaxed">
+                            New instructor applications will appear here once applicants submit their credentials for review.
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     )
 }
 
-export default ApplicationTable
+export default ApplicationTable

@@ -17,7 +17,7 @@ const DashboardSkeleton = ({ role }) => {
     : 'bg-emerald-500/10';
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex w-full fixed inset-0 z-50">
+    <div className="min-h-screen bg-black flex w-full fixed inset-0 z-50">
       {/* Sidebar Skeleton (Hidden on Mobile) */}
       <div className="hidden lg:flex flex-col w-64 border-r border-white/5 bg-black/50 p-4 shrink-0">
         <div className={`h-10 w-3/4 rounded-lg mb-8 animate-pulse ${accentColor}`}></div>
@@ -54,8 +54,8 @@ const DashboardSkeleton = ({ role }) => {
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header section */}
             <div className="space-y-3 mb-8">
-              <div className={`h-8 w-1/4 rounded-lg animate-pulse ${accentColor}`}></div>
-              <div className={`h-4 w-1/3 rounded-md animate-pulse ${pulseColor}`}></div>
+              <div className="h-8 w-1/4 rounded-lg animate-pulse bg-white/[0.06]"></div>
+              <div className="h-4 w-1/3 rounded-md animate-pulse bg-white/[0.03]"></div>
             </div>
 
             {/* Top Cards Grid */}
@@ -63,11 +63,11 @@ const DashboardSkeleton = ({ role }) => {
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-5">
                   <div className="flex justify-between items-start mb-4">
-                    <div className={`h-4 w-1/2 rounded animate-pulse ${pulseColor}`}></div>
-                    <div className={`w-10 h-10 rounded-xl animate-pulse ${accentColor}`}></div>
+                    <div className="h-4 w-1/2 rounded animate-pulse bg-white/[0.03]"></div>
+                    <div className="w-10 h-10 rounded-xl animate-pulse bg-white/[0.06]"></div>
                   </div>
-                  <div className={`h-8 w-3/4 rounded-lg mb-3 animate-pulse ${pulseColor}`}></div>
-                  <div className={`h-3 w-1/4 rounded animate-pulse ${pulseColor}`}></div>
+                  <div className="h-8 w-3/4 rounded-lg mb-3 animate-pulse bg-white/[0.03]"></div>
+                  <div className="h-3 w-1/4 rounded animate-pulse bg-white/[0.03]"></div>
                 </div>
               ))}
             </div>
@@ -75,20 +75,20 @@ const DashboardSkeleton = ({ role }) => {
             {/* Bottom Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
               <div className="lg:col-span-2 bg-white/[0.02] border border-white/5 rounded-xl p-6 min-h-[350px]">
-                <div className={`h-6 w-1/4 rounded-md mb-8 animate-pulse ${pulseColor}`}></div>
+                <div className="h-6 w-1/4 rounded-md mb-8 animate-pulse bg-white/[0.03]"></div>
                 <div className="space-y-5">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className={`h-14 w-full rounded-lg animate-pulse ${pulseColor}`}></div>
+                    <div key={i} className="h-14 w-full rounded-lg animate-pulse bg-white/[0.03]"></div>
                   ))}
                 </div>
               </div>
               <div className="bg-white/[0.02] border border-white/5 rounded-xl p-6 min-h-[350px] flex flex-col">
-                <div className={`h-6 w-1/3 rounded-md mb-8 animate-pulse ${pulseColor}`}></div>
+                <div className="h-6 w-1/3 rounded-md mb-8 animate-pulse bg-white/[0.03]"></div>
                 <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-                   <div className={`w-40 h-40 rounded-full animate-pulse ${accentColor}`}></div>
+                   <div className="w-40 h-40 rounded-full animate-pulse bg-white/[0.06]"></div>
                    <div className="w-full flex flex-col items-center gap-3">
-                     <div className={`h-4 w-1/2 rounded animate-pulse ${pulseColor}`}></div>
-                     <div className={`h-4 w-3/4 rounded animate-pulse ${pulseColor}`}></div>
+                     <div className="h-4 w-1/2 rounded animate-pulse bg-white/[0.03]"></div>
+                     <div className="h-4 w-3/4 rounded animate-pulse bg-white/[0.03]"></div>
                    </div>
                 </div>
               </div>
