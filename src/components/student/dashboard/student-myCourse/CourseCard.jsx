@@ -36,40 +36,52 @@ const CourseCard = ({ course, setSelectedCourse, userData }) => {
     // console.log('Course progress details', progressData);
 
     return (
-        <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-purple-600 transition-all group">
+        <div className="bg-[#111827]/80 backdrop-blur-md rounded-2xl overflow-hidden border border-white/5 hover:border-purple-500/40 shadow-lg hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)] transition-all duration-300 group hover:-translate-y-1 flex flex-col">
             <div className="relative h-48 overflow-hidden">
-                <img src={courseDetails?.thumbnail} alt={courseDetails?.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2 text-sm text-white/80">
-                    <Clock className="w-4 h-4" />
-                    <span>{totalLectureTiming}</span>
-                    <span>•</span>
-                    <span>{courseDetails?.category?.name ?? 'N/A'}</span>
+                <img src={courseDetails?.thumbnail} alt={courseDetails?.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-transparent to-transparent opacity-90" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3 text-xs font-medium text-white/90">
+                    <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                        <Clock className="w-3.5 h-3.5 text-purple-400" />
+                        <span>{totalLectureTiming}</span>
+                    </div>
+                    <div className="bg-purple-500/20 text-purple-200 backdrop-blur-md px-2.5 py-1 rounded-full border border-purple-500/20">
+                        {courseDetails?.category?.name ?? 'N/A'}
+                    </div>
                 </div>
             </div>
-            <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors">{courseDetails?.title ?? 'N/A'}</h3>
-                <p className="text-gray-400 text-sm mb-4">by {courseDetails?.instructor?.name ?? 'N/A'}</p>
-                <div className="flex items-center gap-4 mb-4 text-sm">
-                    <div className="flex items-center gap-1">
-                        <span className="text-yellow-400">★</span>
-                        <span><CourseRating courseId={course?.id} /></span>
+            <div className="p-6 flex flex-col flex-1">
+                <h3 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors line-clamp-2">{courseDetails?.title ?? 'N/A'}</h3>
+                <p className="text-gray-400 text-sm mb-5 font-medium">by <span className="text-gray-300">{courseDetails?.instructor?.name ?? 'N/A'}</span></p>
+                
+                <div className="flex items-center gap-3 mb-6 text-sm mt-auto">
+                    <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5 font-semibold text-gray-200">
+                        <span className="text-purple-400 font-medium">Rating:</span>
+                        <CourseRating courseId={course?.id} />
                     </div>
-                    <span className="text-gray-600">|</span>
-                    <span className="text-gray-400">{completedCourse?.length ?? 0}/{lectureData?.length ?? 0} completed</span>
+                    <span className="text-gray-700">•</span>
+                    <span className="text-gray-400 font-medium bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
+                        <span className="text-white">{completedCourse?.length ?? 0}</span> / {lectureData?.length ?? 0} modules
+                    </span>
                 </div>
-                <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-2">
-                        <span className="text-gray-400">Progress</span>
-                        <span className="font-semibold text-purple-400">{progressPercent}%</span>
+                
+                <div className="mb-6 bg-white/[0.02] p-4 rounded-xl border border-white/5">
+                    <div className="flex justify-between text-sm mb-2.5">
+                        <span className="text-gray-400 font-medium">Progress</span>
+                        <span className="font-bold text-purple-400">{progressPercent}%</span>
                     </div>
-                    <div className="w-full bg-gray-800 rounded-full h-2">
-                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all" style={{ width: `${progressPercent}%` }} />
+                    <div className="w-full bg-gray-800/80 rounded-full h-1.5 overflow-hidden">
+                        <div 
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)]" 
+                            style={{ width: `${progressPercent}%` }} 
+                        />
                     </div>
                 </div>
-                <button onClick={() => setSelectedCourse(course)} className="w-full py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer">
-                    <Play className="w-4 h-4" />
-                    Continue Learning
+                
+                <button onClick={() => setSelectedCourse(course)} className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white shadow-lg hover:shadow-purple-500/25 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer group/btn overflow-hidden relative border border-purple-500/30">
+                    <div className="absolute inset-0 bg-white/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-in-out" />
+                    <Play className="w-4 h-4 fill-current relative z-10 group-hover/btn:scale-110 transition-transform" />
+                    <span className="relative z-10 tracking-wide">Continue Learning</span>
                 </button>
             </div>
         </div>

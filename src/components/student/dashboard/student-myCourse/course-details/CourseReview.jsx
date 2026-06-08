@@ -11,7 +11,6 @@ const CourseReview = ({ getSpecificCourseData, selectedCourse, review }) => {
                 <div className="text-center">
 
                     <span className="text-5xl font-bold mb-2">
-                        <Stars className='h-6 w-6 text-yellow-400' />{" "}
                         <CourseRating courseId={selectedCourse?.id} />
                     </span>
 
@@ -24,7 +23,7 @@ const CourseReview = ({ getSpecificCourseData, selectedCourse, review }) => {
                         return (
                             <div key={star} className="flex items-center gap-3">
                                 <div className="flex items-center gap-1 w-20">
-                                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                    
                                     <span className="text-sm">{star}</span>
                                 </div>
                                 <div className="flex-1 bg-gray-800 rounded-full h-2">
