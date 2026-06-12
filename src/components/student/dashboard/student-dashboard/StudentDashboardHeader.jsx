@@ -44,16 +44,16 @@ const StudentDashboardHeader = ({ userDetails }) => {
   };
 
   return (
-    <div className="rounded-xl bg-[#111] border border-white/8 px-6 py-6 mb-6 flex items-center justify-between gap-6 flex-wrap">
+    <div className="bg-transparent px-2 sm:px-4 py-6 mb-2 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 relative text-center sm:text-left">
       {/* Left — avatar + info */}
-      <div className="flex items-center gap-5">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-8">
         {/* Avatar */}
         <div className="relative flex-shrink-0">
-          <div className="w-16 h-16 rounded-full overflow-hidden ring-1 ring-white/15">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden ring-4 ring-[#1e1e2e]">
             {userPhoto ? (
               <img src={userPhoto} alt={userName} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-[#1e1e2e] text-white text-2xl font-bold">
+              <div className="w-full h-full flex items-center justify-center bg-[#1e1e2e] text-white text-4xl font-bold">
                 {userName.charAt(0).toUpperCase()}
               </div>
             )}
@@ -62,8 +62,8 @@ const StudentDashboardHeader = ({ userDetails }) => {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isStudentLoading}
-            className="absolute -bottom-1 -right-1 w-6 h-6 rounded-md bg-[#222] border border-white/15
-              flex items-center justify-center cursor-pointer hover:bg-[#2a2a2a] transition-colors"
+            className="absolute bottom-0 right-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#2a2a36] border-2 border-black
+              flex items-center justify-center cursor-pointer hover:bg-[#3f3f50] transition-colors shadow-lg"
           >
             {isStudentLoading
               ? <Loader2 size={11} className="animate-spin text-white/60" />
@@ -74,8 +74,8 @@ const StudentDashboardHeader = ({ userDetails }) => {
         </div>
 
         {/* Text */}
-        <div>
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+        <div className="flex flex-col items-center sm:items-start">
+          <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5 flex-wrap">
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/6 border border-white/10 text-white/50 uppercase tracking-wide">
               Student Dashboard
             </span>

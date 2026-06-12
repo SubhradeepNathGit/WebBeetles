@@ -107,7 +107,7 @@ const ReviewForm = ({ getSpecificCourseData, authId, setShowReviewForm, reviewFo
     }
 
     return (
-        <div className="bg-gray-900 rounded-xl p-6 mb-8 border border-gray-800">
+        <div className="bg-[#0a0a0c] rounded-xl p-6 mb-8 border border-[#1c1c1f]">
             <h3 className="text-xl font-semibold mb-6">Write Your Review</h3>
 
             <form className="space-y-6" onSubmit={handleSubmit(handleSubmitReview)}>
@@ -125,7 +125,7 @@ const ReviewForm = ({ getSpecificCourseData, authId, setShowReviewForm, reviewFo
                 <div>
                     <label className="block text-sm font-medium mb-2">Your Review <span className="text-red-500">{errors.comment?.message == 'required' ? '*' : null}</span></label>
                     <textarea rows={6} placeholder="Share your thoughts about the course..."
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                        className="w-full bg-[#0d0d10] border border-[#2e2e35] rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500 text-white transition-colors resize-none"
                         {...register("comment", {
                             required: "required",
                             minLength: {
@@ -134,7 +134,7 @@ const ReviewForm = ({ getSpecificCourseData, authId, setShowReviewForm, reviewFo
                             },
                         })}
                     />
-                    <p className={`text-xs mt-2 ${errors.comment?.message == 'min50' ? 'text-red-500' : 'text-gray-500'}`}>
+                    <p className={`text-xs mt-2 ${errors.comment?.message == 'min50' ? 'text-red-500' : 'text-zinc-500'}`}>
                         Minimum 50 characters
                     </p>
                 </div>
@@ -142,7 +142,7 @@ const ReviewForm = ({ getSpecificCourseData, authId, setShowReviewForm, reviewFo
                 {/* Buttons */}
                 <div className="flex gap-3">
                     <button type="submit" disabled={isReviewPending||isActivityLoading}
-                        className={`px-6 py-3 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors ${(!isReviewPending||!isActivityLoading) ? 'bg-purple-600 cursor-pointer' : 'bg-purple-700 cursor-not-allowed'}`}>
+                        className={`px-6 py-3 bg-[#0d0d10] text-[#eaeaea] border border-[#2e2e35] hover:bg-[#15151a] hover:border-[#42424c] hover:text-white disabled:bg-zinc-900/50 disabled:text-zinc-600 disabled:border-[#1c1c1f] disabled:cursor-not-allowed rounded-lg font-medium transition-all duration-300 shadow-sm flex items-center justify-center gap-2 ${(!isReviewPending||!isActivityLoading) ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
                         {(isReviewPending||isActivityLoading) && <Loader2 className='w-4 h-4 animate-spin inline' />} Submit Review
                     </button>
 
@@ -150,7 +150,7 @@ const ReviewForm = ({ getSpecificCourseData, authId, setShowReviewForm, reviewFo
                         setShowReviewForm(false);
                         reset()
                     }}
-                        className={`px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-semibold transition-colors ${(isReviewPending||isActivityLoading) ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                        className={`px-6 py-3 bg-[#0d0d10] text-[#eaeaea] border border-[#2e2e35] hover:bg-[#15151a] hover:border-[#42424c] hover:text-white rounded-lg font-medium transition-all duration-300 shadow-sm ${(isReviewPending||isActivityLoading) ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         Cancel
                     </button>
                 </div>

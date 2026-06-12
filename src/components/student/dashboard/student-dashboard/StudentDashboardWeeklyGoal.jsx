@@ -1,23 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Target, Flame } from "lucide-react";
+import { useSelector } from 'react-redux';
+import { useLectureProgress } from '../../../../tanstack/query/fetchVideoProgressDetails';
 
 const StudentDashboardWeeklyGoal = () => {
-  const [weeklyGoal, setWeeklyGoal] = useState({ current: 0, target: 15 });
+  const { userAuthData } = useSelector(state => state.checkAuth);
+  const { data: progressData } = useLectureProgress({ student_id: userAuthData?.id });
 
-  useEffect(() => {
-    setWeeklyGoal({ current: 12, target: 15 });
-  }, []);
+  const weeklyGoal = useMemo(() => {
+    if (!progressData || !Array.isArray(progressData)) return { current: 0, target: 15 };
+
+    const now = new Date();
+    const day = now.getDay();
+    // Calculate Monday of the current week
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1); 
+    const startOfWeek = new Date(now.setDate(diff));
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    let watchedThisWeek = 0;
+
+    progressData.forEach(p => {
+      // Supabase rows should have updated_at, but we fallback to created_at just in case
+      const dateStr = p.updated_at || p.created_at;
+      if (dateStr) {
+        const updatedDate = new Date(dateStr);
+        if (updatedDate >= startOfWeek) {
+          watchedThisWeek += Math.min(p.watched_seconds || 0, p.total_seconds || 0);
+        }
+      }
+    });
+
+    // Convert seconds to hours, rounded to 1 decimal
+    const currentHours = Math.round((watchedThisWeek / 3600) * 10) / 10;
+    
+    return { current: currentHours, target: 15 };
+  }, [progressData]);
 
   const pct       = Math.min((weeklyGoal.current / weeklyGoal.target) * 100, 100);
   const isDone    = pct >= 100;
-  const remaining = weeklyGoal.target - weeklyGoal.current;
+  // Use Math.max to ensure remaining is not negative, format to 1 decimal place
+  const remaining = Math.max(0, Math.round((weeklyGoal.target - weeklyGoal.current) * 10) / 10);
 
   const r  = 36;
   const circ = 2 * Math.PI * r;
   const dash = circ * (1 - pct / 100);
 
   return (
-    <div className="rounded-xl bg-[#111] border border-white/8 overflow-hidden">
+    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-white/8">
         <div className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
@@ -70,6 +99,7 @@ const StudentDashboardWeeklyGoal = () => {
             style={{
               width: `${pct}%`,
               background: isDone ? "#34d399" : "#a78bfa",
+              boxShadow: isDone ? "0 0 10px rgba(52,211,153,0.5)" : "0 0 10px rgba(167,139,250,0.5)"
             }}
           />
         </div>

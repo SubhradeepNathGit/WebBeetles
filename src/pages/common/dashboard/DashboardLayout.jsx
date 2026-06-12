@@ -89,14 +89,24 @@ const DashboardLayout = ({ currentPage }) => {
       />
 
       <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setIsMobileOpen(true)}
-          className="fixed left-4 top-4 z-30 rounded-lg bg-black/80 p-3 text-gray-300 shadow-lg border border-white/10 backdrop-blur-md transition-all hover:bg-white/10 hover:text-white md:hidden"
-          aria-label="Open sidebar"
-        >
-          <Menu size={20} />
-        </button>
+        {/* Mobile Header Bar */}
+        <div className="flex items-center justify-between px-4 py-3 bg-black border-b border-white/5 md:hidden">
+          <button
+            type="button"
+            onClick={() => setIsMobileOpen(true)}
+            className="rounded-lg bg-white/5 p-2.5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+            aria-label="Open sidebar"
+          >
+            <Menu size={18} />
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="WebBeetles" className="h-7 w-7 object-contain" />
+            <span className="font-semibold text-sm tracking-wider text-white">WebBeetles</span>
+          </div>
+
+          <div className="w-9 h-9" /> {/* Spacer to center the logo */}
+        </div>
 
         <main className="flex-1 overflow-y-auto overflow-x-hidden bg-black p-4 sm:p-6 lg:p-8">
           {renderContent()}

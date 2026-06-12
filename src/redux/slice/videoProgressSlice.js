@@ -1,48 +1,81 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../util/supabase/supabase";
 
+// Helper to handle safe upsert without relying on unique constraints and preventing un-completing
+const safeUpsert = async ({ student_id, course_id, lesson_id, watched_seconds, total_seconds, completed, read_doc, type, forceComplete = false }) => {
+    // 1. Check if record already exists
+    const { data: existing, error: fetchError } = await supabase
+        .from("video_progress")
+        .select("id, completed, watched_seconds")
+        .eq("student_id", student_id)
+        .eq("lesson_id", lesson_id);
+
+    if (fetchError) throw fetchError;
+
+    // 2. Determine final 'completed' state (never revert true to false)
+    const isCompletedNow = completed || (total_seconds > 0 && watched_seconds >= total_seconds - 1);
+    const wasCompleted = existing?.[0]?.completed === true;
+    const finalCompleted = forceComplete || wasCompleted || isCompletedNow;
+
+    const payload = {
+        student_id,
+        course_id,
+        lesson_id,
+        watched_seconds: watched_seconds ?? existing?.[0]?.watched_seconds ?? 0,
+        total_seconds,
+        completed: finalCompleted,
+        type,
+        updated_at: new Date().toISOString()
+    };
+
+    if (read_doc !== undefined) {
+        payload.read_doc = read_doc;
+    }
+
+    // 3. Update if exists, Insert if not
+    let res;
+    if (existing && existing.length > 0) {
+        res = await supabase.from("video_progress")
+            .update(payload)
+            .eq("id", existing[0].id)
+            .select();
+    } else {
+        res = await supabase.from("video_progress")
+            .insert(payload)
+            .select();
+    }
+
+    if (res?.error) throw res.error;
+    return res?.data?.[0];
+};
+
 // ADD or UPDATE (UPSERT) video progress
 export const upsertVideoProgress = createAsyncThunk("videoProgress/upsert",
-    async (
-        { student_id, course_id, lesson_id, watched_seconds = 0, total_seconds, completed = false, read_doc = false, type },
-        { rejectWithValue }) => {
+    async ({ student_id, course_id, lesson_id, watched_seconds = 0, total_seconds, completed = false, read_doc = false, type }, { rejectWithValue }) => {
         try {
-            const res = await supabase.from("video_progress").upsert(
-                {
-                    student_id, course_id, lesson_id, watched_seconds, total_seconds, completed, read_doc, type,
-                    updated_at: new Date().toISOString(),
-                }, {
-                onConflict: "student_id,lesson_id",
-            }).select();
-            // console.log('Response for adding or updating video progress', res);
-
-            if (res?.error) throw res?.error;
-
-            return res?.data?.[0];
+            return await safeUpsert({ student_id, course_id, lesson_id, watched_seconds, total_seconds, completed, read_doc, type });
         } catch (err) {
             return rejectWithValue(err.message);
         }
     }
 );
 
-// Update only watched seconds (video seek / timeupdate)
+// Update watched seconds
 export const updateWatchedSeconds = createAsyncThunk("videoProgress/updateWatchedSeconds",
-    async ({ student_id, lesson_id, watched_seconds, total_seconds }, { rejectWithValue }) => {
-        // console.log('Receive data in slice to update video progress', student_id, lesson_id, watched_seconds, total_seconds);
-
+    async ({ student_id, course_id, lesson_id, watched_seconds, total_seconds, type }, { rejectWithValue }) => {
         try {
-            const isCompleted = watched_seconds >= total_seconds;
+            return await safeUpsert({ student_id, course_id, lesson_id, watched_seconds, total_seconds, type });
+        } catch (err) {
+            return rejectWithValue(err.message);
+        }
+    }
+);
 
-            const res = await supabase.from("video_progress").update({
-                watched_seconds,
-                completed: isCompleted,
-                updated_at: new Date().toISOString(),
-            }).eq("student_id", student_id).eq("lesson_id", lesson_id).select();
-            // console.log('Response for updating video progress watched seconds', res);
-
-            if (res?.error) throw res?.error;
-
-            return res?.data?.[0];
+// Mark video as completed explicitly
+export const markVideoCompleted = createAsyncThunk("videoProgress/markCompleted",
+    async ({ student_id, course_id, lesson_id, total_seconds, type }, { rejectWithValue }) => {
+        try {
+            return await safeUpsert({ student_id, course_id, lesson_id, watched_seconds: total_seconds, total_seconds, type, forceComplete: true });
         } catch (err) {
             return rejectWithValue(err.message);
         }
@@ -52,17 +85,14 @@ export const updateWatchedSeconds = createAsyncThunk("videoProgress/updateWatche
 // Mark document as read
 export const markDocAsRead = createAsyncThunk("videoProgress/markDocAsRead",
     async ({ student_id, lesson_id }, { rejectWithValue }) => {
-        // console.log('Received data in slice for marking doc as read', student_id, lesson_id);
-
         try {
             const res = await supabase.from("video_progress").update({
                 read_doc: true,
+                completed: true,
                 updated_at: new Date().toISOString(),
             }).eq("student_id", student_id).eq("lesson_id", lesson_id).select();
-            // console.log('Response for updating mark as read', res);
 
             if (res?.error) throw res?.error;
-
             return res?.data?.[0];
         } catch (err) {
             return rejectWithValue(err.message);
@@ -107,6 +137,19 @@ export const videoProgressSlice = createSlice({
                 state.videoProgressData = action.payload;
             })
             .addCase(updateWatchedSeconds.rejected, (state, action) => {
+                state.isVideoProgressLoading = false;
+                state.hasVideoProgressError = action.payload;
+            })
+
+            // MARK COMPLETED
+            .addCase(markVideoCompleted.pending, (state) => {
+                state.isVideoProgressLoading = true;
+            })
+            .addCase(markVideoCompleted.fulfilled, (state, action) => {
+                state.isVideoProgressLoading = false;
+                state.videoProgressData = action.payload;
+            })
+            .addCase(markVideoCompleted.rejected, (state, action) => {
                 state.isVideoProgressLoading = false;
                 state.hasVideoProgressError = action.payload;
             })

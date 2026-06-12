@@ -5,7 +5,7 @@ html, body {
   height: auto;                
   min-height: 100vh;           
   overflow-x: hidden;          
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   -webkit-tap-highlight-color: transparent;
   background: #000;
 }

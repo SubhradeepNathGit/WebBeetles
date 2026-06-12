@@ -13,7 +13,10 @@ const MyCoursesPage = ({ userData }) => {
     { userAuthData } = useSelector(state => state.checkAuth),
     { isPurchaseLoading, getPurchaseData, hasPurchaseError } = useSelector(state => state.purchase);
 
-  const purchaseItems = getPurchaseData?.flatMap(order => order.purchase_items.map(item => item?.courses)) || [];
+  const purchaseItems = getPurchaseData?.flatMap(order => order.purchase_items.map(item => ({
+    ...item?.courses,
+    purchase_item_id: item?.id
+  }))) || [];
 
   useEffect(() => {
     if (userAuthData) {

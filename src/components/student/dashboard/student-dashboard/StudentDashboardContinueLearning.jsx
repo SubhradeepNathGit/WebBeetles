@@ -23,7 +23,7 @@ const StudentDashboardContinueLearning = () => {
   }, [userAuthData]);
 
   return (
-    <div className="rounded-xl bg-[#111] border border-white/8 overflow-hidden">
+    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/8">
         <div className="flex items-center gap-3">
@@ -43,9 +43,30 @@ const StudentDashboardContinueLearning = () => {
       {/* Course List */}
       <div className="p-5 space-y-3">
         {isPurchaseLoading ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-3">
-            <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-purple-500 animate-spin" />
-            <p className="text-xs text-white/30">Loading your courses...</p>
+          <div className="space-y-3 animate-pulse">
+            {[1, 2].map((n) => (
+              <div key={n} className="flex gap-4 p-4 border border-white/5 rounded-lg bg-transparent">
+                {/* Thumbnail skeleton */}
+                <div className="w-full sm:w-36 h-28 sm:h-24 rounded-md bg-white/5 flex-shrink-0" />
+                {/* Text lines skeletons */}
+                <div className="flex-1 min-w-0 flex flex-col justify-center space-y-3">
+                  <div className="h-4 w-3/4 rounded bg-white/5" />
+                  <div className="h-3 w-1/3 rounded bg-white/5" />
+                  <div className="flex gap-2">
+                    <div className="h-5 w-12 rounded bg-white/5" />
+                    <div className="h-5 w-10 rounded bg-white/5" />
+                    <div className="h-5 w-16 rounded bg-white/5" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between">
+                      <div className="h-3 w-16 rounded bg-white/5" />
+                      <div className="h-3 w-8 rounded bg-white/5" />
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-white/5" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : purchaseItems?.length > 0 ? (
           purchaseItems.slice(0, 3).map(course => (

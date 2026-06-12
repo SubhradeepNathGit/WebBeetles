@@ -17,13 +17,11 @@ const StudentDashboardCourseContinueCard = ({ course, userAuthData }) => {
   const totalLectureTiming = formatToHHMMSS(totalSeconds);
 
   const completedLectures = progressData?.filter(p => p?.completed)?.length ?? 0;
-  const watchedSeconds = progressData?.reduce((acc, v) => acc + Math.min(v.watched_seconds || 0, v.total_seconds || 0), 0) || 0;
 
-  const progressPercent = totalSeconds
+  const progressPercent = lectureData?.length
     ? (() => {
-        const raw = (watchedSeconds / totalSeconds) * 100;
-        if (raw >= 100) return courseDetails?.is_completed ? 100 : 99;
-        return Math.floor(raw);
+        const percent = Math.floor((completedLectures / lectureData.length) * 100);
+        return percent > 100 ? 100 : percent;
       })()
     : 0;
 
@@ -42,14 +40,14 @@ const StudentDashboardCourseContinueCard = ({ course, userAuthData }) => {
     >
       
       {/* Thumbnail */}
-      <div className="relative flex-shrink-0">
+      <div className="relative w-full sm:w-36 aspect-video sm:aspect-none sm:h-24 rounded-md overflow-hidden border border-white/10 flex-shrink-0">
         <img
           src={course?.thumbnail}
           alt={course?.title}
-          className="w-full sm:w-36 h-28 sm:h-24 rounded-md object-cover border border-white/10"
+          className="w-full h-full object-cover"
         />
         {/* Play overlay on hover */}
-        <div className="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center">
             <Play size={14} className="text-white ml-0.5" fill="white" />
           </div>
@@ -93,10 +91,13 @@ const StudentDashboardCourseContinueCard = ({ course, userAuthData }) => {
             </span>
             <span className={`font-bold ${progressTextColor}`}>{progressPercent}%</span>
           </div>
-          <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-black/60 border border-white/10 overflow-hidden backdrop-blur-md shadow-inner">
             <div
               className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
-              style={{ width: `${progressPercent}%` }}
+              style={{ 
+                width: `${progressPercent}%`,
+                boxShadow: progressColor.includes('emerald') ? '0 0 10px rgba(16,185,129,0.5)' : progressColor.includes('purple') ? '0 0 10px rgba(168,85,247,0.5)' : '0 0 10px rgba(59,130,246,0.5)'
+              }}
             />
           </div>
         </div>

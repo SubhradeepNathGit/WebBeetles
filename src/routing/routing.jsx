@@ -30,6 +30,7 @@ import CategoryDetails from "../pages/student/CategoryDetails";
 import TermsOfService from "../pages/common/terms&policy/TermsOfService";
 import PrivacyPolicy from "../pages/common/terms&policy/PrivacyPolicy";
 import DashboardLayout from "../pages/common/dashboard/DashboardLayout";
+import CertificateVerification from "../pages/student/certificate/CertificateVerification";
 
 // Pages - instructor (no layout — /instructor goes directly to login)
 import InstructorSignup from "../pages/instructor/auth/register/InstructorSignup";
@@ -90,7 +91,24 @@ const Routing = () => {
   const { settings, loading } = useAppSettings();
   const location = useLocation();
 
-  if (loading) {
+  const isAuthRoute = [
+    "/signin",
+    "/signup",
+    "/forget-password",
+    "/reset-password",
+    "/otp",
+    "/instructor",
+    "/instructor/",
+    "/instructor/signin",
+    "/instructor/signup",
+    "/instructor/forget-password",
+    "/instructor/reset-password",
+    "/instructor/otp",
+    "/admin",
+    "/admin/"
+  ].includes(location.pathname) || location.pathname.startsWith("/certificate/");
+
+  if (loading && !isAuthRoute) {
     if (location.pathname === "/") {
       return <BannerSkeleton />;
     }
@@ -132,6 +150,7 @@ const Routing = () => {
         <Route path="/password-reset-email-sent" element={<MaintenanceGuard isMaintenance={isMaintenance}><PasswordResetEmailSent userType="student" /></MaintenanceGuard>} />
         <Route path="/reset-password" element={<MaintenanceGuard isMaintenance={isMaintenance}><ResetPassword /></MaintenanceGuard>} />
         <Route path="/otp" element={<MaintenanceGuard isMaintenance={isMaintenance}><Otp /></MaintenanceGuard>} />
+        <Route path="/certificate/:purchaseItemId" element={<MaintenanceGuard isMaintenance={isMaintenance}><CertificateVerification /></MaintenanceGuard>} />
         
         {/* Protected Student Cart */}
         <Route element={<ProtectedRoute role="student" />}>

@@ -16,7 +16,7 @@ const StudentDashboardRecentActivity = ({ studentDetails }) => {
   }, [dispatch]);
 
   return (
-    <div className="rounded-xl bg-[#111] border border-white/8 overflow-hidden">
+    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-white/8">
         <div className="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/25 flex items-center justify-center">
@@ -27,9 +27,20 @@ const StudentDashboardRecentActivity = ({ studentDetails }) => {
 
       <div className="p-5">
         {isActivityLoading ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-3">
-            <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-blue-500 animate-spin" />
-            <p className="text-xs text-white/30">Loading activity...</p>
+          <div className="space-y-2.5 animate-pulse">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="flex items-center gap-3 p-2.5 rounded-lg border border-transparent bg-transparent">
+                {/* Icon skeleton */}
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/5 flex-shrink-0" />
+                {/* Text lines skeletons */}
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="h-3.5 w-2/3 rounded bg-white/5" />
+                  <div className="h-2.5 w-1/2 rounded bg-white/5" />
+                </div>
+                {/* Time skeleton */}
+                <div className="h-3 w-10 rounded bg-white/5 flex-shrink-0" />
+              </div>
+            ))}
           </div>
         ) : activityList?.length > 0 ? (
           <div className="space-y-1">

@@ -38,18 +38,9 @@ const CategoryCard = ({ cat, index }) => {
             <div
                 className="relative rounded-3xl p-6 sm:p-8 h-64 flex flex-col justify-between transition-all duration-300 hover:scale-105 bg-neutral-900 hover:bg-gradient-to-br hover:from-purple-600 hover:to-black/30 border border-neutral-900 hover:border-purple-500 group">
 
-                <div
-                    className="absolute -top-6 right-6 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full 
-                    bg-purple-700 text-white transition-all duration-300
-                    group-hover:bg-white/10 group-hover:backdrop-blur-md group-hover:border group-hover:border-white/20"
-                >
-                    {/* {categoriesIcon[index % categoriesIcon.length]} */}
-                    {categoriesIcon[Math?.floor(Math?.random() * (categoriesIcon?.length))]}
-                </div>
-
                 {/* Content */}
                 <div className="pt-4">
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-3 group-hover:text-white transition-colors duration-300">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold mb-3 group-hover:text-white transition-colors duration-300 tracking-tight">
                         {cat?.name ?? 'N/A'}
                     </h3>
                     <p className="text-sm lg:text-base text-gray-400 group-hover:text-purple-100 transition-colors duration-300 leading-relaxed">

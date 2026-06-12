@@ -10,28 +10,25 @@ import StudentDashboardSubscriptionCard from "./student-dashboard/StudentDashboa
 
 const StudentDashboard = ({ studentDetails: getStudentData }) => {
   return (
-    <div className="space-y-6 bg-black">
-      {/* Header */}
+    <div className="bg-[#050508] min-h-screen space-y-6 lg:space-y-8">
+      {/* Premium Header */}
       <StudentDashboardHeader userDetails={getStudentData} />
-
-      {/* Subscription / Plan Card */}
-      <StudentDashboardSubscriptionCard userDetails={getStudentData} />
 
       {/* Stats Row */}
       <StudentDashboardStats />
 
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-3 gap-5 md:gap-6">
+      {/* Main Content Grid - Seamless Premium Layout */}
+      <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Left — 2/3 */}
-        <div className="lg:col-span-2 space-y-5 md:space-y-6">
+        <div className="lg:col-span-2 space-y-6 lg:space-y-8">
           <StudentDashboardContinueLearning />
           <StudentDashboardRecentActivity studentDetails={getStudentData} />
         </div>
 
         {/* Right — 1/3 */}
-        <div className="space-y-5 md:space-y-6">
-          <StudentDashboardDeadlines />
+        <div className="space-y-6 lg:space-y-8">
           <StudentDashboardWeeklyGoal />
+          <StudentDashboardSubscriptionCard userDetails={getStudentData} />
           <StudentDashboardQuickAction />
         </div>
       </div>

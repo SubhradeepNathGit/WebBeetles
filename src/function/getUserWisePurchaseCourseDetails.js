@@ -6,7 +6,7 @@ export const getUserWisePurchaseCourseDetails = async (student_id ) => {
     if (!student_id)
         throw new Error("student_id are required");
 
-    const res = await supabase.from('purchase_items').select(`id,is_exam_completed,purchases!inner (*),
+    const res = await supabase.from('purchase_items').select(`id,purchases!inner (*),
     courses (*)`).eq('purchases.user_id', student_id);
 
     // console.log('Response for fetching course details for a specific user', res);

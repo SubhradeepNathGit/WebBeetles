@@ -83,7 +83,7 @@ const ReviewCard = ({ review, userId, setShowReviewForm, setUserReview, setRevie
         <>
             <div className={`relative rounded-xl p-6 border text-start ${isUserReview
                 ? 'bg-gradient-to-br from-purple-600/10 to-purple-800/10 border-purple-700/30 mb-2'
-                : 'bg-gray-900 border-gray-800'}`}>
+                : 'bg-[#0a0a0c] border-[#1c1c1f]'}`}>
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-4">
                         <div
@@ -109,7 +109,7 @@ const ReviewCard = ({ review, userId, setShowReviewForm, setUserReview, setRevie
                         <div className="flex gap-2">
                             <button
                                 onClick={() => handleEditReview()}
-                                className="p-2 hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+                                className="p-2 hover:bg-zinc-800/40 rounded-lg transition-colors cursor-pointer"
                                 title="Edit Review"
                             >
                                 <Edit2 className="w-4 h-4" />
@@ -141,7 +141,7 @@ const ReviewCard = ({ review, userId, setShowReviewForm, setUserReview, setRevie
                 </p>
 
                 {!isUserReview && (
-                    <div className="flex items-center gap-4 pt-4 border-t border-gray-800">
+                    <div className="flex items-center gap-4 pt-4 border-t border-[#1c1c1f]">
                         <button onClick={() => hasUserVoted ? voteHelpful() : undefined} disabled={hasUserVoted}
                             className={`flex items-center gap-2 text-sm transition-colors ${hasUserVoted
                                 ? 'text-purple-400 cursor-not-allowed' : 'text-gray-400 hover:text-purple-400 cursor-pointer'}`}>

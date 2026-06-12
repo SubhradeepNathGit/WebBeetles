@@ -19,7 +19,7 @@ const actions = [
     iconColor: "text-emerald-400",
     bg: "bg-emerald-600/12",
     border: "border-emerald-500/20",
-    action: () => console.log("View Certificates clicked"),
+    action: () => window.dispatchEvent(new CustomEvent("open-user-course")),
   },
 ];
 
@@ -27,7 +27,7 @@ const StudentDashboardQuickAction = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="rounded-xl bg-[#111] border border-white/8 overflow-hidden">
+    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-white/8">
         <div className="w-8 h-8 rounded-lg bg-amber-600/20 border border-amber-500/25 flex items-center justify-center">

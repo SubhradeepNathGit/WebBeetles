@@ -25,7 +25,10 @@ const StudentDashboardStats = () => {
   }, [userAuthData?.id, dispatch]);
 
   const purchaseItems = useMemo(() =>
-    getPurchaseData?.flatMap(order => (order.purchase_items ?? []).map(item => item.courses)) || [],
+    getPurchaseData?.flatMap(order => (order.purchase_items ?? []).map(item => ({
+      ...item.courses,
+      purchase_item_id: item.id
+    }))) || [],
     [getPurchaseData]
   );
 
@@ -52,24 +55,24 @@ const StudentDashboardStats = () => {
       coursesEnrolled:   purchaseItems.length,
       coursesCompleted:  completed,
       coursePending:     purchaseItems.length - completed,
-      certificatesEarned: purchaseItems.filter(p => p?.is_exam_completed).length,
+      certificatesEarned: completed,
     };
   }, [purchaseItems, courseProgressMap]);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
       {statConfig.map(({ icon: Icon, label, key, iconColor, bg, border }) => (
         <div
           key={key}
-          className={`rounded-xl bg-[#111] border ${border} px-5 py-5
-            hover:bg-[#161616] transition-colors cursor-default`}
+          className={`relative rounded-2xl bg-black border border-white/[0.08] p-4 sm:p-6 
+            hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 cursor-default group`}
         >
-          <div className={`w-9 h-9 rounded-lg ${bg} border ${border}
-            flex items-center justify-center mb-4`}>
-            <Icon size={17} className={iconColor} />
+          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${bg} border ${border}
+            flex items-center justify-center mb-3 sm:mb-5 shadow-inner`}>
+            <Icon size={20} className={iconColor} />
           </div>
-          <p className="text-3xl font-bold text-white mb-1">{stats[key] ?? 0}</p>
-          <p className="text-xs text-white/40">{label}</p>
+          <p className="text-4xl font-black text-white mb-1 tracking-tight">{stats[key] ?? 0}</p>
+          <p className="text-xs font-semibold text-white/50 uppercase tracking-wider">{label}</p>
         </div>
       ))}
     </div>

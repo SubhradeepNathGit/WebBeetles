@@ -17,17 +17,10 @@ const CourseCard = ({ course, setSelectedCourse, userData }) => {
 
     const completedCourse = progressData?.filter(course => course?.completed);
 
-    const watchedSeconds = progressData?.reduce((acc, v) => acc + Math.min(v.watched_seconds || 0, v.total_seconds || 0), 0) || 0;
-
     const calculateCourseProgress = () => {
-        if (!totalSeconds) return 0;
-
-        const raw = (watchedSeconds / totalSeconds) * 100;
-        if (raw >= 100) {
-            if (!courseDetails?.is_completed) return 99;
-            return 100;
-        }
-        return Math.floor(raw);
+        if (!lectureData?.length) return 0;
+        const percent = Math.floor(((completedCourse?.length || 0) / lectureData.length) * 100);
+        return percent > 100 ? 100 : percent;
     };
 
     const progressPercent = calculateCourseProgress();
@@ -36,12 +29,12 @@ const CourseCard = ({ course, setSelectedCourse, userData }) => {
     // console.log('Course progress details', progressData);
 
     return (
-        <div className="h-full bg-[#111827]/80 backdrop-blur-md rounded-2xl overflow-hidden border border-white/5 hover:border-purple-500/40 shadow-lg hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)] transition-all duration-300 group hover:-translate-y-1 flex flex-col">
+        <div className="h-full bg-[#0a0a0c] rounded-2xl overflow-hidden border border-[#1c1c1f] hover:border-purple-500/30 shadow-lg hover:shadow-[0_8px_30px_rgb(168,85,247,0.1)] transition-all duration-300 group hover:-translate-y-1 flex flex-col">
             <div className="relative h-48 overflow-hidden">
                 <img src={courseDetails?.thumbnail} alt={courseDetails?.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-transparent to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-transparent to-transparent opacity-90" />
                 <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3 text-xs font-medium text-white/90">
-                    <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                    <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
                         <Clock className="w-3.5 h-3.5 text-purple-400" />
                         <span>{totalLectureTiming}</span>
                     </div>
@@ -55,32 +48,31 @@ const CourseCard = ({ course, setSelectedCourse, userData }) => {
                 <p className="text-gray-400 text-sm mb-5 font-medium">by <span className="text-gray-300">{courseDetails?.instructor?.name ?? 'N/A'}</span></p>
                 
                 <div className="flex items-center gap-3 mb-6 text-sm mt-auto">
-                    <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-md border border-white/5 font-semibold text-gray-200">
+                    <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-[#1c1c1f] font-semibold text-gray-200">
                         <span className="text-purple-400 font-medium">Rating:</span>
                         <CourseRating courseId={course?.id} />
                     </div>
                     <span className="text-gray-700">•</span>
-                    <span className="text-gray-400 font-medium bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
+                    <span className="text-gray-400 font-medium bg-black/40 px-2.5 py-1 rounded-md border border-[#1c1c1f]">
                         <span className="text-white">{completedCourse?.length ?? 0}</span> / {lectureData?.length ?? 0} modules
                     </span>
                 </div>
                 
-                <div className="mb-6 bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                    <div className="flex justify-between text-sm mb-2.5">
+                <div className="mb-6">
+                    <div className="flex justify-between text-xs mb-2">
                         <span className="text-gray-400 font-medium">Progress</span>
                         <span className="font-bold text-purple-400">{progressPercent}%</span>
                     </div>
-                    <div className="w-full bg-gray-800/80 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-black/60 border border-white/10 rounded-full h-1.5 overflow-hidden backdrop-blur-md shadow-inner">
                         <div 
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)]" 
+                            className="bg-purple-500 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(168,85,247,0.6)]" 
                             style={{ width: `${progressPercent}%` }} 
                         />
                     </div>
                 </div>
                 
-                <button onClick={() => setSelectedCourse(course)} className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 text-white shadow-lg hover:shadow-purple-500/25 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer group/btn overflow-hidden relative border border-purple-500/30">
-                    <div className="absolute inset-0 bg-white/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-in-out" />
-                    <Play className="w-4 h-4 fill-current relative z-10 group-hover/btn:scale-110 transition-transform" />
+                <button onClick={() => setSelectedCourse(course)} className="w-full py-3.5 bg-[#0d0d10] text-[#eaeaea] border border-[#2e2e35] hover:bg-[#15151a] hover:border-[#42424c] hover:text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer group/btn shadow-sm">
+                    <Play className="w-4 h-4 fill-current relative z-10 group-hover/btn:scale-110 transition-transform group-hover/btn:text-purple-400" />
                     <span className="relative z-10 tracking-wide">Continue Learning</span>
                 </button>
             </div>

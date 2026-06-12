@@ -6,8 +6,7 @@ const CourseContent = ({ getSpecificCourseData, userAuthData, selectedCourse, ge
   const courseSection = [
     { id: 1, title: 'Demo lecture video', type: 'demo' },
     { id: 2, title: 'Course lecture video', type: 'video' },
-    { id: 3, title: 'Course document', type: 'document' },
-    { id: 4, title: 'Certification test', type: 'exam' }
+    { id: 3, title: 'Course document', type: 'document' }
   ];
 
   const specificLecture = (sectionType) => {

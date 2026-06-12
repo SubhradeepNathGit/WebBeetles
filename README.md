@@ -23,7 +23,22 @@
 - **Course Management:** Comprehensive tools for creating, updating, and publishing courses.
 - **Profile & Credentialing:** Detailed instructor onboarding with professional verification.
 - **Performance Analytics:** Real-time stats on student enrollment and course revenue.
-- **Automated Workflows:** Integrated request-status tracking for course approvals.
+- **Quick Action Navigation**: Linked the "View Certificates" quick action to open the "My Courses" tab.
+
+---
+
+## 4. Premium Certificate & Stamp Refinements
+- **Student Name Scaling**: Reduced the font size of the student name inside [CertificateModal.jsx](file:///c:/Users/Subhradeep%20Nath/OneDrive/Desktop/New%20folder%20(6)/WebBeetles/src/components/student/dashboard/student-myCourse/course-details/CertificateModal.jsx) from a large `text-6xl` to a more proportional, elegant `text-2xl sm:text-3xl lg:text-4xl` font serif size to balance the visual layout.
+- **Detailed Course Description & Curriculum Badges**: Added a structured description explaining key curriculum competencies and dynamic badges (40 Hours Coursework, Graded Assessments, Hands-on Projects) to enrich the certificate with academic depth.
+- **Authentic Stamp & Seal**: Implemented a CSS and SVG vector-based official gold foil seal featuring:
+  - Scalloped outer borders and inner dashed rings.
+  - A circular text path showing "WebBeetles Academy • Official Seal •".
+  - A central laurel wreath starburst with "EST. 2024" branding.
+  - Classic red ribbons extending below the seal with a V-cut finish.
+- **Scannable Verification QR Code**: Added a scannable QR code generated from a public endpoint that maps directly to the guest verification URL, allowing verification using any scanner or mobile phone camera.
+- **Verification Portal Sync**: Updated [CertificateVerification.jsx](file:///c:/Users/Subhradeep%20Nath/OneDrive/Desktop/New%20folder%20(6)/WebBeetles/src/pages/student/certificate/CertificateVerification.jsx) to render the exact same premium certificate design, ensuring a consistent brand experience when credentials are verified online.
+
+---
 
 ### 🛠️ Admin Dashboard
 - **Universal Oversight:** Manage students, instructors, and platform-wide settings.

@@ -1,16 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, ChevronRight, Lock } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import LessonItem from './lesson-item/LessonItem';
 import { formatToHHMMSS } from '../../../../../../util/timeFormat/timeFormat';
 import { useLectureProgress } from '../../../../../../tanstack/query/fetchVideoProgressDetails';
 
 const SectionContent = ({ section, getSpecificCourseData, userAuthData, selectedCourse, getPurchaseData }) => {
-    // console.log(selectedCourse);
-
     const [isExpanded, setIsExpanded] = useState(false);
-    const [isOptionOpen, setIsOptionOpen] = useState(section?.type != 'exam');
-
-    const purchaseItems = getPurchaseData?.flatMap(order => order.purchase_items.filter(item => item?.course_id == selectedCourse?.id)) || [];
 
     const sectionLectures = useMemo(() => {
         if (!Array.isArray(getSpecificCourseData)) return [];
@@ -28,84 +23,37 @@ const SectionContent = ({ section, getSpecificCourseData, userAuthData, selected
 
     const completedLecture = progressData?.filter(lecture => lecture?.completed);
 
-    const watchedSeconds = progressData?.reduce((acc, v) => acc + Math.min(v.watched_seconds || 0, v.total_seconds || 0), 0) || 0;
-
-    const calculateCourseProgress = () => {
-        if (!totalSeconds) return 0;
-
-        const raw = (watchedSeconds / totalSeconds) * 100;
-        if (raw >= 100) {
-            if (!selectedCourse?.is_completed) return 99;
-            return 100;
-        }
-        return Math.floor(raw);
-    };
-
-    const progressPercent = calculateCourseProgress();
-
-    useEffect(() => {
-        if (progressPercent == 100) {
-            setIsOptionOpen(true);
-        }
-    }, [progressPercent, selectedCourse])
-
-    // console.log('Lecture progress details', progressData);
-    // console.log('Purchase course status details', purchaseItems);
-
     return (
-        <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
+        <div className="bg-[#0a0a0c] rounded-lg overflow-hidden border border-[#1c1c1f]">
             <button
-                className={`w-full flex items-center justify-between p-4 hover:bg-gray-800 transition-colors ${!isOptionOpen ? 'cursor-not-allowed' : 'cursor'}`}>
-                <div className='flex items-center gap-4'>
-                    {isOptionOpen ? (
-                        isExpanded ? (
-                            <ChevronDown className={`w-5 h-5 text-purple-400 ${!isOptionOpen ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                                onClick={() => (!isOptionOpen ? null : setIsExpanded(prev => !prev))} />
-                        ) : (
-                            <ChevronRight className={`w-5 h-5 text-purple-400 ${!isOptionOpen ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                                onClick={() => (!isOptionOpen ? null : setIsExpanded(prev => !prev))}
-                            />
-                        )) : (
-                        <Lock className="w-5 h-5 text-gray-400 cursor-not-allowed" />
-                    )}
+                onClick={() => setIsExpanded(prev => !prev)}
+                className="w-full flex items-center justify-between p-4 hover:bg-zinc-900/40 transition-colors cursor-pointer text-white group"
+            >
+                <div className='flex items-center gap-3 sm:gap-4'>
+                    <div className="w-8 h-8 rounded-lg bg-zinc-900/50 border border-[#1c1c1f] flex items-center justify-center text-purple-400 transition-colors">
+                        <ChevronRight className={`w-4.5 h-4.5 transition-transform duration-300 ${isExpanded ? 'rotate-90' : 'rotate-0'}`} />
+                    </div>
                     <div className="text-left">
-                        <h3 className="font-semibold text-lg">
+                        <h3 className="font-semibold text-sm sm:text-base md:text-lg">
                             {section?.title?.split(' ')?.map(t => t?.charAt(0)?.toUpperCase() + t?.slice(1)?.toLowerCase())?.join(" ") ?? 'N/A'}
                         </h3>
-                        {section?.type != 'exam' ? (
-                            <p className="text-sm text-gray-400">
-                                {sectionLectures?.length ?? 0} Lesson{sectionLectures?.length > 1 ? 's' : ''}
-                                {section?.type != 'document' && (<> • {totalLectureTiming}</>)}
-                            </p>
-                        ) : (
-                            <p className="text-sm text-gray-400">
-                                {isOptionOpen ? purchaseItems?.[0]?.is_exam_completed ? 'Exam already completed' : 'You are elegiable to attend exam' : 'Course not completed yet'}
-                            </p>
-                        )}
+                        <p className="text-[11px] sm:text-xs md:text-sm text-gray-400">
+                            {sectionLectures?.length ?? 0} Lesson{sectionLectures?.length > 1 ? 's' : ''}
+                            {section?.type != 'document' && (<> • {totalLectureTiming}</>)}
+                        </p>
                     </div>
                 </div>
-                {section?.type != 'exam' && (
-                    <div className="text-sm text-gray-400"> {completedLecture?.length ?? 0}/{sectionLectures?.length} completed </div>
-                )}
+                <div className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                    {completedLecture?.length ?? 0}/{sectionLectures?.length} completed
+                </div>
             </button>
 
             {isExpanded && (
-                section?.type != 'exam' ?
-                    <div className="border-t border-gray-800">
-                        {sectionLectures?.map((lesson, index) => (
-                            <LessonItem key={lesson.id ?? index} lesson={lesson} userAuthData={userAuthData} type={section?.type} />
-                        ))}
-                    </div>
-                    :
-                    <div className="border-t border-gray-800">
-                        <div className='w-full flex'>
-                            {!purchaseItems?.[0]?.is_exam_completed ? (
-                                <button onClick={() => alert('Exam in progress')} className='w-80 rounded-xl mx-auto text-center bg-green-600 hover:bg-green-700 cursor-pointer text-white py-2 my-2'>Start Test</button>
-                            ) : (
-                                <p className='mx-auto text-center my-4'>You have already attend your exam.</p>
-                            )}
-                        </div>
-                    </div>
+                <div className="border-t border-[#1c1c1f]">
+                    {sectionLectures?.map((lesson, index) => (
+                        <LessonItem key={lesson.id ?? index} lesson={lesson} userAuthData={userAuthData} type={section?.type} />
+                    ))}
+                </div>
             )}
         </div>
     );
