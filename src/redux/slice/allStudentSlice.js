@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import supabase from "../../util/supabase/supabase";
+import supabaseAdmin from "../../util/supabase/supabaseAdmin";
 
 // fetch all students
 export const fetchAllStudents = createAsyncThunk("userSlice/fetchAllStudents",
     async (_, { rejectWithValue }) => {
         try {
-            const res = await supabase.from("students").select("*").order("created_at", { ascending: false });
+            const res = await supabaseAdmin.from("students").select("*").order("created_at", { ascending: false });
 
             // console.log('Response for fetching all students', res);
 

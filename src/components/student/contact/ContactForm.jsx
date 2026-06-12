@@ -52,6 +52,8 @@ const ContactForm = () => {
             setShowToast(true);
             reset();
 
+            // Note: Chatbot is now accessible via the global Navbar toggle
+
             setTimeout(() => setShowToast(false), 5000);
           }
           else {

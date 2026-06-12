@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import supabaseAdmin from "../../util/supabase/supabaseAdmin";
 import supabase from "../../util/supabase/supabase";
 
 // request instructor action 
@@ -43,7 +44,7 @@ export const instructorRequest = createAsyncThunk('instructorSlice/instructorReq
 export const allInstructor = createAsyncThunk('instructorSlice/allInstructor',
     async ({ application_status, application_complete, is_blocked } = {}, { rejectWithValue }) => {
         try {
-            let query = supabase.from("instructors").select("*").order("created_at", { ascending: false });;
+            let query = supabaseAdmin.from("instructors").select("*").order("created_at", { ascending: false });;
 
             if (application_status) {
                 query = query.eq("application_status", application_status);
@@ -130,7 +131,7 @@ export const updateInstructorBlockUnblockStatus = createAsyncThunk("instructorSl
         // console.log('update block-unblock status data', id);
 
         try {
-            const res = await supabase.from("instructors").update({ is_blocked: status }).eq("id", id).select();
+            const res = await supabaseAdmin.from("instructors").update({ is_blocked: status }).eq("id", id).select();
 
             // console.log('Response for updating status', res);
 
@@ -149,7 +150,7 @@ export const updateInstructorApproveRejectStatus = createAsyncThunk("instructorS
         // console.log('update block-unblock status data', id);
 
         try {
-            const res = await supabase.from("instructors").update({ application_status: status }).eq("id", id).select();
+            const res = await supabaseAdmin.from("instructors").update({ application_status: status }).eq("id", id).select();
 
             // console.log('Response for updating status', res);
 

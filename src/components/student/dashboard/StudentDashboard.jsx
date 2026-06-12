@@ -10,7 +10,7 @@ import StudentDashboardSubscriptionCard from "./student-dashboard/StudentDashboa
 
 const StudentDashboard = ({ studentDetails: getStudentData }) => {
   return (
-    <div className="bg-[#050508] min-h-screen space-y-6 lg:space-y-8">
+    <div className="bg-black min-h-screen space-y-6 lg:space-y-8">
       {/* Premium Header */}
       <StudentDashboardHeader userDetails={getStudentData} />
 

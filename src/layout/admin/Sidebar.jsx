@@ -12,6 +12,8 @@ import { checkLoggedInUser, logoutUser } from "../../redux/slice/authSlice/check
 import toastifyAlert from "../../util/alert/toastify";
 import getSweetAlert from "../../util/alert/sweetAlert";
 
+import { useFetchContactMessages } from "../../tanstack/query/fetchContactMessages";
+
 const NavItem = ({ to, icon: Icon, children, collapsed, onClick, badge }) => (
     <NavLink
         to={to}
@@ -49,6 +51,8 @@ export default function Sidebar({ onNavigate }) {
         { isInstructorLoading, getInstructorData, isInstructorError } = useSelector(state => state?.instructor),
         { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state?.course),
         { isUserLoading, userAuthData: getAdminData, userError } = useSelector(state => state.checkAuth);
+
+    const { data: contactMessages, isLoading: isMessagesLoading } = useFetchContactMessages();
 
     const pending = getCourseData?.filter(c => c?.status == 'pending');
 
@@ -132,7 +136,7 @@ export default function Sidebar({ onNavigate }) {
         { to: "/admin/approve-courses", label: "Courses", icon: BookOpenCheck, badge: isCourseLoading ? <Loader2 className="inline h-3 w-3 mb-1 animate-spin" /> : pending?.length ?? 0 },
         { to: "/admin/analytics", label: "Analytics", icon: BarChart2 },
         { to: "/admin/charge", label: "Charge", icon: IndianRupee },
-        { to: "/admin/contact", label: "Message", icon: MessageSquareText, badge: 5 },
+        { to: "/admin/contact", label: "Message", icon: MessageSquareText, badge: isMessagesLoading ? <Loader2 className="inline h-3 w-3 mb-1 animate-spin" /> : contactMessages?.length ?? 0 },
         { to: "/admin/settings", label: "Settings", icon: Settings },
     ];
 

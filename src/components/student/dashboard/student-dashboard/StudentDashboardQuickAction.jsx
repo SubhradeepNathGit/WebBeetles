@@ -29,7 +29,7 @@ const StudentDashboardQuickAction = () => {
   return (
     <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-white/8">
+      <div className="flex items-center gap-3 px-5 py-4">
         <div className="w-8 h-8 rounded-lg bg-amber-600/20 border border-amber-500/25 flex items-center justify-center">
           <Zap size={14} className="text-amber-400" />
         </div>

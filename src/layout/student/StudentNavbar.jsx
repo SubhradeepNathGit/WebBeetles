@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Bot, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import getSweetAlert from "../../util/alert/sweetAlert";
 import { checkLoggedInUser, logoutUser } from "../../redux/slice/authSlice/checkUserAuthSlice";
+import Chatbot from "../../components/student/contact/Chatbot";
 
 const StudentNavbar = () => {
   const [isOpen, setIsOpen] = useState(false),
     [activeDropdown, setActiveDropdown] = useState(null),
     [scrolled, setScrolled] = useState(false),
+    [chatbotOpen, setChatbotOpen] = useState(false),
     { isUserLoading, userAuthData: getStudentData, userError } = useSelector(state => state.checkAuth),
+    { cartItems } = useSelector(state => state.cart),
     dispatch = useDispatch(),
     navigate = useNavigate();
 
@@ -129,8 +132,34 @@ const StudentNavbar = () => {
             </div>
 
 
-            {/* Get Started Button (Desktop + Tablet) */}
-            <div className="hidden md:block">
+            {/* Get Started Button & AI Chatbot (Desktop + Tablet) */}
+            <div className="hidden md:flex items-center gap-4">
+              
+              {/* Chatbot Toggle Button */}
+              <button 
+                onClick={() => setChatbotOpen(true)}
+                className="w-8 h-8 lg:w-9 lg:h-9  flex items-center justify-center transition-all duration-300"
+                title="WebBeetles AI Assistant"
+              >
+                <Bot className="text-white w-5 h-5 lg:w-6 lg:h-6 group-hover:scale-110 transition-transform duration-300" />
+              </button>
+
+              {/* Cart Button (Only visible after login) */}
+              {getStudentData && (
+                <Link 
+                  to="/cart"
+                  className="w-10 h-10 lg:w-11 lg:h-11  flex items-center justify-center transition-all duration-300 group relative "
+                  title="Your Cart"
+                >
+                  <ShoppingCart className="text-white w-5 h-5 lg:w-[22px] lg:h-[22px] transition-all duration-300" />
+                  {cartItems?.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-transparent text-white bg-white/30 text-[10px] font-bold w-[18px] h-[18px] lg:w-5 lg:h-5 rounded-full flex items-center justify-center border border-pink-600 transform group-hover:scale-110 transition-transform duration-300">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Link>
+              )}
+
               {!getStudentData ?
                 <Link
                   to="/signin"
@@ -145,7 +174,7 @@ const StudentNavbar = () => {
                   </span>
                   
                   {/* Round Profile Button */}
-                  <div className="w-8 h-8 sm:w-8 sm:h-8 lg:w-9 lg:h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center shadow-md ring-2 ring-white/20 group-hover:ring-purple-400/50 group-hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden">
+                  <div className="w-10 h-10 lg:w-11 lg:h-11 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center shadow-md ring-2 ring-white/20 group-hover:ring-purple-400/50 group-hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden">
                     {getStudentData ? (
                       <img className="w-full h-full object-cover"
                         src={
@@ -345,6 +374,9 @@ const StudentNavbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Global AI Chatbot Drawer */}
+      <Chatbot isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
     </>
   );
 };

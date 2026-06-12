@@ -58,10 +58,12 @@ const InstructorCourseDetails = ({ courseData: getSpecificCourseData }) => {
 
     const isCourseInCart = cartItems?.some(item => item?.course_id === getSpecificCourseData?.id);
 
+    const isCoursePurchased = purchasedCourse?.includes(getSpecificCourseData?.id);
+
     // Handle add to cart 
     const addToCart = async (course) => {
 
-        if (purchasedCourse?.includes(course?.id)) {
+        if (isCoursePurchased) {
             hotToast("Course already purchased", "info", <Info className='text-orange-600' />);
             return;
         }
@@ -150,19 +152,20 @@ const InstructorCourseDetails = ({ courseData: getSpecificCourseData }) => {
                             {getSpecificCourseData?.price?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? 'N/A'}
                         </p>
 
-                        <button disabled={isCartLoading || isCartAddLoading}
+                        <button disabled={isCartLoading || isCartAddLoading || isCoursePurchased}
                             type="button" onClick={() => {
+                                if (isCoursePurchased) return;
                                 if (isCourseInCart) navigate('/cart');
                                 else if (userAuthData) addToCart(getSpecificCourseData);
                                 else navigate('/signin');
                             }}
                             className={`flex mb-5 mt-1 items-center justify-center gap-2 w-full text-white backdrop-blur-md border 
-                                    border-white/30 px-5 py-3 rounded-full transition ${isCartLoading || isCartAddLoading ?
+                                    border-white/30 px-5 py-3 rounded-full transition ${isCartLoading || isCartAddLoading || isCoursePurchased ?
                                     'cursor-not-allowed bg-gray-500 border-gray-400 opacity-60 hover:bg-gray-500 hover:border-gray-400' :
                                     'cursor-pointer hover:bg-purple-800 hover:border-purple-600 hover:opacity-90 bg-purple-600'}`}>
                             {isCartLoading || isCartAddLoading ? (
                                 <Loader2 className='animate-spin w-4 h-4' />) : ''}
-                            {isCourseInCart ? 'Go To Cart' : 'Add To Cart'} <HiArrowRight className="text-lg" />
+                            {isCoursePurchased ? 'Purchased' : (isCourseInCart ? 'Go To Cart' : 'Add To Cart')} {!isCoursePurchased && <HiArrowRight className="text-lg" />}
                         </button>
                     </div>
                 </>

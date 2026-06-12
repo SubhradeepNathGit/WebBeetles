@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../util/supabase/supabase";
+import supabaseAdmin from "../../util/supabase/supabaseAdmin";
 import { checkLoggedInUser } from "./authSlice/checkUserAuthSlice";
 
 // update student profile action 
@@ -81,7 +82,7 @@ export const updateBlockUnblockStudentStatus = createAsyncThunk("userProfileSlic
         // console.log('update block-unblock status data', id);
 
         try {
-            const res = await supabase.from("students").update({ is_blocked: status }).eq("id", id).select();
+            const res = await supabaseAdmin.from("students").update({ is_blocked: status }).eq("id", id).select();
 
             // console.log('Response for updating status', res);
 
