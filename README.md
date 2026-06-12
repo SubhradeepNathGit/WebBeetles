@@ -99,7 +99,7 @@ graph TD
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/SubhradeepNathGit/Product-CRUD.git
+   git clone https://github.com/SubhradeepNathGit/WebBeetles.git
    cd WebBeetles
    ```
 
