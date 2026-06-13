@@ -12,14 +12,13 @@ export const getAdminAnalytics = async () => {
         // 2. Fetch Purchase Items for Enrollments and Top Courses
         const { data: purchaseItems, error: piError } = await supabaseAdmin
             .from("purchase_items")
-            .select("course_id, price, created_at");
+            .select("course_id, price, purchases(created_at)");
         if (piError) throw piError;
 
         // 3. Fetch Students for Total and MAU
         const { data: students, error: sError } = await supabaseAdmin
             .from("students")
-            .select("id, created_at, role")
-            .eq("role", "student");
+            .select("id, created_at");
         if (sError) throw sError;
 
         // 4. Fetch Instructors for MAU
@@ -33,8 +32,9 @@ export const getAdminAnalytics = async () => {
         const { data: courses, error: cError } = await supabaseAdmin
             .from("courses")
             .select(`
-                id, title, category, status,
-                instructor:instructor_id(name)
+                id, title, status,
+                category:categories(name),
+                instructor:instructors(name)
             `);
         if (cError) throw cError;
 
