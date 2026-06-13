@@ -3,7 +3,7 @@ import { Check, IndianRupee, Star, Users } from 'lucide-react'
 import { useCourseStudents } from '../../../../tanstack/query/fetchCourseStudents';
 import CourseRating from '../../../student/dashboard/student-myCourse/rating-review/CourseRating';
 
-const LiveCourseRow = ({ c, setOpenBlockUnblockModal, setBlockUnblockCourseId, setBlockUnblockChangeStatus }) => {
+const LiveCourseRow = ({ c, setPreview, setOpenBlockUnblockModal, setBlockUnblockCourseId, setBlockUnblockChangeStatus }) => {
 
     const { isLoading: isStudentDataLoading, data: studentData, error: hasStudentDataError } = useCourseStudents(c?.id);
     const currentStatus = (!c?.is_admin_block && !c?.is_active) ? true : false;
@@ -23,7 +23,7 @@ const LiveCourseRow = ({ c, setOpenBlockUnblockModal, setBlockUnblockCourseId, s
             {c.students && <span className="text-sm text-gray-400 hidden md:block">{c.students.toLocaleString()} students</span>}
             {c.revenue && <span className="text-sm text-yellow-500 font-semibold hidden md:block">{c.revenue}</span>} */}
             <span className="text-sm font-semibold hidden md:block">
-                <button className='mx-2 text-xs uppercase px-3.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-300/10 text-blue-400 hover:text-blue-300 border border-blue-500/20 hover:border-blue-400/20 cursor-pointer'>View</button>
+                <button onClick={() => setPreview(c)} className='mx-2 text-xs uppercase px-3.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-300/10 text-blue-400 hover:text-blue-300 border border-blue-500/20 hover:border-blue-400/20 cursor-pointer'>View</button>
                 <button className={`text-xs uppercase px-3.5 py-1.5 rounded-xl border ${!c?.is_admin_block ? 'bg-red-500/10 hover:bg-red-300/10 text-red-400 hover:text-red-300 border-red-500/20 hover:border-red-400/20' :
                     'bg-green-500/10 hover:bg-green-300/10 text-green-400 hover:text-green-300 border-green-500/20 hover:border-green-400/20'} cursor-pointer`}
                     onClick={() => { setOpenBlockUnblockModal(true); setBlockUnblockCourseId(c?.id); setBlockUnblockChangeStatus(c?.is_admin_block?'unblock':'block') }}>{!c?.is_admin_block ? 'Block' : 'Active'}</button>
