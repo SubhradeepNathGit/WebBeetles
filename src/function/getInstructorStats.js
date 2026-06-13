@@ -1,9 +1,9 @@
-import supabase from "../util/supabase/supabase";
+import supabaseAdmin from "../util/supabase/supabaseAdmin";
 
 export const getInstructorStats = async (instructorId) => {
     if (!instructorId) throw new Error("Instructor ID required");
 
-    const { data, error } = await supabase.from("purchase_items")
+    const { data, error } = await supabaseAdmin.from("purchase_items")
         .select(`price,purchases!inner(user_id, payment_status),courses!inner(instructor_id)`)
         .eq("courses.instructor_id", instructorId).eq("purchases.payment_status", "paid");
 
