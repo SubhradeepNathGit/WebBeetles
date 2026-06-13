@@ -12,8 +12,7 @@ const LiveCourseRow = ({ c, setOpenBlockUnblockModal, setBlockUnblockCourseId, s
         <div className="px-6 py-4 flex items-center gap-4 hover:bg-white/[0.02] transition-colors group">
             <div className="w-9 h-9 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-500 flex-shrink-0"><Check size={16} /></div>
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white group-hover:text-yellow-400 transition-colors truncate relative">{(c?.title?.length > 28 ? c?.title?.slice(0, 28) + '...' : c?.title) ?? 'N/A'}
-                    <span className={`absolute text-[9px] ml-1 ${currentStatus ? 'text-green-500' : 'text-red-500'}`}>{currentStatus ? 'Active' : 'Block'}</span>
+                <p className="text-sm font-semibold text-white group-hover:text-yellow-400 transition-colors relative">{c?.title ?? 'N/A'}
                 </p>
                 <p className="text-xs text-gray-500">{c?.instructor?.name ?? 'N/A'} · <IndianRupee className='inline w-2.5 h-2.5 mb-0.5 text-blue-300' />{c?.price ?? 0} · <Users className='inline w-2.5 h-2.5 mb-0.5 mr-0.5 text-red-300' />{studentData?.length} · <Star className='inline w-2.5 h-2.5 mb-1 mr-0.5 text-yellow-400' /><CourseRating courseId={c?.id} /></p>
             </div>
