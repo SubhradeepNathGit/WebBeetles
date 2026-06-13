@@ -1,4 +1,4 @@
-# WebBeetles - Premium AI-Integrated Online Course Marketplace
+# WebBeetles - Premium AI-Integrated Multi-Role Online Course Marketplace
 
 [![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)](https://vitejs.dev/)
@@ -14,7 +14,11 @@
 ## 🚀 Key Features & Capabilities
 
 ### 🤖 AI-Integrated Experience (Powered by Google Gemini)
-- **Intelligent Chatbot:** An advanced, context-aware support bot driven by the Google Gemini API. It provides automated, real-time assistance, answers complex course inquiries, guides platform navigation, and resolves issues directly within the student dashboard.
+- **Intelligent Support Chatbot (`Chatbot.jsx`):** An advanced, context-aware support bot driven by the **Google Gemini 2.5 Flash API**. It provides automated, real-time assistance directly within the student dashboard.
+  - **Direct API Integration:** The chatbot connects directly to the `generativelanguage.googleapis.com` REST endpoint, utilizing the blazing-fast Gemini 2.5 Flash model for instantaneous responses.
+  - **Contextual Memory:** It dynamically maintains a rolling conversation history (injecting the last 5 interactions into the AI prompt) to ensure complete contextual awareness and seamless human-like follow-ups.
+  - **Custom System Prompts:** Operates under a highly customized system instruction prompt, forcing the AI to adopt the persona of the "WebBeetles Assistant". It is strictly instructed to maintain a professional, empathetic tone, prioritize platform-specific course queries, and gracefully handle out-of-scope or technical questions.
+  - **Premium UI/UX:** Features a modern, backdrop-blurred sliding drawer built with Tailwind CSS, complete with responsive typing indicators (bouncing dots animation), auto-scrolling message views, and robust error handling.
 - **Smart Automation:** Reduces support overhead by autonomously handling common student queries, simulating a 24/7 human-like teaching assistant.
 
 ### 👤 Student Portal
