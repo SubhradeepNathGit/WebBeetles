@@ -60,7 +60,8 @@ export default function Analytics() {
         // Process Purchase Items (Enrollments & Top Courses)
         const courseRevenueMap = {};
         analyticsData.purchaseItems.forEach(pi => {
-            const date = new Date(pi.created_at);
+            const dateStr = pi.purchases?.created_at || new Date().toISOString();
+            const date = new Date(dateStr);
             if (date.getFullYear() === currentYear) {
                 monthlyEnrollments[date.getMonth()] += 1;
             }
@@ -82,7 +83,7 @@ export default function Analytics() {
                     id: tc.id,
                     title: courseDetails.title || "Unknown Course",
                     instructor: courseDetails.instructor?.name || "Unknown",
-                    category: courseDetails.category || "Uncategorized",
+                    category: courseDetails.category?.name || "Uncategorized",
                     revenue: tc.revenue,
                     students: tc.enrollments
                 };
@@ -117,7 +118,8 @@ export default function Analytics() {
         let activeCourseCount = 0;
         analyticsData.courses.forEach(c => {
             if (c.status === "approved") activeCourseCount++;
-            catCount[c.category] = (catCount[c.category] || 0) + 1;
+            const catName = c.category?.name || "Uncategorized";
+            catCount[catName] = (catCount[catName] || 0) + 1;
         });
         
         // Take top 5 categories
