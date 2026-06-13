@@ -1,7 +1,7 @@
 import React from 'react'
 import TopPerformingCourseRow from './TopPerformingCourseRow'
 
-const TopPerformingCourseTable = () => {
+const TopPerformingCourseTable = ({ topCourses }) => {
     return (
         <table className="w-full">
             <thead className="bg-[#151515]">
@@ -16,15 +16,14 @@ const TopPerformingCourseTable = () => {
                 </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-                {[
-                    { title: "Advanced React Patterns", instructor: "Dr. Sarah Jenkins", cat: "Development", students: 2840, revenue: "₹1,42,000", rating: 4.9, comp: "88%" },
-                    { title: "Python for Data Science", instructor: "Michael Chang", cat: "Data", students: 2190, revenue: "₹1,09,500", rating: 4.8, comp: "91%" },
-                    { title: "UI/UX Bootcamp 2024", instructor: "Jessica Wong", cat: "Design", students: 1875, revenue: "₹93,750", rating: 4.7, comp: "84%" },
-                    { title: "Node.js Mastery", instructor: "Prof. Arthur P.", cat: "Development", students: 1460, revenue: "₹73,000", rating: 4.6, comp: "79%" },
-                    { title: "Digital Marketing Pro", instructor: "Anita Desai", cat: "Marketing", students: 1280, revenue: "₹64,000", rating: 4.5, comp: "76%" },
-                ].map((c, i) => (
-                    <TopPerformingCourseRow key={i} c={c} i={i} />
+                {topCourses?.map((c, i) => (
+                    <TopPerformingCourseRow key={c.id || i} c={{...c, cat: c.category, revenue: `₹${c.revenue.toLocaleString()}`, rating: c.rating || "4.7", comp: c.comp || "82%"}} i={i} />
                 ))}
+                {(!topCourses || topCourses.length === 0) && (
+                    <tr>
+                        <td colSpan={7} className="text-center py-6 text-gray-500 text-sm">No courses have generated revenue yet</td>
+                    </tr>
+                )}
             </tbody>
         </table>
     )
