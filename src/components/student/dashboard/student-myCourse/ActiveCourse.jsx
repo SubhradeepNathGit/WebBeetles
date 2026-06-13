@@ -139,10 +139,10 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
                                 <p className="text-gray-400 mb-8 max-w-md relative z-10">You've successfully finished all the modules in this course. Your verified certificate of completion is now ready.</p>
                                 <button 
                                     onClick={() => setShowCertModal(true)}
-                                    className="px-8 py-3.5 bg-gradient-to-r from-purple-600/25 to-pink-600/25 text-white border border-purple-500/30 hover:from-purple-600/35 hover:to-pink-600/35 hover:border-purple-500/50 hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] rounded-xl font-bold flex items-center gap-2 cursor-pointer transition-all duration-300 hover:-translate-y-0.5 active:scale-95 relative z-10 text-sm tracking-wide"
+                                    className="px-8 py-3.5 bg-black text-white border border-gray-600 hover:bg-[#111] hover:border-gray-400 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] rounded-xl font-bold flex items-center gap-2 cursor-pointer transition-all duration-300 hover:-translate-y-0.5 active:scale-95 relative z-10 text-sm tracking-wide"
                                 >
                                     Claim & View Certificate
-                                    <ChevronRight className="w-5 h-5 text-pink-400" />
+                                    <ChevronRight className="w-5 h-5 text-gray-400" />
                                 </button>
                             </div>
                         )}
