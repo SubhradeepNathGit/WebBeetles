@@ -10,7 +10,7 @@ const InstructorAccountStatus = ({ instructorDetails }) => {
     const updatedAt = instructorDetails?.updated_at || "";
 
     return (
-        <div className="bg-white/10 backdrop-blur-xl rounded-xl lg:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-5 lg:p-6">
+        <div className="bg-[#111] border border-white/8 rounded-xl p-4 sm:p-5 lg:p-6 shadow-xl">
             <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6 flex items-center gap-2">
                 <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-green-500/30 flex items-center justify-center border border-green-400/30"><Shield size={18} className="text-green-300" /></div>
                 Account Status
