@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import supabase from '../../../util/supabase/supabase';
+import supabaseAdmin from '../../../util/supabase/supabaseAdmin';
 import { Award, CheckCircle, AlertTriangle, Calendar, User, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
 
 const CertificateVerification = () => {
@@ -16,7 +16,7 @@ const CertificateVerification = () => {
         setError(null);
 
         // 1. Fetch purchase item and linked course and order
-        const { data: purchaseItem, error: piError } = await supabase
+        const { data: purchaseItem, error: piError } = await supabaseAdmin
           .from('purchase_items')
           .select('id, is_exam_completed, created_at, course_id, purchases(user_id)')
           .eq('id', purchaseItemId)
@@ -37,7 +37,7 @@ const CertificateVerification = () => {
         const studentId = purchaseItem.purchases?.user_id;
         let studentName = "Student";
         if (studentId) {
-          const { data: student, error: stdError } = await supabase
+          const { data: student, error: stdError } = await supabaseAdmin
             .from('students')
             .select('name')
             .eq('id', studentId)
@@ -48,7 +48,7 @@ const CertificateVerification = () => {
         }
 
         // 3. Fetch course details & instructor
-        const { data: course, error: crsError } = await supabase
+        const { data: course, error: crsError } = await supabaseAdmin
           .from('courses')
           .select('title, instructor_id')
           .eq('id', purchaseItem.course_id)
@@ -61,7 +61,7 @@ const CertificateVerification = () => {
           courseTitle = course.title;
           
           if (course.instructor_id) {
-            const { data: instructor, error: instError } = await supabase
+            const { data: instructor, error: instError } = await supabaseAdmin
               .from('instructors')
               .select('name')
               .eq('id', course.instructor_id)
