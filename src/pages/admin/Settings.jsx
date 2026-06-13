@@ -7,8 +7,8 @@ import PlatformIdentity from "../../components/admin/settings/PlatformIdentity";
 import PlatformToggle from "../../components/admin/settings/PlatformToggle";
 import SystemStatus from "../../components/admin/settings/SystemStatus";
 import PlatformSummary from "../../components/admin/settings/PlatformSummary";
-import DangerZone from "../../components/admin/settings/DangerZone";
-import Certification from "../../components/admin/settings/Certification";
+
+
 import useAppSettings from "../../tanstack/query/fetchAppSettings";
 import { fetchCodes } from "../../redux/slice/promocodeSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -117,10 +117,6 @@ export default function Settings() {
                         <SystemStatus />
 
                         <PlatformSummary cartEnabled={cartEnabled} maintenanceMode={maintenanceMode} promoCodes={allCode} tax={allCharges} />
-
-                        <Certification />
-
-                        <DangerZone />
                     </div>
                 </div>
             </div>
