@@ -97,8 +97,12 @@ const PreviewModal = ({ preview, setPreview, setVideoModal, setImageModal, setVi
                 </div>
                 <div className="p-5 border-t border-white/5 flex justify-end gap-3 bg-[#0d0d0d] rounded-b-2xl">
                     <button onClick={() => setPreview(null)} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl text-sm font-medium transition-colors cursor-pointer">Close</button>
-                    <button onClick={() => { setOpenMarkModal(true); setChangeStatus("rejected"); setCourseId(preview?.id); setPreview(null); }} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-xl text-sm font-semibold transition-colors cursor-pointer"><X size={16} /> Reject Course</button>
-                    <button onClick={() => { setOpenMarkModal(true); setChangeStatus("approved"); setCourseId(preview?.id); setPreview(null); }} className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-emerald-500/20 cursor-pointer"><Check size={16} /> Publish Course</button>
+                    {preview?.status === 'pending' && (
+                        <>
+                            <button onClick={() => { setOpenMarkModal(true); setChangeStatus("rejected"); setCourseId(preview?.id); setPreview(null); }} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-xl text-sm font-semibold transition-colors cursor-pointer"><X size={16} /> Reject Course</button>
+                            <button onClick={() => { setOpenMarkModal(true); setChangeStatus("approved"); setCourseId(preview?.id); setPreview(null); }} className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-emerald-500/20 cursor-pointer"><Check size={16} /> Publish Course</button>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
