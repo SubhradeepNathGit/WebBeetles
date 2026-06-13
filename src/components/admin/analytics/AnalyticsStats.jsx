@@ -14,16 +14,16 @@ function KpiCard({ icon: Icon, label, value, trend, up = true }) {
     );
 }
 
-const AnalyticsStats = () => {
+const AnalyticsStats = ({ stats }) => {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <KpiCard icon={DollarSign} label="Total Revenue" value="₹14.2L" trend="+18.4%" />
-            <KpiCard icon={Users} label="Total Students" value="12,847" trend="+15.5%" />
-            <KpiCard icon={BookOpen} label="Active Courses" value="328" trend="+5.3%" />
-            <KpiCard icon={TrendingUp} label="Avg Completion" value="82%" trend="+4.1%" />
-            <KpiCard icon={ShoppingCart} label="Cart Sessions" value="1,284" trend="-3.1%" up={false} />
-            <KpiCard icon={Star} label="Avg Rating" value="4.7★" trend="+0.2" />
+            <KpiCard icon={DollarSign} label="Total Revenue" value={`₹${stats?.totalRevenue?.toLocaleString() || 0}`} trend="+18.4%" />
+            <KpiCard icon={Users} label="Total Students" value={stats?.totalStudents?.toLocaleString() || "0"} trend="+15.5%" />
+            <KpiCard icon={BookOpen} label="Active Courses" value={stats?.activeCourseCount || "0"} trend="+5.3%" />
+            <KpiCard icon={TrendingUp} label="Avg Completion" value={`${stats?.avgCompletion || 0}%`} trend="+4.1%" />
+            <KpiCard icon={ShoppingCart} label="Cart Sessions" value={stats?.cartSessions?.toLocaleString() || "0"} trend="-3.1%" up={false} />
+            <KpiCard icon={Star} label="Avg Rating" value={`${stats?.avgRating || "0.0"}★`} trend="+0.2" />
         </div>
     )
 }
