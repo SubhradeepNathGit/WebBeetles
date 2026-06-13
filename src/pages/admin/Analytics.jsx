@@ -246,7 +246,30 @@ export default function Analytics() {
     };
 
     if (isLoading) {
-        return <div className="h-full w-full flex justify-center items-center py-20"><Loader2 className="w-10 h-10 animate-spin text-purple-500" /></div>;
+        return (
+            <div className="space-y-6 animate-pulse">
+                {/* Header Skeleton */}
+                <div className="h-10 w-48 bg-[#111] rounded-lg mb-2"></div>
+                <div className="h-4 w-96 bg-[#111] rounded-lg mb-6"></div>
+
+                {/* KPI Cards Skeleton */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className="bg-[#111] p-5 rounded-2xl border border-white/5 h-32"></div>
+                    ))}
+                </div>
+
+                {/* Charts Skeleton */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className={`bg-[#111] p-6 rounded-2xl border border-white/5 h-[320px] ${i === 5 ? "col-span-full" : ""}`}></div>
+                    ))}
+                </div>
+
+                {/* Table Skeleton */}
+                <div className="bg-[#111] rounded-2xl border border-white/5 h-96"></div>
+            </div>
+        );
     }
 
     return (
