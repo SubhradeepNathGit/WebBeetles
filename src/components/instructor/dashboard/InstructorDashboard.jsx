@@ -5,7 +5,7 @@ import InstructorDashboardStats from "./dashboardComp/InstructorDashboardStats";
 import InstructorExpertise from "./dashboardComp/InstructorExpertise";
 import InstructorSocialLinks from "./dashboardComp/InstructorSocialLinks";
 import InstructorMyCourse from "./dashboardComp/course/InstructorMyCourse";
-import InstructorRecentActivity from "./dashboardComp/InstructorRecentActivity";
+
 import InstructorQuickLinks from "./dashboardComp/InstructorQuickLinks";
 import InstructorThisMonthsStats from "./dashboardComp/InstructorThisMonthsStats";
 import InstructorAccountStatus from "./dashboardComp/InstructorAccountStatus";
@@ -88,8 +88,7 @@ const InstructorDashboard = ({ instructorDetails }) => {
             {/* COURSES */}
             <InstructorMyCourse courses={getCourseData} />
 
-            {/* ACTIVITY */}
-            <InstructorRecentActivity instructorDetails={instructorDetails} />
+
           </div>
 
           {/* RIGHT COL */}
