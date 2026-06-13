@@ -1,11 +1,11 @@
-import supabase from "../util/supabase/supabase";
+import supabaseAdmin from "../util/supabase/supabaseAdmin";
 
 export const getCourseStudents = async (courseId) => {
 
     if (!courseId) throw new Error("Course ID required");
 
     // 1️⃣ Get purchase items for the course
-    const { data: purchaseItems, error: itemError } = await supabase
+    const { data: purchaseItems, error: itemError } = await supabaseAdmin
         .from("purchase_items")
         .select("purchase_id, price")
         .eq("course_id", courseId);
@@ -17,7 +17,7 @@ export const getCourseStudents = async (courseId) => {
     const purchaseIds = purchaseItems.map((item) => item.purchase_id);
 
     // 2️⃣ Get purchases
-    const { data: purchases, error: purchaseError } = await supabase
+    const { data: purchases, error: purchaseError } = await supabaseAdmin
         .from("purchases")
         .select("id, user_id, payment_status")
         .in("id", purchaseIds)
@@ -30,7 +30,7 @@ export const getCourseStudents = async (courseId) => {
     const userIds = purchases.map((p) => p.user_id);
 
     // 3️⃣ Fetch students
-    const { data: students, error: studentError } = await supabase
+    const { data: students, error: studentError } = await supabaseAdmin
         .from("students")
         .select("id, name, email, profile_image_url, last_login")
         .in("id", userIds);
