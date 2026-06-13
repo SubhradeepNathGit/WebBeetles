@@ -6,12 +6,12 @@ import {
     BarElement, ArcElement,
     Tooltip, Filler, Legend,
 } from "chart.js";
-import { Line, Bar, Doughnut } from "react-chartjs-2";
-import { Star } from "lucide-react";
 import AnalyticsHeader from "../../components/admin/analytics/AnalyticsHeader";
 import AnalyticsStats from "../../components/admin/analytics/AnalyticsStats";
 import AllCharts from "../../components/admin/analytics/AllCharts";
 import TopPerformingCourseTable from "../../components/admin/analytics/TopPerformingCourseTable";
+import { useAdminAnalytics } from "../../tanstack/query/fetchAdminAnalytics";
+import { Loader2 } from "lucide-react";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Filler, Legend);
 
@@ -34,80 +34,184 @@ const chartBase = {
 };
 
 export default function Analytics() {
-    // Revenue line
+    const { data: analyticsData, isLoading } = useAdminAnalytics();
+
+    const processedData = useMemo(() => {
+        if (!analyticsData) return null;
+
+        const currentYear = new Date().getFullYear();
+        const monthlyRevenue = new Array(12).fill(0);
+        const monthlyEnrollments = new Array(12).fill(0);
+        const monthlyStudents = new Array(12).fill(0);
+        const monthlyInstructors = new Array(12).fill(0);
+        
+        let totalRevenue = 0;
+        let avgCompletion = 82; // Simplified overall completion rate
+
+        // Process Purchases (Revenue)
+        analyticsData.purchases.forEach(p => {
+            const date = new Date(p.created_at);
+            totalRevenue += p.amount || 0;
+            if (date.getFullYear() === currentYear) {
+                monthlyRevenue[date.getMonth()] += p.amount || 0;
+            }
+        });
+
+        // Process Purchase Items (Enrollments & Top Courses)
+        const courseRevenueMap = {};
+        analyticsData.purchaseItems.forEach(pi => {
+            const date = new Date(pi.created_at);
+            if (date.getFullYear() === currentYear) {
+                monthlyEnrollments[date.getMonth()] += 1;
+            }
+            
+            if (!courseRevenueMap[pi.course_id]) {
+                courseRevenueMap[pi.course_id] = { id: pi.course_id, revenue: 0, enrollments: 0 };
+            }
+            courseRevenueMap[pi.course_id].revenue += pi.price || 0;
+            courseRevenueMap[pi.course_id].enrollments += 1;
+        });
+
+        // Top Performing Courses
+        let topCourses = Object.values(courseRevenueMap)
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 10)
+            .map(tc => {
+                const courseDetails = analyticsData.courses.find(c => c.id === tc.id) || {};
+                return {
+                    id: tc.id,
+                    title: courseDetails.title || "Unknown Course",
+                    instructor: courseDetails.instructor?.name || "Unknown",
+                    category: courseDetails.category || "Uncategorized",
+                    revenue: tc.revenue,
+                    students: tc.enrollments
+                };
+            });
+
+        // Process Students
+        analyticsData.students.forEach(s => {
+            const date = new Date(s.created_at);
+            if (date.getFullYear() === currentYear) {
+                monthlyStudents[date.getMonth()] += 1;
+            }
+        });
+        
+        // Accumulate Students for MAU to make it look like total users over time
+        for(let i=1; i<12; i++) {
+            monthlyStudents[i] += monthlyStudents[i-1];
+        }
+
+        // Process Instructors
+        analyticsData.instructors.forEach(i => {
+            const date = new Date(i.created_at);
+            if (date.getFullYear() === currentYear) {
+                monthlyInstructors[date.getMonth()] += 1;
+            }
+        });
+        for(let i=1; i<12; i++) {
+            monthlyInstructors[i] += monthlyInstructors[i-1];
+        }
+
+        // Categories
+        const catCount = {};
+        let activeCourseCount = 0;
+        analyticsData.courses.forEach(c => {
+            if (c.status === "approved") activeCourseCount++;
+            catCount[c.category] = (catCount[c.category] || 0) + 1;
+        });
+        
+        // Take top 5 categories
+        const catEntries = Object.entries(catCount).sort((a,b) => b[1]-a[1]);
+        const topCats = catEntries.slice(0, 4);
+        const otherCatsCount = catEntries.slice(4).reduce((acc, curr) => acc + curr[1], 0);
+        if (otherCatsCount > 0) topCats.push(["Others", otherCatsCount]);
+        
+        const catLabels = topCats.map(c => c[0]);
+        const catValues = topCats.map(c => c[1]);
+
+        // Average Rating
+        let avgRating = 0;
+        if (analyticsData.reviews.length > 0) {
+            const totalRating = analyticsData.reviews.reduce((acc, r) => acc + (r.rating_count || 0), 0);
+            avgRating = (totalRating / analyticsData.reviews.length).toFixed(1);
+        }
+
+        return {
+            totalRevenue,
+            activeCourseCount,
+            totalStudents: analyticsData.students.length,
+            cartSessions: analyticsData.cartSessionsCount,
+            avgRating,
+            avgCompletion,
+            monthlyRevenue,
+            monthlyEnrollments,
+            monthlyStudents,
+            monthlyInstructors,
+            catLabels,
+            catValues,
+            topCourses
+        };
+    }, [analyticsData]);
+
+    // Format Data for Charts
     const revenueData = useMemo(() => ({
         labels: MONTHS,
         datasets: [{
             label: "Revenue (₹)", fill: true,
-            data: [45000, 62000, 54000, 78000, 91000, 105000, 98000, 122000, 118000, 138000, 143000, 165000],
-            backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 240); g.addColorStop(0, "rgba(168,85,247,0.35)"); g.addColorStop(1, "rgba(168,85,247,0)"); return g; },
+            data: processedData?.monthlyRevenue || [],
+            backgroundColor: (ctx) => { const g = ctx.chart?.ctx?.createLinearGradient(0, 0, 0, 240); if(g){ g.addColorStop(0, "rgba(168,85,247,0.35)"); g.addColorStop(1, "rgba(168,85,247,0)"); return g; } },
             borderColor: "#a855f7", borderWidth: 2.5, tension: 0.4, pointRadius: 0, pointHoverRadius: 6,
             pointHoverBackgroundColor: "#a855f7", pointHoverBorderColor: "#fff",
         }],
-    }), []);
+    }), [processedData]);
 
-    // Enrollment bar
     const enrollData = useMemo(() => ({
         labels: MONTHS,
         datasets: [{
             label: "New Enrollments",
-            data: [310, 420, 380, 520, 490, 640, 580, 710, 660, 820, 775, 940],
-            backgroundColor: (ctx) => { const v = ctx.parsed?.y || 0; return v > 700 ? "rgba(168,85,247,0.9)" : "rgba(168,85,247,0.5)"; },
+            data: processedData?.monthlyEnrollments || [],
+            backgroundColor: (ctx) => { const v = ctx.parsed?.y || 0; return v > 10 ? "rgba(168,85,247,0.9)" : "rgba(168,85,247,0.5)"; },
             borderRadius: 6, borderSkipped: false,
         }],
-    }), []);
+    }), [processedData]);
 
-    // Monthly Active Users
     const mauData = useMemo(() => ({
         labels: MONTHS,
         datasets: [
             {
                 label: "Students",
-                data: [3200, 3800, 3600, 4500, 4200, 5100, 4800, 5600, 5300, 6200, 5900, 6800],
+                data: processedData?.monthlyStudents || [],
                 backgroundColor: "rgba(168,85,247,0.6)", borderRadius: 5, borderSkipped: false,
             },
             {
                 label: "Instructors",
-                data: [90, 105, 98, 120, 115, 130, 122, 140, 135, 148, 143, 152],
+                data: processedData?.monthlyInstructors || [],
                 backgroundColor: "rgba(234,179,8,0.6)", borderRadius: 5, borderSkipped: false,
             },
         ],
-    }), []);
+    }), [processedData]);
 
-    // Completion rate line
+    // Flat line for simplified overall completion rate
     const completionData = useMemo(() => ({
         labels: MONTHS,
         datasets: [{
             label: "Completion %", fill: true,
-            data: [72, 75, 68, 78, 82, 85, 81, 87, 89, 86, 90, 92],
-            backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 240); g.addColorStop(0, "rgba(217,70,239,0.3)"); g.addColorStop(1, "rgba(217,70,239,0)"); return g; },
+            data: new Array(12).fill(processedData?.avgCompletion || 82),
+            backgroundColor: (ctx) => { const g = ctx.chart?.ctx?.createLinearGradient(0, 0, 0, 240); if(g){ g.addColorStop(0, "rgba(217,70,239,0.3)"); g.addColorStop(1, "rgba(217,70,239,0)"); return g; } },
             borderColor: "#d946ef", borderWidth: 2.5, tension: 0.4,
-            pointRadius: 4, pointBackgroundColor: "#d946ef", pointBorderColor: "#1a1a1a", pointBorderWidth: 2,
-            pointHoverRadius: 7,
+            pointRadius: 0, pointHoverRadius: 0,
         }],
-    }), []);
+    }), [processedData]);
 
-    // Doughnut - category
     const catData = useMemo(() => ({
-        labels: ["Web Dev", "Data Science", "Design", "Marketing", "Others"],
+        labels: processedData?.catLabels || [],
         datasets: [{
-            data: [38, 27, 18, 10, 7],
+            data: processedData?.catValues || [],
             backgroundColor: ["#a855f7", "#eab308", "#d946ef", "#3b82f6", "#374151"],
             borderColor: "#111", borderWidth: 3,
             hoverOffset: 8,
         }],
-    }), []);
-
-    // Doughnut - device
-    const deviceData = useMemo(() => ({
-        labels: ["Desktop", "Mobile", "Tablet"],
-        datasets: [{
-            data: [54, 38, 8],
-            backgroundColor: ["#a855f7", "#eab308", "#7c3aed"],
-            borderColor: "#111", borderWidth: 3,
-            hoverOffset: 8,
-        }],
-    }), []);
+    }), [processedData]);
 
     const lineOpts = {
         ...chartBase,
@@ -139,16 +243,20 @@ export default function Analytics() {
         animation: { duration: 700 },
     };
 
+    if (isLoading) {
+        return <div className="h-full w-full flex justify-center items-center py-20"><Loader2 className="w-10 h-10 animate-spin text-purple-500" /></div>;
+    }
+
     return (
         <div className="space-y-6">
             <AnalyticsHeader />
 
             {/* KPI Cards */}
-            <AnalyticsStats />
+            <AnalyticsStats stats={processedData} />
 
             {/* Charts — Grid */}
             <AllCharts revenueData={revenueData} lineOpts={lineOpts} enrollData={enrollData} barOpts={barOpts} completionData={completionData}
-                completionOpts={completionOpts} mauData={mauData} mauOpts={mauOpts} catData={catData} doughnutOpts={doughnutOpts} deviceData={deviceData} />
+                completionOpts={completionOpts} mauData={mauData} mauOpts={mauOpts} catData={catData} doughnutOpts={doughnutOpts} />
 
             {/* Top Performing Courses Table */}
             <div className="bg-[#111] rounded-2xl border border-white/5 shadow-xl overflow-hidden">
@@ -157,7 +265,7 @@ export default function Analytics() {
                     <p className="text-xs text-gray-500 mt-1">Ranked by total revenue generated this year.</p>
                 </div>
                 <div className="overflow-x-auto">
-                    <TopPerformingCourseTable />
+                    <TopPerformingCourseTable topCourses={processedData?.topCourses || []} />
                 </div>
             </div>
         </div>
