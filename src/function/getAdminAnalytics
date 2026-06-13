@@ -1,0 +1,66 @@
+import supabaseAdmin from "../util/supabase/supabaseAdmin";
+
+export const getAdminAnalytics = async () => {
+    try {
+        // 1. Fetch Purchases for Revenue
+        const { data: purchases, error: pError } = await supabaseAdmin
+            .from("purchases")
+            .select("amount, created_at, payment_status")
+            .eq("payment_status", "paid");
+        if (pError) throw pError;
+
+        // 2. Fetch Purchase Items for Enrollments and Top Courses
+        const { data: purchaseItems, error: piError } = await supabaseAdmin
+            .from("purchase_items")
+            .select("course_id, price, created_at");
+        if (piError) throw piError;
+
+        // 3. Fetch Students for Total and MAU
+        const { data: students, error: sError } = await supabaseAdmin
+            .from("students")
+            .select("id, created_at, role")
+            .eq("role", "student");
+        if (sError) throw sError;
+
+        // 4. Fetch Instructors for MAU
+        const { data: instructors, error: iError } = await supabaseAdmin
+            .from("instructors")
+            .select("id, created_at, application_status")
+            .eq("application_status", "approved");
+        if (iError) throw iError;
+
+        // 5. Fetch Courses for Categories and Stats
+        const { data: courses, error: cError } = await supabaseAdmin
+            .from("courses")
+            .select(`
+                id, title, category, status,
+                instructor:instructor_id(name)
+            `);
+        if (cError) throw cError;
+
+        // 6. Fetch Reviews for Average Rating
+        const { data: reviews, error: rError } = await supabaseAdmin
+            .from("course_reviews")
+            .select("rating_count");
+        if (rError) throw rError;
+
+        // 7. Fetch active carts (optional, just rough count)
+        const { count: cartCount, error: cartError } = await supabaseAdmin
+            .from("carts")
+            .select("*", { count: 'exact', head: true });
+        if (cartError) throw cartError;
+
+        return {
+            purchases: purchases || [],
+            purchaseItems: purchaseItems || [],
+            students: students || [],
+            instructors: instructors || [],
+            courses: courses || [],
+            reviews: reviews || [],
+            cartSessionsCount: cartCount || 0
+        };
+    } catch (error) {
+        console.error("Error fetching admin analytics:", error);
+        throw error;
+    }
+};
