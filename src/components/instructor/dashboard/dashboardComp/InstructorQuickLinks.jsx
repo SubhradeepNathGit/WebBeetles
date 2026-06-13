@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 
 const InstructorQuickLinks = ({quickActions}) => {
     return (
-        <div className="bg-white/10 backdrop-blur-xl rounded-xl lg:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-5 lg:p-6">
+        <div className="bg-[#111] border border-white/8 rounded-xl p-4 sm:p-5 lg:p-6 shadow-xl">
             <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-4 lg:mb-6">Quick Actions</h2>
             <div className="space-y-2 sm:space-y-3">
                 {quickActions.map((a, i) => (
