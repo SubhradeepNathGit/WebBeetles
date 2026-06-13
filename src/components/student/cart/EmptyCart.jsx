@@ -8,7 +8,7 @@ const EmptyCart = ({ navigateBack }) => {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#111] rounded-2xl shadow-2xl p-8 sm:p-16 text-center border border-white/10"
+            className="w-full py-16 sm:py-24 flex flex-col items-center text-center"
         >
             <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
                 <ShoppingCart className="w-16 h-16 text-white/30" />
