@@ -118,7 +118,7 @@ export default function ApproveCourses() {
 
             {/* Approved Courses List */}
             {isCourseLoading ? <TableSkeleton columns={8} rows={5} /> :
-            <LiveCourseTable approved={approved} setOpenBlockUnblockModal={setOpenBlockUnblockModal} setBlockUnblockCourseId={setBlockUnblockCourseId}
+            <LiveCourseTable approved={approved} setPreview={setPreview} setOpenBlockUnblockModal={setOpenBlockUnblockModal} setBlockUnblockCourseId={setBlockUnblockCourseId}
                 setBlockUnblockChangeStatus={setBlockUnblockChangeStatus} />}
 
             {/* Rejected Courses List */}
