@@ -16,7 +16,7 @@ const InstructorMyCourse = ({ courses }) => {
                 </button>
             </div>
             <div className="space-y-3 sm:space-y-4">
-                {courses?.slice(0, 3)?.map(course => (
+                {courses?.slice(0, 5)?.map(course => (
                     <InstructorDashboardCourseCard key={course?.id} course={course} />
                 ))}
             </div>
