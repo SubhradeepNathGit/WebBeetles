@@ -1,4 +1,4 @@
-import supabase from "../util/supabase/supabase";
+import supabaseAdmin from "../util/supabase/supabaseAdmin";
 
 const getMonthRange = (date) => {
     const start = new Date(date);
@@ -22,7 +22,7 @@ export const getInstructorMonthlyStats = async ({ instructorId }) => {
     );
 
     const fetchData = async ({ start, end }) => {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
             .from("purchase_items").select(`price,courses!inner (instructor_id),purchases!inner (created_at)`)
             .eq("courses.instructor_id", instructorId)
             .gte("purchases.created_at", start.toISOString())
