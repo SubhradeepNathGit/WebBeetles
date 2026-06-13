@@ -6,7 +6,6 @@ import InstructorExpertise from "./dashboardComp/InstructorExpertise";
 import InstructorSocialLinks from "./dashboardComp/InstructorSocialLinks";
 import InstructorMyCourse from "./dashboardComp/course/InstructorMyCourse";
 import InstructorRecentActivity from "./dashboardComp/InstructorRecentActivity";
-import InstructorUpcommingTasks from "./dashboardComp/InstructorUpcommingTasks";
 import InstructorQuickLinks from "./dashboardComp/InstructorQuickLinks";
 import InstructorThisMonthsStats from "./dashboardComp/InstructorThisMonthsStats";
 import InstructorAccountStatus from "./dashboardComp/InstructorAccountStatus";
@@ -17,8 +16,6 @@ import { getInstructorStudentCount } from "../../../function/getStudentCountBase
 import DashboardSkeleton from "../../../layout/common/DashboardSkeleton";
 
 const InstructorDashboard = ({ instructorDetails }) => {
-
-  // console.log('Instructor data', instructorDetails);
 
   const dispatch = useDispatch(),
     [studentCount, setStudentCount] = useState(0),
@@ -41,21 +38,6 @@ const InstructorDashboard = ({ instructorDetails }) => {
 
     loadStudentCount();
   }, [instructorDetails?.id]);
-
-  // console.log('Get course details', getCourseData);
-
-
-
-
-  const [data] = useState({
-    stats: { totalCourses: 0, totalStudents: 0 },  tasks:
-      [
-        { id: 1, task: "Review Assignment Submissions", course: "React Masterclass", date: "Oct 15, 2025", priority: "high", count: 23 },
-        { id: 2, task: "Update Course Content", course: "Full Stack Dev", date: "Oct 18, 2025", priority: "medium", count: 5 },
-        { id: 3, task: "Answer Student Questions", course: "UI/UX Design", date: "Oct 20, 2025", priority: "high", count: 12 }
-      ]
-    , monthly: { enrollments: 0, revenue: 0 }
-  });
 
   const stats = [
     { icon: BookOpen, value: getCourseData?.length ?? 0, label: "Total Courses", color: "rose" },
@@ -112,9 +94,6 @@ const InstructorDashboard = ({ instructorDetails }) => {
 
           {/* RIGHT COL */}
           <div className="space-y-4 sm:space-y-5 lg:space-y-6">
-
-            {/* TASKS */}
-            <InstructorUpcommingTasks tasks={data.tasks} />
 
             {/* MONTHLY */}
             <InstructorThisMonthsStats instructorDetails={instructorDetails} />
