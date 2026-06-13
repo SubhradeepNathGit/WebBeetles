@@ -1,4 +1,4 @@
-# WebBeetles - Premium AI-Integrated Multi-Role Online Course Marketplace
+# WebBeetles - AI-Integrated Multi-Role Online Course Marketplace
 
 [![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)](https://vitejs.dev/)
@@ -106,8 +106,7 @@ graph TD
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/SubhradeepNathGit/Product-CRUD.git
-   cd WebBeetles
+  git clone https://github.com/SubhradeepNathGit/WebBeetles.git
    ```
 
 2. **Install dependencies:**
