@@ -75,25 +75,58 @@ const PreviewModal = ({ preview, setPreview, setVideoModal, setImageModal, setVi
                         </button>
                     </div>
 
-                    {/* Lecture preview card */}
-                    <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                            <ListVideo size={28} className="text-emerald-500/60 flex-shrink-0" />
-                            <div>
-                                <p className="text-sm font-semibold text-white">{`${(demoVideo?.video_title || (preview?.title?.length > 35 ? preview?.title?.slice(0, 33) + '...' : preview?.title))} — Demo Video`}</p>
-                                <p className="text-xs text-gray-500 mt-0.5">Demo video on the specific course.</p>
+                    {/* Lecture preview card (Demo Video only for Pending) */}
+                    {preview?.status === 'pending' && (
+                        <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <ListVideo size={28} className="text-emerald-500/60 flex-shrink-0" />
+                                <div>
+                                    <p className="text-sm font-semibold text-white">{`${(demoVideo?.video_title || (preview?.title?.length > 35 ? preview?.title?.slice(0, 33) + '...' : preview?.title))} — Demo Video`}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">Demo video on the specific course.</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setVideoTitle(demoVideo?.video_title);
+                                    setVideoModal(demoVideo?.video_url);
+                                }}
+                                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-xs font-semibold shadow-lg shadow-emerald-500/20 cursor-pointer"
+                            >
+                                <Play size={13} /> Play Demo Video
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Full Course Curriculum (For Live Courses) */}
+                    {preview?.status === 'approved' && lectureData && lectureData.length > 0 && (
+                        <div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Course Curriculum</p>
+                            <div className="bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden max-h-60 overflow-y-auto divide-y divide-white/5">
+                                {lectureData.map((video, idx) => (
+                                    <div key={idx} className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 flex-shrink-0">
+                                                <span className="text-xs font-bold">{idx + 1}</span>
+                                            </div>
+                                            <div className="truncate pr-4">
+                                                <p className="text-sm font-semibold text-white truncate">{video?.video_title ?? 'Untitled Module'}</p>
+                                                <p className="text-xs text-gray-500">{formatToHHMMSS(video?.duration)}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setVideoTitle(video?.video_title);
+                                                setVideoModal(video?.video_url);
+                                            }}
+                                            className="flex-shrink-0 flex items-center justify-center p-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg transition-colors cursor-pointer"
+                                        >
+                                            <Play size={14} />
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                        <button
-                            onClick={() => {
-                                setVideoTitle(demoVideo?.video_title);
-                                setVideoModal(demoVideo?.video_url);
-                            }}
-                            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-xs font-semibold shadow-lg shadow-emerald-500/20 cursor-pointer"
-                        >
-                            <Play size={13} /> Play Demo Video
-                        </button>
-                    </div>
+                    )}
                 </div>
                 <div className="p-5 border-t border-white/5 flex justify-end gap-3 bg-[#0d0d0d] rounded-b-2xl">
                     <button onClick={() => setPreview(null)} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl text-sm font-medium transition-colors cursor-pointer">Close</button>
