@@ -13,7 +13,7 @@ function ChartCard({ title, children, subtitle, full = false }) {
     );
 }
 
-const AllCharts = ({ revenueData, lineOpts, enrollData, barOpts, completionData, completionOpts, mauData, mauOpts, catData, doughnutOpts }) => {
+const AllCharts = ({ revenueData, lineOpts, enrollData, barOpts, completionData, completionOpts, mauData, mauOpts, catData, courseRevenueData, doughnutOpts }) => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ChartCard title="Revenue Growth" subtitle="Monthly platform revenue from all course purchases">
@@ -28,7 +28,10 @@ const AllCharts = ({ revenueData, lineOpts, enrollData, barOpts, completionData,
             <ChartCard title="Monthly Active Users" subtitle="Students and instructors actively using the platform">
                 <Bar data={mauData} options={mauOpts} />
             </ChartCard>
-            <ChartCard title="Courses by Category" full>
+            <ChartCard title="Revenue by Course" subtitle="Top courses generating revenue">
+                <Doughnut data={courseRevenueData} options={doughnutOpts} />
+            </ChartCard>
+            <ChartCard title="Courses by Category" subtitle="Distribution of courses across categories">
                 <Doughnut data={catData} options={doughnutOpts} />
             </ChartCard>
         </div>

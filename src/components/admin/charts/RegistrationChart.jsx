@@ -12,11 +12,18 @@ function RegistrationChart() {
 
     const buildMonthlyCount = (rows = []) => {
         const counts = Array(12).fill(0);
+        const currentMonth = new Date().getMonth();
 
         rows.forEach((r) => {
             const m = new Date(r.created_at).getMonth();
             counts[m] += 1;
         });
+
+        for (let i = 0; i < 12; i++) {
+            if (i > currentMonth) {
+                counts[i] = null;
+            }
+        }
 
         return counts;
     };
@@ -43,7 +50,7 @@ function RegistrationChart() {
             {
                 label: "Instructor Registrations",
                 data: instructorData,
-                backgroundColor: "rgba(34,197,94,0.5)",
+                backgroundColor: "#ef4444",
                 borderRadius: 6,
                 borderSkipped: false,
             },

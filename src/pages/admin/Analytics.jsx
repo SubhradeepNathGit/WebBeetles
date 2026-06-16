@@ -90,6 +90,22 @@ export default function Analytics() {
             });
 
         // Process Students
+        let studentsBeforeCurrentYear = 0;
+        analyticsData.students.forEach(s => {
+            const date = new Date(s.created_at);
+            if (date.getFullYear() < currentYear) {
+                studentsBeforeCurrentYear++;
+            }
+        });
+
+        let instructorsBeforeCurrentYear = 0;
+        analyticsData.instructors.forEach(i => {
+            const date = new Date(i.created_at);
+            if (date.getFullYear() < currentYear) {
+                instructorsBeforeCurrentYear++;
+            }
+        });
+
         analyticsData.students.forEach(s => {
             const date = new Date(s.created_at);
             if (date.getFullYear() === currentYear) {
@@ -98,6 +114,7 @@ export default function Analytics() {
         });
         
         // Accumulate Students for MAU to make it look like total users over time
+        monthlyStudents[0] += studentsBeforeCurrentYear;
         for(let i=1; i<12; i++) {
             monthlyStudents[i] += monthlyStudents[i-1];
         }
@@ -109,8 +126,20 @@ export default function Analytics() {
                 monthlyInstructors[date.getMonth()] += 1;
             }
         });
+        monthlyInstructors[0] += instructorsBeforeCurrentYear;
         for(let i=1; i<12; i++) {
             monthlyInstructors[i] += monthlyInstructors[i-1];
+        }
+
+        // Nullify future months
+        const currentMonth = new Date().getMonth();
+        for (let i = 0; i < 12; i++) {
+            if (i > currentMonth) {
+                monthlyRevenue[i] = null;
+                monthlyEnrollments[i] = null;
+                monthlyStudents[i] = null;
+                monthlyInstructors[i] = null;
+            }
         }
 
         // Categories
@@ -138,6 +167,16 @@ export default function Analytics() {
             avgRating = (totalRating / analyticsData.reviews.length).toFixed(1);
         }
 
+        // Revenue by Course (top 5 courses + Others)
+        const topRevCourses = topCourses.slice(0, 5);
+        const otherRevenue = topCourses.slice(5).reduce((acc, c) => acc + c.revenue, 0);
+        const courseRevLabels = topRevCourses.map(c => c.title.length > 20 ? c.title.slice(0, 20) + '…' : c.title);
+        const courseRevValues = topRevCourses.map(c => c.revenue);
+        if (otherRevenue > 0) {
+            courseRevLabels.push("Others");
+            courseRevValues.push(otherRevenue);
+        }
+
         return {
             totalRevenue,
             activeCourseCount,
@@ -151,6 +190,8 @@ export default function Analytics() {
             monthlyInstructors,
             catLabels,
             catValues,
+            courseRevLabels,
+            courseRevValues,
             topCourses
         };
     }, [analyticsData]);
@@ -178,18 +219,10 @@ export default function Analytics() {
     }), [processedData]);
 
     const mauData = useMemo(() => ({
-        labels: MONTHS,
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         datasets: [
-            {
-                label: "Students",
-                data: processedData?.monthlyStudents || [],
-                backgroundColor: "rgba(168,85,247,0.6)", borderRadius: 5, borderSkipped: false,
-            },
-            {
-                label: "Instructors",
-                data: processedData?.monthlyInstructors || [],
-                backgroundColor: "rgba(234,179,8,0.6)", borderRadius: 5, borderSkipped: false,
-            },
+            { label: "Student Registrations", data: processedData?.monthlyStudents || Array(12).fill(0), backgroundColor: "#8b5cf6", borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.8 },
+            { label: "Instructor Registrations", data: processedData?.monthlyInstructors || Array(12).fill(0), backgroundColor: "#ef4444", borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.8 },
         ],
     }), [processedData]);
 
@@ -198,7 +231,7 @@ export default function Analytics() {
         labels: MONTHS,
         datasets: [{
             label: "Completion %", fill: true,
-            data: new Array(12).fill(processedData?.avgCompletion || 82),
+            data: new Array(12).fill(processedData?.avgCompletion || 82).map((v, i) => i <= new Date().getMonth() ? v : null),
             backgroundColor: (ctx) => { const g = ctx.chart?.ctx?.createLinearGradient(0, 0, 0, 240); if(g){ g.addColorStop(0, "rgba(217,70,239,0.3)"); g.addColorStop(1, "rgba(217,70,239,0)"); return g; } },
             borderColor: "#d946ef", borderWidth: 2.5, tension: 0.4,
             pointRadius: 0, pointHoverRadius: 0,
@@ -210,6 +243,16 @@ export default function Analytics() {
         datasets: [{
             data: processedData?.catValues || [],
             backgroundColor: ["#a855f7", "#eab308", "#d946ef", "#3b82f6", "#374151"],
+            borderColor: "#111", borderWidth: 3,
+            hoverOffset: 8,
+        }],
+    }), [processedData]);
+
+    const courseRevenueData = useMemo(() => ({
+        labels: processedData?.courseRevLabels || [],
+        datasets: [{
+            data: processedData?.courseRevValues || [],
+            backgroundColor: ["#10b981", "#f59e0b", "#6366f1", "#ec4899", "#06b6d4", "#374151"],
             borderColor: "#111", borderWidth: 3,
             hoverOffset: 8,
         }],
@@ -281,7 +324,7 @@ export default function Analytics() {
 
             {/* Charts — Grid */}
             <AllCharts revenueData={revenueData} lineOpts={lineOpts} enrollData={enrollData} barOpts={barOpts} completionData={completionData}
-                completionOpts={completionOpts} mauData={mauData} mauOpts={mauOpts} catData={catData} doughnutOpts={doughnutOpts} />
+                completionOpts={completionOpts} mauData={mauData} mauOpts={mauOpts} catData={catData} courseRevenueData={courseRevenueData} doughnutOpts={doughnutOpts} />
 
             {/* Top Performing Courses Table */}
             <div className="bg-[#111] rounded-2xl border border-white/5 shadow-xl overflow-hidden">

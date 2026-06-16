@@ -1,9 +1,9 @@
-import supabase from "../util/supabase/supabase";
+import supabaseAdmin from "../util/supabase/supabaseAdmin";
 
 export const getAllCoursesRevenue = async (courseIds) => {
     if (!courseIds.length) return {};
 
-    const { data, error } = await supabase.from("purchase_items").select("course_id, price").in("course_id", courseIds);
+    const { data, error } = await supabaseAdmin.from("purchase_items").select("course_id, price").in("course_id", courseIds);
 
     if (error) throw error;
 

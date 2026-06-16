@@ -1,10 +1,10 @@
-import supabase from "../util/supabase/supabase";
+import supabaseAdmin from "../util/supabase/supabaseAdmin";
 
 export const fetchCoursePurchases = async (courseId) => {
     if (!courseId) return [];
     // console.log('Fetch purchase item Id', courseId);
 
-    const res = await supabase.from("purchase_items").select('*').eq("course_id", courseId).order("created_at", { ascending: false });
+    const res = await supabaseAdmin.from("purchase_items").select('*').eq("course_id", courseId).order("created_at", { ascending: false });
     // console.log('Response for fetching purchase item', res);
 
     if (res?.error) throw new Error(res?.error.message);

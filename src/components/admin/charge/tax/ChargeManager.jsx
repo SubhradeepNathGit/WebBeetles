@@ -90,7 +90,9 @@ const ChargeManager = ({ toggleCharge, setOpenMarkModal, setChargeId, setType })
         <div className="bg-[#0f0f0f] border border-white/10 rounded-xl p-6 h-[480px] w-full overflow-y-auto md:mr-1.5">
 
             {/* Header */}
-            <SectionCard icon={BadgePercent} title="Course Charges"></SectionCard>
+            <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-lg font-bold text-white">Course Charges</h2>
+            </div>
 
             {/* Charges List */}
             <div className="space-y-3 flex flex-col items-center">

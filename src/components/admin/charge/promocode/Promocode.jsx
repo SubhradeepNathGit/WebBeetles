@@ -96,7 +96,9 @@ const Promocode = ({ togglePromo, setOpenMarkModal, setChargeId, setType }) => {
         <div className="bg-[#0f0f0f] border border-white/10 rounded-xl p-6 h-[480px] w-full overflow-y-auto md:ml-1.5 mt-2 md:mt-0">
 
             {/* Header */}
-            <SectionCard icon={Ticket} title="Promo Codes & Discounts"></SectionCard>
+            <div className="flex items-center gap-3 mb-4">
+                <h2 className="text-lg font-bold text-white">Promo Codes & Discounts</h2>
+            </div>
 
             {/* List */}
             <div className="space-y-3">
