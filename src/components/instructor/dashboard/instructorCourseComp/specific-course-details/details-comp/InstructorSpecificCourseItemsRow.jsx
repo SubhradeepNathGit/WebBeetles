@@ -26,63 +26,100 @@ const InstructorSpecificCourseItemsRow = ({ lectureData, selectedCourse, setUpda
     const navigate = useNavigate();
 
     return (
-        <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-            <div className="flex items-center justify-between p-4 bg-gray-800">
+        <div className="group/section relative overflow-hidden rounded-2xl bg-zinc-900/40 border border-zinc-800/80 shadow-xl backdrop-blur-md transition-all duration-300 hover:border-zinc-700/60">
+            {/* Section Header */}
+            <div className="flex items-center justify-between p-4 sm:p-5">
                 <button onClick={canExpand ? () =>
                     setExpandedSections(prev => ({
                         ...prev,
                         [section.id]: !prev[section.id],
                     })) : undefined}
                     className={`flex items-center gap-4 flex-1 ${canExpand ? "cursor-pointer" : "cursor-not-allowed opacity-70"}`} >
+                    
                     {canExpand ? (
-                        expandedSections[section.id] ? (
-                            <ChevronDown className="w-5 h-5 text-rose-400" />) : (
-                            <ChevronRight className="w-5 h-5 text-rose-400" />)) : (
-                        <LockKeyhole className="w-5 h-5 text-white" />
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all duration-300 ${
+                            expandedSections[section.id] 
+                                ? 'bg-red-500/15 border-red-500/30' 
+                                : 'bg-zinc-900/60 border-zinc-800 group-hover/section:border-red-500/20 group-hover/section:bg-red-500/10'
+                        }`}>
+                            {expandedSections[section.id] ? (
+                                <ChevronDown className="w-4 h-4 text-red-400" />
+                            ) : (
+                                <ChevronRight className="w-4 h-4 text-zinc-400 group-hover/section:text-red-400 transition-colors" />
+                            )}
+                        </div>
+                    ) : (
+                        <div className="w-9 h-9 rounded-lg bg-zinc-900/60 border border-zinc-800 flex items-center justify-center">
+                            <LockKeyhole className="w-4 h-4 text-zinc-500" />
+                        </div>
                     )}
 
                     <div className="text-left">
-                        <h3 className="font-semibold text-lg">{section?.title?.split(" ")?.map(s => s?.charAt(0)?.toUpperCase() + s?.slice(1)?.toLowerCase())?.join(" ") ?? 'N/A'}</h3>
-                        {section?.type !== "exam" ?
-                            <p className="text-sm text-gray-400">
+                        <h3 className="font-semibold text-base sm:text-lg text-white">
+                            {section?.title?.split(" ")?.map(s => s?.charAt(0)?.toUpperCase() + s?.slice(1)?.toLowerCase())?.join(" ") ?? 'N/A'}
+                        </h3>
+                        {section?.type !== "exam" ? (
+                            <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">
                                 {lecture?.length} lesson{lecture?.length > 1 ? "s" : ""}
                                 {section?.type !== "document" ? ` • ${totalLectureTiming}` : ""}
-                            </p> : <p className="text-sm text-gray-400">
+                            </p>
+                        ) : (
+                            <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">
                                 {selectedCourse?.is_exam_scheduled ? 'Already scheduled' : 'Not scheduled yet'}
-                            </p>}
+                            </p>
+                        )}
                     </div>
                 </button>
-
-                {/* <div className="flex gap-2">
-                    <button className="p-2 hover:bg-gray-700 rounded-lg transition-colors">
-                        <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-red-600/20 text-red-400 rounded-lg transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                    </button>
-                </div> */}
             </div>
-            {expandedSections[section.id] && (
-                <div>
-                    {lecture?.map(lesson => <InstructorLessonItem key={lesson?.id} section={section} lesson={lesson} setUpdateData={setUpdateData} setShowDeleteLectureModal={setShowDeleteLectureModal} setDeletedData={setDeletedData} setShowVideoModal={setShowVideoModal} setShowUploadModal={setShowUploadModal} selectedCourse={selectedCourse} />)}
 
+            {/* Expanded Content */}
+            {expandedSections[section.id] && (
+                <div className="border-t border-zinc-800/60">
+                    {lecture?.map(lesson => (
+                        <InstructorLessonItem 
+                            key={lesson?.id} 
+                            section={section} 
+                            lesson={lesson} 
+                            setUpdateData={setUpdateData} 
+                            setShowDeleteLectureModal={setShowDeleteLectureModal} 
+                            setDeletedData={setDeletedData} 
+                            setShowVideoModal={setShowVideoModal} 
+                            setShowUploadModal={setShowUploadModal} 
+                            selectedCourse={selectedCourse} 
+                        />
+                    ))}
+
+                    {/* Upload Button */}
                     {section?.type != 'demo' && section?.type != 'exam' && (
-                        <div className="p-4 border-t border-gray-800">
-                            <button onClick={!selectedCourse?.is_completed ? () => { setUploadForm({ course_id: selectedCourse?.id, category_id: selectedCourse?.category?.id, sectionType: section?.type }); setShowUploadModal(true); setUpdateData(null); } : undefined} className={`w-full py-3 bg-rose-600/20 border border-rose-600/50 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-rose-400 ${selectedCourse?.is_completed ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-rose-600/30'}`}>
-                                <Upload className="w-5 h-5" />
+                        <div className="p-4 border-t border-zinc-800/40">
+                            <button 
+                                onClick={!selectedCourse?.is_completed ? () => { setUploadForm({ course_id: selectedCourse?.id, category_id: selectedCourse?.category?.id, sectionType: section?.type }); setShowUploadModal(true); setUpdateData(null); } : undefined} 
+                                className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 border
+                                    ${selectedCourse?.is_completed 
+                                        ? 'bg-zinc-900/30 border-zinc-800/50 text-zinc-600 cursor-not-allowed' 
+                                        : 'bg-red-500/8 border-red-500/20 text-red-400 cursor-pointer hover:bg-red-500/15 hover:border-red-500/35 hover:shadow-lg hover:shadow-red-950/10 active:scale-[0.98]'}`}
+                            >
+                                <Upload className="w-4 h-4" />
                                 {section?.type == 'video' ? 'Upload / Add Video' : section?.type == 'document' ? 'Upload / Add Document' : 'Upload / Add Content'}
                             </button>
                         </div>
                     )}
+
+                    {/* Set Question Paper Button */}
                     {section?.type == 'exam' && (
-                        <div className="p-4 border-t border-gray-800">
-                            <button onClick={!selectedCourse?.is_exam_scheduled ? () => navigate('/instructor/dashboard/question-set') : hotToast(`Question paper already set!`, "warning")} className={`w-full py-3 bg-green-600/20 border border-green-600/50 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-green-400 ${selectedCourse?.is_exam_scheduled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-green-600/30'}`}>
-                                <FileBadge className="w-5 h-5" />
+                        <div className="p-4 border-t border-zinc-800/40">
+                            <button 
+                                onClick={!selectedCourse?.is_exam_scheduled ? () => navigate('/instructor/dashboard/question-set') : () => hotToast(`Question paper already set!`, "warning")} 
+                                className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 border
+                                    ${selectedCourse?.is_exam_scheduled 
+                                        ? 'bg-zinc-900/30 border-zinc-800/50 text-zinc-600 cursor-not-allowed' 
+                                        : 'bg-emerald-500/8 border-emerald-500/20 text-emerald-400 cursor-pointer hover:bg-emerald-500/15 hover:border-emerald-500/35 hover:shadow-lg hover:shadow-emerald-950/10 active:scale-[0.98]'}`}
+                            >
+                                <FileBadge className="w-4 h-4" />
                                 Set Question Paper
                             </button>
                         </div>
                     )}
-
                 </div>
             )}
         </div>
