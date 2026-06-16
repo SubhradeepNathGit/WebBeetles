@@ -12,7 +12,7 @@ const StudentNavbar = () => {
     [activeDropdown, setActiveDropdown] = useState(null),
     [scrolled, setScrolled] = useState(false),
     [chatbotOpen, setChatbotOpen] = useState(false),
-    { isUserLoading, userAuthData: getStudentData, userError } = useSelector(state => state.checkAuth),
+    { isUserLoading, userAuthData: getStudentData, userError, isAuthChecked } = useSelector(state => state.checkAuth),
     { cartItems } = useSelector(state => state.cart),
     dispatch = useDispatch(),
     navigate = useNavigate();
@@ -145,7 +145,7 @@ const StudentNavbar = () => {
               </button>
 
               {/* Cart Button (Only visible after login) */}
-              {getStudentData && (
+              {isAuthChecked && getStudentData && (
                 <Link 
                   to="/cart"
                   className="w-10 h-10 lg:w-11 lg:h-11  flex items-center justify-center transition-all duration-300 group relative "
@@ -160,13 +160,16 @@ const StudentNavbar = () => {
                 </Link>
               )}
 
-              {!getStudentData ?
+              {(!isAuthChecked || isUserLoading) ? (
+                <div className="w-24 h-10 lg:h-12 bg-white/10 animate-pulse rounded-full"></div>
+              ) : !getStudentData ? (
                 <Link
                   to="/signin"
                   className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-full font-semibold hover:bg-white/40 transition-all duration-300 transform hover:scale-105 text-sm lg:text-base"
                 >
                   Get Started
-                </Link> :
+                </Link>
+              ) : (
                 <div className="relative group flex items-center gap-3">
                   {/* Welcome Text */}
                   <span className="text-white/90 font-medium text-sm lg:text-base hidden sm:block cursor-default">
@@ -210,7 +213,7 @@ const StudentNavbar = () => {
                     </div>
                   </div>
                 </div>
-              }
+              )}
             </div>
 
             {/* Mobile Hamburger */}
@@ -332,7 +335,9 @@ const StudentNavbar = () => {
 
               {/* Get Started / Profile */}
               <div className="mt-6">
-                {!getStudentData ? (
+                {(!isAuthChecked || isUserLoading) ? (
+                  <div className="w-full h-12 bg-white/10 animate-pulse rounded-xl"></div>
+                ) : !getStudentData ? (
                   <Link
                     to="/signin"
                     className="block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-4 rounded-xl font-semibold text-center transition-all duration-300 transform hover:scale-105 shadow-lg"
@@ -363,7 +368,7 @@ const StudentNavbar = () => {
                         userLogout();
                         handleNavClick();
                       }}
-                      className="block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-white px-6 py-4 rounded-xl font-semibold text-center transition-all duration-300 w-full"
+                      className="block bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-4 rounded-xl font-semibold text-center transition-all duration-300 w-full"
                     >
                       Logout
                     </button>

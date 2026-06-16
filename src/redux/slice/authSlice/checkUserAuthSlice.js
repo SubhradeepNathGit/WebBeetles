@@ -92,7 +92,17 @@ export const checkLoggedInUser = () => async (dispatch) => {
 
     for (const fetchFn of fetchOrder) {
       const res = await dispatch(fetchFn(userId));
-      if (res.meta.requestStatus !== "rejected") return; // Found the correct profile
+      if (res.meta.requestStatus !== "rejected") {
+        // Ensure the correct session token is set for ProtectedRoutes
+        if (fetchFn === fetchStudentDetails) {
+          sessionStorage.setItem('student_token', data.session.access_token);
+        } else if (fetchFn === fetchInstructorDetails) {
+          sessionStorage.setItem('instructor_token', data.session.access_token);
+        } else if (fetchFn === fetchAdminDetails) {
+          sessionStorage.setItem('admin_token', data.session.access_token);
+        }
+        return; 
+      }
     }
 
     // All fetches failed — no profile found in any table
