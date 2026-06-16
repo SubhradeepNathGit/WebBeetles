@@ -13,8 +13,13 @@ const InstructorDashboardCourseCard = ({ course }) => {
     const status = (course?.status == 'approved' && course?.is_active) ? 'Published' : (course?.status == 'approved' && !course?.is_active) ? 'Draft' : course?.status == 'pending' ? 'Pending' : 'Rejected';
     const statusColor = (course?.status == 'approved' && course?.is_active) ? 'bg-green-500 text-white' : (course?.status == 'approved' && !course?.is_active) ? 'bg-yellow-500 text-black' : course?.status == 'pending' ? 'bg-orange-500 text-white' : 'bg-red-500 text-white';
 
+    const handleCourseClick = () => {
+        // Dispatch event to switch to instructor courses page with the selected course
+        window.dispatchEvent(new CustomEvent("open-instructor-course-details", { detail: { course } }));
+    };
+
     return (
-        <div className="group bg-zinc-900/30 rounded-2xl p-3.5 sm:p-5 hover:bg-zinc-800/40 transition-all duration-300 border border-zinc-800/60 hover:border-zinc-700/80 shadow-lg hover:shadow-2xl overflow-hidden relative cursor-pointer">
+        <div onClick={handleCourseClick} className="group bg-zinc-900/30 rounded-2xl p-3.5 sm:p-5 hover:bg-zinc-800/40 transition-all duration-300 border border-zinc-800/60 hover:border-zinc-700/80 shadow-lg hover:shadow-2xl overflow-hidden relative cursor-pointer">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-transparent to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-colors duration-500 pointer-events-none"></div>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 relative z-10">
                 <div className="relative flex-shrink-0">

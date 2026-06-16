@@ -17,6 +17,7 @@ import InstructorAnalytics from "../../../components/instructor/dashboard/Instru
 const DashboardLayout = ({ currentPage }) => {
   const [activePage, setActivePage] = useState(currentPage ?? "dashboard");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [initialSelectedCourse, setInitialSelectedCourse] = useState(null);
 
   const { user_type } = useParams();
   const navigate = useNavigate();
@@ -28,9 +29,13 @@ const DashboardLayout = ({ currentPage }) => {
     const handlers = {
       "open-user-course": () => setActivePage("student-myCourses"),
       "open-add-course": () => setActivePage("instructor-add-myCourses"),
-      "open-instructor-course": () => setActivePage("instructor-myCourses"),
+      "open-instructor-course": () => { setInitialSelectedCourse(null); setActivePage("instructor-myCourses"); },
       "open-instructor-analytics": () => setActivePage("instructor-analytics"),
       "open-request-instructor": () => setActivePage("requestInstructor"),
+      "open-instructor-course-details": (e) => {
+        setInitialSelectedCourse(e.detail?.course || null);
+        setActivePage("instructor-myCourses");
+      },
     };
 
     Object.entries(handlers).forEach(([event, fn]) => window.addEventListener(event, fn));
@@ -63,7 +68,7 @@ const DashboardLayout = ({ currentPage }) => {
       case "instructor-dashboard":
         return <InstructorDashboard instructorDetails={userAuthData} />;
       case "instructor-myCourses":
-        return <InstructorCourse instructorDetails={userAuthData} />;
+        return <InstructorCourse instructorDetails={userAuthData} initialSelectedCourse={initialSelectedCourse} />;
       case "instructor-add-myCourses":
         return <AddCourseForm />;
       case "instructor-analytics":

@@ -46,6 +46,8 @@ function RegistrationChart() {
                 backgroundColor: "rgba(168,85,247,0.6)",
                 borderRadius: 6,
                 borderSkipped: false,
+                barPercentage: 0.6,
+                categoryPercentage: 0.6,
             },
             {
                 label: "Instructor Registrations",
@@ -53,6 +55,8 @@ function RegistrationChart() {
                 backgroundColor: "#ef4444",
                 borderRadius: 6,
                 borderSkipped: false,
+                barPercentage: 0.6,
+                categoryPercentage: 0.6,
             },
         ],
     }), [studentData, instructorData]);
