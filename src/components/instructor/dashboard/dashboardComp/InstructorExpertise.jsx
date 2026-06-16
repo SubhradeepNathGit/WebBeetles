@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Code, Edit3, Loader2, Plus, Tag, X } from 'lucide-react';
 import getSweetAlert from '../../../../util/alert/sweetAlert';
 import toastifyAlert from '../../../../util/alert/toastify';
-import { updateInstructor } from '../../../../redux/slice/instructorSlice';
-import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 import hotToast from '../../../../util/alert/hot-toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import supabase from '../../../../util/supabase/supabase';
+import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 
 const InstructorExpertise = ({ instructorDetails }) => {
 
@@ -15,47 +15,59 @@ const InstructorExpertise = ({ instructorDetails }) => {
     const [updatingExpertise, setUpdatingExpertise] = useState(false);
     const [editingExpertise, setEditingExpertise] = useState(false);
 
-    React.useEffect(() => {
+    const dispatch = useDispatch();
+
+    // Keep local state synced with prop changes
+    useEffect(() => {
         setExpertise(instructorDetails?.expertise || []);
         if (!editingExpertise) setTempExpertise(instructorDetails?.expertise || []);
     }, [instructorDetails?.expertise]);
 
-    const dispatch = useDispatch();
-
-    // handle expertise
+    // handle expertise save — directly update Supabase to avoid any middleware issues
     const handleExpertiseSave = async () => {
 
-        setUpdatingExpertise(true);
-        const updatedExpertise = tempExpertise?.map(exp => exp?.split(",")?.map(ex => ex?.split(" ")?.map(e => e?.charAt(0)?.toUpperCase() + e?.slice(1)?.toLowerCase())?.join(" "))?.join(","));
-
-        const instructor_obj = { ...instructorDetails, expertise: updatedExpertise };
-
         if (tempExpertise.length === 0) {
-            toastifyAlert.warn("Experties cannot be empty!");
+            toastifyAlert.warn("Expertise cannot be empty!");
             return;
         }
-        else {
-            dispatch(updateInstructor({ data: instructor_obj, id: instructorDetails?.id }))
-                .then(res => {
-                    // console.log('Response from experties update', res);
 
-                    if (res.meta.requestStatus === "fulfilled") {
-                        dispatch(setUserAuthData(res.payload));
-                        setEditingExpertise(false);
-                        setExpertise(res?.payload?.expertise || []);
-                        hotToast('Expertise updated successfully', "success");
-                    }
-                    else {
-                        hotToast('Something went wrong!', "error");
-                    }
-                })
-                .catch(err => {
-                    console.error("Error occurred in updating experties", err);
-                    getSweetAlert("Oops...", "Something went wrong!", "error");
-                })
-                .finally(() => {
-                    setUpdatingExpertise(false);
-                });
+        setUpdatingExpertise(true);
+
+        try {
+            // Title-case the expertise entries
+            const updatedExpertise = tempExpertise.map(exp =>
+                exp.split(",").map(ex =>
+                    ex.split(" ").map(e =>
+                        e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()
+                    ).join(" ")
+                ).join(",")
+            );
+
+            // Directly update only the expertise field in Supabase
+            const { data: updatedData, error } = await supabase
+                .from("instructors")
+                .update({ expertise: updatedExpertise })
+                .eq("id", instructorDetails?.id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // Update local state
+            setExpertise(updatedData.expertise || []);
+            setEditingExpertise(false);
+
+            // Sync to global auth state so other components see the change
+            dispatch(setUserAuthData(updatedData));
+
+            hotToast('Expertise updated successfully', "success");
+        }
+        catch (err) {
+            console.error("Error occurred in updating expertise", err);
+            hotToast("Something went wrong!", "error");
+        }
+        finally {
+            setUpdatingExpertise(false);
         }
     };
 

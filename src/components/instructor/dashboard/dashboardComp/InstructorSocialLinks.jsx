@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Dribbble, Edit3, ExternalLink, Facebook, Github, Globe, Instagram, Linkedin, LinkIcon, Loader2, Mail, Plus, Twitch, Twitter, X, Youtube } from 'lucide-react';
 import { FaPinterest, FaDiscord, FaSlack, FaReddit } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
-import { updateInstructor } from '../../../../redux/slice/instructorSlice';
+import supabase from '../../../../util/supabase/supabase';
 import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 import hotToast from '../../../../util/alert/hot-toast';
 
@@ -46,36 +46,37 @@ const InstructorSocialLinks = ({ instructorDetails }) => {
 
         setUpdatingSocials(true);
 
-        const instructor_obj = {
-            ...instructorDetails,
-            social_links: cleanedSocials
-        };
+        try {
+            // Prepare clean data for Supabase (strip _id)
+            const socialsForDb = cleanedSocials.map(s => ({ platform: s.platform, url: s.url }));
 
-        dispatch(updateInstructor({ data: instructor_obj, id: instructorDetails?.id }))
-            .then(res => {
-                // console.log('Response from socials update', res);
+            // Directly update only the social_links field in Supabase
+            const { data: updatedData, error } = await supabase
+                .from("instructors")
+                .update({ social_links: socialsForDb })
+                .eq("id", instructorDetails?.id)
+                .select()
+                .single();
 
-                if (res.meta.requestStatus === "fulfilled") {
-                    const normalized = normalizeSocials(res?.payload?.social_links);
-                    
-                    dispatch(setUserAuthData(res.payload));
+            if (error) throw error;
 
-                    setEditingSocials(false);
-                    setTempSocials(normalized);
-                    setSocialLinks(normalized);
-                    hotToast('Social links updated successfully', "success");
-                }
-                else {
-                    hotToast('Something went wrong!', "error");
-                }
-            })
-            .catch(err => {
-                console.error("Error occurred in updating socials", err);
-                getSweetAlert("Oops...", "Something went wrong!", "error");
-            })
-            .finally(() => {
-                setUpdatingSocials(false);
-            });
+            const normalized = normalizeSocials(updatedData?.social_links);
+
+            // Sync to global auth state
+            dispatch(setUserAuthData(updatedData));
+
+            setEditingSocials(false);
+            setTempSocials(normalized);
+            setSocialLinks(normalized);
+            hotToast('Social links updated successfully', "success");
+        }
+        catch (err) {
+            console.error("Error occurred in updating socials", err);
+            hotToast("Something went wrong!", "error");
+        }
+        finally {
+            setUpdatingSocials(false);
+        }
     };
 
     const addSocialLink = () => {
