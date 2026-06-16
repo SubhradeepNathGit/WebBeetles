@@ -5,6 +5,7 @@ import getSweetAlert from '../../../../util/alert/sweetAlert';
 import { formatDate } from '../../../../util/dateFormat/dateFormat';
 import hotToast from '../../../../util/alert/hot-toast';
 import supabase from '../../../../util/supabase/supabase';
+import supabaseAdmin from '../../../../util/supabase/supabaseAdmin';
 import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 import toastifyAlert from '../../../../util/alert/toastify';
 
@@ -94,7 +95,7 @@ const InstructorDashboardHeader = ({ instructorDetails }) => {
             const publicUrl = publicUrlData.publicUrl;
 
             // Update ONLY image fields in DB — don't touch expertise/social_links/bio
-            const { data: updatedData, error: updateError } = await supabase
+            const { data: updatedData, error: updateError } = await supabaseAdmin
                 .from("instructors")
                 .update({ profile_image_url: publicUrl, profile_image: image_name })
                 .eq("id", id)
@@ -125,7 +126,7 @@ const InstructorDashboardHeader = ({ instructorDetails }) => {
 
         try {
             // Update ONLY the bio field — don't touch expertise/social_links
-            const { data: updatedData, error } = await supabase
+            const { data: updatedData, error } = await supabaseAdmin
                 .from("instructors")
                 .update({ bio: tempBio })
                 .eq("id", instructorDetails?.id)

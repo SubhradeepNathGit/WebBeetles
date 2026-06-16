@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Dribbble, Edit3, ExternalLink, Facebook, Github, Globe, Instagram, Linkedin, LinkIcon, Loader2, Mail, Plus, Twitch, Twitter, X, Youtube } from 'lucide-react';
 import { FaPinterest, FaDiscord, FaSlack, FaReddit } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
-import supabase from '../../../../util/supabase/supabase';
+import supabaseAdmin from '../../../../util/supabase/supabaseAdmin';
 import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 import hotToast from '../../../../util/alert/hot-toast';
 
@@ -51,7 +51,7 @@ const InstructorSocialLinks = ({ instructorDetails }) => {
             const socialsForDb = cleanedSocials.map(s => ({ platform: s.platform, url: s.url }));
 
             // Directly update only the social_links field in Supabase
-            const { data: updatedData, error } = await supabase
+            const { data: updatedData, error } = await supabaseAdmin
                 .from("instructors")
                 .update({ social_links: socialsForDb })
                 .eq("id", instructorDetails?.id)

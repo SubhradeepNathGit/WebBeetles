@@ -4,7 +4,7 @@ import getSweetAlert from '../../../../util/alert/sweetAlert';
 import toastifyAlert from '../../../../util/alert/toastify';
 import hotToast from '../../../../util/alert/hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import supabase from '../../../../util/supabase/supabase';
+import supabaseAdmin from '../../../../util/supabase/supabaseAdmin';
 import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 
 const InstructorExpertise = ({ instructorDetails }) => {
@@ -43,15 +43,20 @@ const InstructorExpertise = ({ instructorDetails }) => {
                 ).join(",")
             );
 
-            // Directly update only the expertise field in Supabase
-            const { data: updatedData, error } = await supabase
+            console.log('[Expertise] Saving:', updatedExpertise, 'for ID:', instructorDetails?.id);
+
+            // Directly update only the expertise field using admin client (bypasses RLS)
+            const { data: updatedData, error } = await supabaseAdmin
                 .from("instructors")
                 .update({ expertise: updatedExpertise })
                 .eq("id", instructorDetails?.id)
                 .select()
                 .single();
 
+            console.log('[Expertise] Response:', { updatedData, error });
+
             if (error) throw error;
+            if (!updatedData) throw new Error('No data returned from update');
 
             // Update local state
             setExpertise(updatedData.expertise || []);
@@ -63,7 +68,7 @@ const InstructorExpertise = ({ instructorDetails }) => {
             hotToast('Expertise updated successfully', "success");
         }
         catch (err) {
-            console.error("Error occurred in updating expertise", err);
+            console.error("[Expertise] Error occurred in updating expertise:", err);
             hotToast("Something went wrong!", "error");
         }
         finally {
