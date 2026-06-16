@@ -34,7 +34,15 @@ const Cart = () => {
   // Calculate totals
   let tax = 0;
   const subtotal = cartItems?.reduce((sum, item) => sum + parseInt(item?.courses?.price), 0);
-  const discountAmount = Math.round(subtotal * (discount / 100));
+  
+  // Calculate subscription discount percentage
+  const subDiscountPercent = userAuthData?.subscription_plan === 'EXPERT' ? 45 :
+                            userAuthData?.subscription_plan === 'PRO' ? 35 :
+                            userAuthData?.subscription_plan === 'STARTER' ? 15 : 0;
+                            
+  const totalDiscountPercent = Math.min(discount + subDiscountPercent, 100);
+  const discountAmount = Math.round(subtotal * (totalDiscountPercent / 100));
+  
   allCharges?.forEach(charge => {
     tax += Math?.round((subtotal - discountAmount) * (Number.parseInt(charge?.percentage)) / 100);
   })

@@ -65,11 +65,20 @@ const RelatedCourse = ({ categoryDetails }) => {
                         ))
                     ) : (
                         <MotionDiv
-                            className="col-span-full font-semibold text-center py-20 mt-50 text-gray-600 text-md"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
+                            className="col-span-full flex flex-col items-center justify-center text-center py-12 px-4 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl max-w-md mx-auto mt-8 w-full backdrop-blur-sm"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4 }}
                         >
-                            No results found
+                            <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4 text-purple-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-white font-semibold text-lg mb-1.5">No Courses Found</h3>
+                            <p className="text-zinc-400 text-sm max-w-xs leading-relaxed">
+                                We couldn't find any courses matching your search or filters at the moment.
+                            </p>
                         </MotionDiv>
                     )}
                 </MotionDiv>

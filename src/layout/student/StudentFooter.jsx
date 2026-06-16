@@ -1,187 +1,197 @@
-
-import { Globe, MapPin, Phone } from "lucide-react";
-import { FaLinkedin } from "react-icons/fa";
-
-import { FaFacebook, FaXTwitter, FaWhatsapp, FaInstagram } from "react-icons/fa6";
+import { Globe, MapPin, Phone, ExternalLink, Shield, FileText, Lock, BadgeCheck, Wifi } from "lucide-react";
+import { FaLinkedin, FaFacebook, FaXTwitter, FaInstagram } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-
 
 const StudentFooter = () => {
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-black text-white border-t border-white/5">
+
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8 sm:py-12 lg:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-10 xl:gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-14 pb-10">
 
-          {/* Quick Links */}
-          <div className="sm:col-span-1 md:col-span-1 lg:col-span-1">
-            <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Quick Links</h3>
-            <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
-              <li>
-                <Link to="/" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/course" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Courses
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  About
-                </Link>
-              </li>
+        {/* Top: Brand + tagline */}
+        <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-12">
+          <div className="max-w-xs">
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src="/logo.png" alt="WebBeetles" className="h-8 w-8 object-contain" />
+              <span className="text-xl font-bold tracking-tight text-white">WebBeetles</span>
+            </div>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              India's premier online learning platform connecting ambitious learners with world-class instructors and industry-ready skills.
+            </p>
 
-              <li>
-                <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Privacy Policy
-                </Link>
-              </li>
-            </ul>
+            {/* Social icons row */}
+            <div className="flex items-center gap-3 mt-6">
+              {[
+                { icon: FaFacebook, color: "hover:text-blue-500", label: "Facebook", href: "https://facebook.com" },
+                { icon: FaXTwitter, color: "hover:text-white", label: "Twitter", href: "https://twitter.com" },
+                { icon: FaInstagram, color: "hover:text-pink-500", label: "Instagram", href: "https://instagram.com" },
+                { icon: FaLinkedin, color: "hover:text-blue-400", label: "LinkedIn", href: "https://linkedin.com" },
+              ].map(({ icon: Icon, color, label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className={`w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 ${color} transition-all duration-200 hover:border-white/20 hover:bg-white/10`}
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              ))}
+            </div>
+
+            {/* Security Trust Badges */}
+            <div className="flex flex-wrap gap-2 mt-6">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-[10px] text-gray-400 font-medium">
+                <Lock className="w-3 h-3 text-emerald-400" />
+                SSL Secured
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-[10px] text-gray-400 font-medium">
+                <BadgeCheck className="w-3 h-3 text-blue-400" />
+                Verified Platform
+              </div>
+             
+            </div>
           </div>
 
-          {/* Features */}
-          <div className="sm:col-span-1 md:col-span-1 lg:col-span-1">
-            <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Features</h3>
-            <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
-              <li>
-                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Online Courses
-                </Link>
-              </li>
-              <li>
-                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Interactive Lessons
-                </Link>
-              </li>
-              <li>
-                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Expert Instructors
-                </Link>
-              </li>
-              <li>
-                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Certification
-                </Link>
-              </li>
+          {/* Navigation columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-12 w-full md:w-auto">
 
-            </ul>
-          </div>
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-4">Quick Links</h4>
+              <ul className="space-y-3">
+                {[
+                  { label: "Home", to: "/" },
+                  { label: "Courses", to: "/course" },
+                  { label: "About", to: "/about" },
+                  { label: "Contact", to: "/contact" },
+                  { label: "Privacy Policy", to: "/privacy" },
+                ].map(({ label, to }) => (
+                  <li key={label}>
+                    <Link to={to} className="text-gray-400 hover:text-white text-sm transition-colors duration-200">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Resource */}
-          <div className="sm:col-span-2 md:col-span-1 lg:col-span-1">
-            <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Resource</h3>
-            <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
-              <li>
-                <Link to="/terms" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Terms and Conditions
-                </Link>
-              </li>
-              <li>
-                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Help Center (FAQ)
-                </Link>
-              </li>
-              <li>
-                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Learning Guides
-                </Link>
-              </li>
-              <li>
-                <Link to="" className="text-gray-400 hover:text-white transition-colors duration-300 text-sm sm:text-base block py-1">
-                  Community Forum
-                </Link>
-              </li>
-            </ul>
-          </div>
+            {/* Features */}
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-4">Features</h4>
+              <ul className="space-y-3">
+                {[
+                  { label: "Online Courses", to: "/course" },
+                  { label: "Interactive Lessons", to: "/course" },
+                  { label: "Expert Instructors", to: "/about" },
+                  { label: "Certification", to: "/course" },
+                  { label: "Live Sessions", to: "/course" },
+                ].map(({ label, to }) => (
+                  <li key={label}>
+                    <Link to={to} className="text-gray-400 hover:text-white text-sm transition-colors duration-200">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Social Media */}
-          <div className="sm:col-span-1 md:col-span-1 lg:col-span-1">
-            <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">
-              Social Media
-            </h3>
-            <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
-              <li>
-                <Link to=""
-                  className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
-                >
-                  <FaFacebook className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm sm:text-base">Facebook</span>
-                </Link>
-              </li>
-              <li>
-                <Link to=""
-                  className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
-                >
-                  <FaXTwitter className="w-5 h-5 text-white" />
-                  <span className="text-sm sm:text-base">Twitter (X)</span>
-                </Link>
-              </li>
-              <li>
-                <Link to=""
-                  className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
-                >
-                  <FaInstagram className="w-5 h-5 text-pink-500" />
-                  <span className="text-sm sm:text-base">Instagram</span>
-                </Link>
-              </li>
-              <li>
-                <Link to=""
-                  className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1"
-                >
-                  <FaLinkedin className="w-5 h-5 text-blue-800" />
-                  <span className="text-sm sm:text-base">LinkedIn</span>
-                </Link>
-              </li>
+            {/* Resources */}
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-4">Resources</h4>
+              <ul className="space-y-3">
+                {[
+                  { label: "Terms of Service", to: "/terms" },
+                  { label: "Privacy Policy", to: "/privacy" },
+                  { label: "Help Center (FAQ)", to: "/contact" },
+                  { label: "Learning Guides", to: "/course" },
+                  { label: "Community Forum", to: "/contact" },
+                ].map(({ label, to }) => (
+                  <li key={label}>
+                    <Link to={to} className="text-gray-400 hover:text-white text-sm transition-colors duration-200">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-            </ul>
-          </div>
+            {/* Contact */}
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-4">Contact Us</h4>
+              <ul className="space-y-4">
+                <li>
+                  <a href="https://www.webbeetles.com" target="_blank" rel="noopener noreferrer"
+                    className="flex items-start gap-2.5 text-gray-400 hover:text-white transition-colors duration-200">
+                    <Globe className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm whitespace-nowrap">www.webbeetles.com</span>
+                  </a>
+                </li>
+                <li>
+                  <div className="flex items-start gap-2.5 text-gray-400">
+                    <MapPin className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm leading-relaxed">Ecospace, Newtown,<br />Kolkata 700007</span>
+                  </div>
+                </li>
+                <li>
+                  <a href="tel:+919098909890" className="flex items-center gap-2.5 text-gray-400 hover:text-white transition-colors duration-200">
+                    <Phone className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                    <span className="text-sm">+91-9098909890</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
 
-
-          {/* Contact Us */}
-          <div className="sm:col-span-2 md:col-span-2 lg:col-span-1">
-            <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-5 lg:mb-6 text-white">Contact Us</h3>
-            <ul className="space-y-2.5 sm:space-y-3 lg:space-y-4">
-              <li>
-                <Link to="" className="flex items-start gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1 group">
-                  <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mt-0.5 flex-shrink-0 group-hover:text-purple-400" />
-                  <span className="leading-tight text-sm sm:text-base break-all">www.webbeetles.com</span>
-                </Link>
-              </li>
-              <li>
-                <div className="flex items-start gap-2 sm:gap-3 text-gray-400 py-1">
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mt-0.5 flex-shrink-0" />
-                  <span className="leading-tight text-sm sm:text-base">Ecospace, Newtown, Kolkata 700007</span>
-                </div>
-              </li>
-              <li>
-                <Link to="tel:0761-8523-398" className="flex items-center gap-2 sm:gap-3 text-gray-400 hover:text-white transition-colors duration-300 py-1 group">
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 flex-shrink-0 group-hover:text-purple-400" />
-                  <span className="text-sm sm:text-base">+91-9098909890</span>
-                </Link>
-              </li>
-            </ul>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Section */}
-      <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
-            <div className="text-gray-400 text-xs sm:text-sm text-center sm:text-left order-2 sm:order-1">
-              Copyright © 2025 WebBeetles
-            </div>
-            <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm order-1 sm:order-2">
-              <Link to="/terms" className="text-gray-400 hover:text-white transition-colors duration-300 whitespace-nowrap">
-                Terms of Service
-              </Link>
-              <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors duration-300 whitespace-nowrap">
-                Privacy Policy
-              </Link>
-            </div>
+        {/* Divider */}
+        <div className="border-t border-white/[0.07]" />
+
+        {/* Bottom Bar */}
+        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+
+          {/* Copyright */}
+          <div className="text-center sm:text-left">
+            <p className="text-gray-500 text-xs sm:text-sm">
+              Copyright © 2026{" "}
+              <span className="text-gray-300 font-medium">WebBeetles</span>
+              {" "}— All rights reserved.
+            </p>
+            <p className="text-gray-600 text-xs mt-1 flex items-center gap-1.5 justify-center sm:justify-start">
+              <Wifi className="w-3 h-3 text-emerald-500" />
+              Platform uptime monitored 24/7 &nbsp;•&nbsp;
+              <Lock className="w-3 h-3 text-emerald-500" />
+              256-bit SSL encrypted
+            </p>
           </div>
+
+          {/* Legal + designer credit */}
+          <div className="flex flex-col items-center sm:items-end gap-2">
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <Link to="/terms" className="hover:text-white transition-colors duration-200 flex items-center gap-1">
+                <FileText className="w-3 h-3" /> Terms of Service
+              </Link>
+              <Link to="/privacy" className="hover:text-white transition-colors duration-200 flex items-center gap-1">
+                <Shield className="w-3 h-3" /> Privacy Policy
+              </Link>
+            </div>
+            {/* Brand credit */}
+            <p className="text-gray-600 text-xs flex items-center gap-1">
+              Designed &amp; Engineered by{" "}
+              <a
+                href="https://subhradeepnathportfolio.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-400 hover:text-purple-300 font-semibold transition-colors duration-200 inline-flex items-center gap-0.5 ml-1"
+              >
+                Subhradeep Nath <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            </p>
+          </div>
+
         </div>
       </div>
     </footer>

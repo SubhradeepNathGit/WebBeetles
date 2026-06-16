@@ -64,13 +64,13 @@ const CourseCard = ({ course, setDeletedData, setSelectedCourse, setExpandedSect
                         <button
                             onClick={() => { setEditForm(course); setShowEditModal(true); }}
                             disabled={course?.status != 'approved'}
-                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 border
+                            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 border
                                 ${course?.status != 'approved'
                                     ? 'cursor-not-allowed opacity-40 bg-white/5 border-white/10 text-white/40'
-                                    : 'cursor-pointer bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/30 hover:border-rose-500/60 text-rose-400 hover:text-rose-300'
+                                    : 'cursor-pointer bg-slate-800/60 hover:bg-slate-700/80 border-slate-700/80 hover:border-slate-600 text-slate-200 hover:text-white'
                                 }`}
                         >
-                            <Edit2 className="w-4 h-4" />
+                            <Edit2 className="w-4 h-4 text-slate-400 group-hover:text-slate-300" />
                             Edit
                         </button>
 
@@ -78,15 +78,13 @@ const CourseCard = ({ course, setDeletedData, setSelectedCourse, setExpandedSect
                         <button
                             onClick={() => { setOpenMarkModal(true); setMarkCourse(course); }}
                             disabled={course?.status != 'approved'}
-                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 border
+                            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 border
                                 ${course?.status != 'approved'
                                     ? 'cursor-not-allowed opacity-40 bg-white/5 border-white/10 text-white/40'
-                                    : course?.is_active
-                                        ? 'cursor-pointer bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 hover:border-amber-500/60 text-amber-400 hover:text-amber-300'
-                                        : 'cursor-pointer bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/30 hover:border-emerald-500/60 text-emerald-400 hover:text-emerald-300'
+                                    : 'cursor-pointer bg-slate-800/60 hover:bg-slate-700/80 border-slate-700/80 hover:border-slate-600 text-slate-200 hover:text-white'
                                 }`}
                         >
-                            {course?.is_active ? <CircleOff className="w-4 h-4" /> : <CircleCheckBig className="w-4 h-4" />}
+                            {course?.is_active ? <CircleOff className="w-4 h-4 text-slate-400" /> : <CircleCheckBig className="w-4 h-4 text-slate-400" />}
                             {!course?.is_active ? 'Active' : 'Draft'}
                         </button>
 
@@ -94,13 +92,13 @@ const CourseCard = ({ course, setDeletedData, setSelectedCourse, setExpandedSect
                         <button
                             onClick={() => { setShowDeleteModal(true); setDeletedData({ lectureId: course?.id, lectureName: course?.title, doc_type: course?.type, courseId: null, video_title: null }); }}
                             disabled={course?.status != 'approved'}
-                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 border
+                            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 border
                                 ${course?.status != 'approved'
                                     ? 'cursor-not-allowed opacity-40 bg-white/5 border-white/10 text-white/40'
-                                    : 'cursor-pointer bg-red-500/15 hover:bg-red-500/25 border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300'
+                                    : 'cursor-pointer bg-slate-800/40 hover:bg-red-950/30 border-slate-700/80 hover:border-red-900/50 text-slate-400 hover:text-red-400'
                                 }`}
                         >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4 text-slate-500 hover:text-red-400 transition-colors" />
                             Delete
                         </button>
                     </div>

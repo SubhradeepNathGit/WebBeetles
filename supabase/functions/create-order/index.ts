@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error(err);
-    return new Response(err.message || "Server error", { status: 500, headers });
+    const errorMessage = err instanceof Error ? err.message : "Server error";
+    return new Response(errorMessage, { status: 500, headers });
   }
 });

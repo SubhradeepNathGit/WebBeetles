@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useSidebarStore } from "../../store/useSidebarStore";
 import {
     Home, Users, Settings, BarChart2, Menu, LogOut, X, ChevronLeft, ChevronRight, User, ClipboardCheck, BookOpenCheck,
-    IndianRupee, Loader2, ShieldUser, ChartBarStacked, MessageSquareText, BellRing, Blinds, UserStar
+    IndianRupee, Loader2, ShieldUser, ChartBarStacked, MessageSquareText, BellRing, Blinds, UserStar, ShieldCheck
 } from "lucide-react";
 import { allInstructor } from "../../redux/slice/instructorSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -138,6 +138,7 @@ export default function Sidebar({ onNavigate }) {
         { to: "/admin/approve-courses", label: "Courses", icon: BookOpenCheck, badge: isCourseLoading ? <Loader2 className="inline h-3 w-3 mb-1 animate-spin" /> : pending?.length ?? 0 },
         { to: "/admin/analytics", label: "Analytics", icon: BarChart2 },
         { to: "/admin/charge", label: "Charge", icon: IndianRupee },
+        { to: "/admin/subscriptions", label: "Subscriptions", icon: ShieldCheck },
         { to: "/admin/contact", label: "Message", icon: MessageSquareText, badge: isMessagesLoading ? <Loader2 className="inline h-3 w-3 mb-1 animate-spin" /> : contactMessages?.length ?? 0 },
         { to: "/admin/settings", label: "Settings", icon: Settings },
     ];

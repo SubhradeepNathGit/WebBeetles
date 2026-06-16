@@ -73,10 +73,10 @@ const PricingSection = () => {
       level: 1,
       features: [
         "Access to all basic course lectures",
-        "Standard digital certificate of completion",
-        "Up to 2 active course enrollments",
+        "Digital certificate of completion",
+        "Up to 15% discount on all courses",
         "Peer community support forums",
-        "Mobile and tablet access",
+        "Instant 24/7 dedicated support",
       ],
     },
     {
@@ -88,11 +88,11 @@ const PricingSection = () => {
       isExpert: true,
       level: 3,
       features: [
-        "Unlimited access to all premium courses",
-        "Co-branded certificates & resume reviews",
-        "Unlimited active course enrollments",
+        "Unlimited access to all courses",
+        "Verified certificate of completion",
+        "Up to 45% discount on all courses",
         "Instant 24/7 dedicated support",
-        "Access to exclusive weekly live webinars",
+        "Access to exclusive live webinars",
       ],
     },
     {
@@ -103,9 +103,9 @@ const PricingSection = () => {
       savings: "Save 35%",
       level: 2,
       features: [
-        "Access to all basic & intermediate courses",
-        "Verified digital certificates",
-        "Unlimited active course enrollments",
+        "Unlimited Access to all courses",
+        "Verified certificate of completion",
+        "Up to 35% discount on all courses",
         "Priority instructor Q&A assistance",
         "1-on-1 monthly progress review",
       ],
@@ -138,22 +138,16 @@ const PricingSection = () => {
     // 3. Initiate payment
     setLoadingPlan(plan.name);
     try {
-      // Get a fresh, valid access token — try multiple strategies
+      // Always force-refresh the session so the JWT is never stale
       let token = null;
-      
-      // Strategy 1: getSession (cached but auto-refreshes if expired)
-      const { data: { session } } = await supabase.auth.getSession();
-      token = session?.access_token;
-      
-      // Strategy 2: Force refresh if no valid session
-      if (!token) {
-        const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
-        token = refreshedSession?.access_token;
-      }
 
-      // Strategy 3: Fallback to sessionStorage (legacy)
-      if (!token) {
-        token = sessionStorage.getItem("student_token");
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      token = refreshData?.session?.access_token;
+
+      // Fallback: cached session (may still be valid)
+      if (!token && !refreshError) {
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token;
       }
 
       // No valid token at all — redirect to sign in
@@ -166,6 +160,11 @@ const PricingSection = () => {
 
       await loadRazorpay();
 
+      let amountToPay = plan.priceINR;
+      if (currentLevel > 0 && currentLevel < plan.level) {
+        amountToPay = plan.priceINR - currentPlan.priceINR;
+      }
+
       const res = await fetch(import.meta.env.VITE_CREATE_ORDER_URL, {
         method: "POST",
         headers: {
@@ -174,7 +173,7 @@ const PricingSection = () => {
           apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
-          total: plan.priceINR,
+          total: amountToPay,
           planName: plan.name,
           isSubscription: true,
         }),
@@ -266,17 +265,35 @@ const PricingSection = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {/* Reorder plans for mobile: STARTER, PRO, EXPERT */}
           {[0, 2, 1].map((originalIndex, displayIndex) => {
             const plan = plans[originalIndex];
             const isHovered = hoveredCard === displayIndex;
             const isPlanLoading = loadingPlan === plan.name;
             
+            const currentPlanName = userAuthData?.subscription_plan;
+            const currentPlanData = plans.find(p => p.name === currentPlanName);
+            const currentPlanLevel = currentPlanData?.level || 0;
+            const currentPlanPrice = currentPlanData?.priceINR || 0;
+            
+            const isCurrentPlan = currentPlanName === plan.name;
+            const isDowngrade = currentPlanLevel > plan.level;
+            const isUpgrade = currentPlanLevel > 0 && currentPlanLevel < plan.level;
+            
+            const isDisabled = isPlanLoading || isCurrentPlan || isDowngrade;
+            const displayPrice = isUpgrade ? (plan.priceINR - currentPlanPrice) : plan.priceINR;
+            
+            let buttonText = "Choose Package";
+            if (isPlanLoading) buttonText = "Processing...";
+            else if (isCurrentPlan) buttonText = "Current Plan";
+            else if (isDowngrade) buttonText = "Unavailable";
+            else if (isUpgrade) buttonText = "Upgrade Package";
+
             return (
             <div
               key={originalIndex}
-              className={`relative h-full transition-all duration-700 max-w-xl mx-auto md:max-w-none md:mx-0 ${
+              className={`relative h-full transition-all duration-700 max-w-sm mx-auto md:max-w-none md:mx-0 ${
                 visibleCards.includes(displayIndex) ? "animate-flip-in" : "opacity-0"
               }`}
               style={{
@@ -287,9 +304,9 @@ const PricingSection = () => {
               }}
             >
               <div
-                className={`relative rounded-2xl p-4 sm:p-6 md:p-4 lg:p-6 xl:p-8 h-full border transition-all duration-300 flex flex-col
+                className={`relative rounded-2xl p-6 md:p-5 lg:p-6 xl:p-8 min-h-[520px] h-full border transition-all duration-300 flex flex-col
                   ${
-                    isHovered
+                    isHovered && !isDisabled
                       ? "bg-gradient-to-b from-purple-500/30 via-purple-700/20 to-purple-900/10 border-purple-400 shadow-md shadow-purple-500/40 backdrop-blur-lg scale-105"
                       : "bg-gray-900/70 border-gray-800 hover:bg-gray-900"
                   }`}
@@ -297,36 +314,41 @@ const PricingSection = () => {
                 onMouseLeave={() => setHoveredCard(null)}
               >
                 {/* Savings Badge */}
-                <div className="absolute -top-3 right-4 sm:right-6 md:right-4 lg:right-6">
-                  <div className="bg-purple-700 text-white px-2 sm:px-3 md:px-2 lg:px-3 xl:px-4 py-1 rounded-full text-xs sm:text-sm font-medium">
+                <div className="absolute -top-3 right-4 sm:right-6">
+                  <div className="bg-purple-600/40 text-white px-3 py-1 rounded-full sm:text-xs font-semibold tracking-wider uppercase shadow-md shadow-purple-900/20">
                     {plan.savings}
                   </div>
                 </div>
 
                 {/* Plan Name */}
-                <h3 className="text-lg sm:text-xl md:text-lg lg:text-xl xl:text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-gray-400 text-xs sm:text-sm md:text-xs lg:text-sm xl:text-base mb-6">
+                <h3 className="text-base sm:text-lg lg:text-2xl font-bold mb-2  mt-5 tracking-wide text-white/90">{plan.name}</h3>
+                <p className="text-gray-400 text-xs sm:text-[13px] mb-5">
                   {plan.subtitle}
                 </p>
 
                 {/* Price */}
-                <div className="mb-6 sm:mb-8">
-                  <div className="flex items-baseline">
-                    <span className="text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-bold">
+                <div className="mb-6 sm:mb-7 flex flex-col items-start">
+                  {isUpgrade && (
+                    <span className="text-gray-500 line-through text-sm sm:text-base font-semibold mb-1 decoration-red-500/50">
                       ₹{plan.priceINR.toLocaleString("en-IN")}
                     </span>
-                    <span className="text-gray-400 ml-1 text-sm sm:text-base md:text-sm lg:text-base">
+                  )}
+                  <div className="flex items-baseline">
+                    <span className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
+                      ₹{displayPrice.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-gray-400 ml-1.5 text-xs sm:text-sm font-medium">
                       {plan.period}
                     </span>
                   </div>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-2 sm:space-y-3 md:space-y-4 mb-6 sm:mb-8 flex-grow">
+                <div className="space-y-4 mb-6 mt-2 sm:mb-8 flex-grow">
                   {plan.features.map((feature, i) => (
-                    <div key={i} className="flex items-start">
+                    <div key={i} className="flex items-center">
                       <CheckIcon />
-                      <span className="text-gray-300 text-xs sm:text-sm md:text-xs lg:text-sm xl:text-base leading-relaxed">
+                      <span className="text-gray-300 text-xs sm:text-[13px] lg:text-md whitespace-nowrap overflow-hidden text-ellipsis">
                         {feature}
                       </span>
                     </div>
@@ -335,20 +357,20 @@ const PricingSection = () => {
 
                 {/* CTA Button */}
                 <button
-                  onClick={() => handleChoosePackage(plan)}
-                  disabled={isPlanLoading}
-                  className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center text-sm sm:text-base md:text-sm lg:text-base cursor-pointer
+                  onClick={() => !isDisabled && handleChoosePackage(plan)}
+                  disabled={isDisabled}
+                  className={`w-full py-2.5 px-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center text-xs sm:text-sm lg:text-md shadow-lg
                     ${
-                      isHovered
-                        ? "bg-gradient-to-r from-purple-500/60 to-purple-700/40 backdrop-blur-md border border-purple-300 text-white hover:from-purple-500 hover:to-purple-700/60"
-                        : "bg-purple-500 text-white hover:bg-purple-700"
-                    } ${isPlanLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+                      isDisabled
+                        ? "bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700"
+                        : isHovered
+                          ? "bg-gradient-to-r from-purple-500/60 to-purple-700/40 backdrop-blur-md border border-purple-300 text-white hover:from-purple-500 hover:to-purple-700/60 cursor-pointer"
+                          : "bg-purple-500 text-white hover:bg-purple-700 cursor-pointer"
+                    }`}
                 >
-                  {isPlanLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  ) : null}
-                  {isPlanLoading ? "Processing..." : "Choose Package"}
-                  {!isPlanLoading && <ArrowIcon />}
+                  {isPlanLoading && <Loader2 className="w-5 h-5 animate-spin mr-2" />}
+                  {buttonText}
+                  {!isDisabled && <ArrowIcon />}
                 </button>
               </div>
             </div>

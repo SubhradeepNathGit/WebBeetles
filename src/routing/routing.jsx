@@ -61,6 +61,7 @@ import Notification from "../pages/admin/Notification";
 import Admin from "../pages/admin/Admin";
 import ExamSet from "../pages/admin/ExamSet";
 import AdminProfile from "../pages/admin/AdminProfile";
+import AdminSubscriptions from "../components/admin/subscriptions/AdminSubscriptions";
 import { Loader2 } from "lucide-react";
 import ProtectedRoute from "./ProtectedRoute";
 import { useParams } from "react-router-dom";
@@ -212,6 +213,7 @@ const Routing = () => {
             <Route path="analytics" element={<Analytics />} />
             <Route path="charge" element={<Charges />} />
             <Route path="category" element={<AllCategory />} />
+            <Route path="subscriptions" element={<AdminSubscriptions />} />
             <Route path="admin" element={<Admin />} />
             <Route path="contact" element={<Contact />} />
             <Route path="notification" element={<Notification />} />

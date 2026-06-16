@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const PreFooterCTA = () => {
   return (
@@ -60,56 +61,37 @@ const PreFooterCTA = () => {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-3 sm:gap-5 justify-center items-center"
           >
-            {/* Start Learning Button */}
-            <motion.button
-              whileHover={{
-                scale: 1.02,
-                
-              }}
-              whileTap={{ scale: 0.98 }}
-              className="group w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-purple-700 rounded-full text-black font-semibold text-xs sm:text-sm lg:text-base transition-all duration-300 hover:bg-purple-500 "
-            >
-              <span className="flex items-center justify-center text-white">
-                Start Learning Now
-                <svg
-                  className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </span>
-            </motion.button>
+            {/* Start Learning Now → /category */}
+            <Link to="/category">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="group w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-purple-700 rounded-full font-semibold text-xs sm:text-sm lg:text-base transition-all duration-300 hover:bg-purple-500"
+              >
+                <span className="flex items-center justify-center text-white">
+                  Start Learning Now
+                  <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </span>
+              </motion.button>
+            </Link>
 
-            {/* View Package Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="group w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-transparent border-2 border-white rounded-full text-white font-semibold text-xs sm:text-sm lg:text-base transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
-            >
-              <span className="flex items-center justify-center">
-                View Package
-                <svg
-                  className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </span>
-            </motion.button>
+            {/* View Package → /course */}
+            <Link to="/course">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="group w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-transparent border-2 border-white rounded-full text-white font-semibold text-xs sm:text-sm lg:text-base transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
+              >
+                <span className="flex items-center justify-center">
+                  View Package
+                  <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </span>
+              </motion.button>
+            </Link>
           </motion.div>
         </div>
       </div>

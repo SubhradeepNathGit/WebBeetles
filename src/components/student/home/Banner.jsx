@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
+// Use motion.create() instead of deprecated motion(Link)
+const MotionLink = motion.create(Link);
+
 const HERO_ASSETS = ["/images/banner-img.jpg", "/images/circle.png"];
 
 const containerVariants = {
@@ -83,7 +86,6 @@ const useHeroAssetsReady = () => {
 };
 
 const Banner = () => {
-  const MotionLink = motion(Link);
   const assetsReady = useHeroAssetsReady();
   const reduceMotion = useReducedMotion();
   const animationState = assetsReady || reduceMotion ? "ready" : "hidden";

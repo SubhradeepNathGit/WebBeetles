@@ -252,12 +252,32 @@ const PaymentSummaryCard = ({
                     <span className="font-semibold text-white">₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
 
+                {/* Subscription Discount */}
+                {userAuthData?.subscription_plan && ['STARTER', 'PRO', 'EXPERT'].includes(userAuthData.subscription_plan) && (
+                    <div className="flex justify-between text-emerald-400 bg-emerald-500/10 -mx-2 px-2 py-2 rounded-lg border border-emerald-500/20">
+                        <span className="flex items-center gap-2 font-medium">
+                            <Tag className="w-4 h-4" /> {userAuthData.subscription_plan} Plan Perk
+                        </span>
+                        <span className="font-bold">
+                            - {userAuthData.subscription_plan === 'EXPERT' ? '45%' : userAuthData.subscription_plan === 'PRO' ? '35%' : '15%'}
+                        </span>
+                    </div>
+                )}
+
                 {promoApplied && (
                     <div className="flex justify-between text-purple-300 bg-purple-500/10 -mx-2 px-2 py-2 rounded-lg border border-purple-500/20">
                         <span className="flex items-center gap-2 font-medium">
-                            <Tag className="w-4 h-4" /> Discount ({discount}%)
+                            <Tag className="w-4 h-4" /> Promo Code Discount
                         </span>
-                        <span className="font-bold">-₹{discountAmount.toLocaleString('en-IN')}</span>
+                        <span className="font-bold">({discount}%)</span>
+                    </div>
+                )}
+
+                {/* Total Combined Discount Amount */}
+                {discountAmount > 0 && (
+                    <div className="flex justify-between text-white/80 border-b border-white/5 pb-2">
+                        <span className="font-medium">Total Discount Savings</span>
+                        <span className="font-bold text-green-400">-₹{discountAmount.toLocaleString('en-IN')}</span>
                     </div>
                 )}
 

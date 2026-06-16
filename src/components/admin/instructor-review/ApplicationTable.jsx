@@ -31,7 +31,6 @@ const ApplicationTable = ({ filtered, setModal, setDocViewer, setOpenMarkModal, 
                     <div className="flex flex-col items-center justify-center py-24 px-6">
                         {/* Decorative icon with glow ring */}
                         <div className="relative mb-6">
-                            <div className="absolute inset-0 rounded-full bg-emerald-500/10 blur-xl scale-150" />
                             <div className="relative w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
                                 <ClipboardX className="w-9 h-9 text-gray-600" strokeWidth={1.5} />
                             </div>
