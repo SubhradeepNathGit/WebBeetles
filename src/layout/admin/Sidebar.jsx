@@ -96,10 +96,12 @@ export default function Sidebar({ onNavigate }) {
     const handleLogout = async () => {
         setIsLoggingOut(true);
         try {
-            dispatch(logoutUser({ user_type: 'admin', status: false }));
+            // Navigate first to escape ProtectedRoute before clearing auth state
+            // This prevents the jitter caused by ProtectedRoute's <Navigate> racing with this navigate()
+            navigate("/admin/", { replace: true });
             sessionStorage.removeItem('admin_token');
+            await dispatch(logoutUser({ user_type: 'admin', status: false }));
             toastifyAlert.success('Logged out Successfully');
-            navigate("/admin");
         } catch (error) {
             console.error("Logout failed:", error);
             toastifyAlert.error("Failed to logout. Please try again.");
