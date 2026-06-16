@@ -3,6 +3,7 @@ import { Code, Edit3, Loader2, Plus, Tag, X } from 'lucide-react';
 import getSweetAlert from '../../../../util/alert/sweetAlert';
 import toastifyAlert from '../../../../util/alert/toastify';
 import { updateInstructor } from '../../../../redux/slice/instructorSlice';
+import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 import hotToast from '../../../../util/alert/hot-toast';
 import { useDispatch } from 'react-redux';
 
@@ -13,6 +14,11 @@ const InstructorExpertise = ({ instructorDetails }) => {
     const [newSkill, setNewSkill] = useState("");
     const [updatingExpertise, setUpdatingExpertise] = useState(false);
     const [editingExpertise, setEditingExpertise] = useState(false);
+
+    React.useEffect(() => {
+        setExpertise(instructorDetails?.expertise || []);
+        if (!editingExpertise) setTempExpertise(instructorDetails?.expertise || []);
+    }, [instructorDetails?.expertise]);
 
     const dispatch = useDispatch();
 
@@ -34,8 +40,9 @@ const InstructorExpertise = ({ instructorDetails }) => {
                     // console.log('Response from experties update', res);
 
                     if (res.meta.requestStatus === "fulfilled") {
+                        dispatch(setUserAuthData(res.payload));
                         setEditingExpertise(false);
-                        setExpertise(res?.payload?.expertise);
+                        setExpertise(res?.payload?.expertise || []);
                         hotToast('Expertise updated successfully', "success");
                     }
                     else {

@@ -3,6 +3,7 @@ import { Dribbble, Edit3, ExternalLink, Facebook, Github, Globe, Instagram, Link
 import { FaPinterest, FaDiscord, FaSlack, FaReddit } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
 import { updateInstructor } from '../../../../redux/slice/instructorSlice';
+import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 import hotToast from '../../../../util/alert/hot-toast';
 
 const InstructorSocialLinks = ({ instructorDetails }) => {
@@ -21,6 +22,12 @@ const InstructorSocialLinks = ({ instructorDetails }) => {
     const [tempSocials, setTempSocials] = useState(normalizeSocials(instructorDetails?.social_links));
     const [editingSocials, setEditingSocials] = useState(false);
     const [updatingSocials, setUpdatingSocials] = useState(false);
+
+    React.useEffect(() => {
+        const normalized = normalizeSocials(instructorDetails?.social_links);
+        setSocialLinks(normalized);
+        if (!editingSocials) setTempSocials(normalized);
+    }, [instructorDetails?.social_links]);
 
     // console.log('Instructor social link details', instructorDetails?.social_links);
 
@@ -49,11 +56,9 @@ const InstructorSocialLinks = ({ instructorDetails }) => {
                 // console.log('Response from socials update', res);
 
                 if (res.meta.requestStatus === "fulfilled") {
-                    const normalized = res?.payload?.social_links.map(s => ({
-                        _id: s.platform,
-                        platform: s.platform,
-                        url: s.url
-                    }));
+                    const normalized = normalizeSocials(res?.payload?.social_links);
+                    
+                    dispatch(setUserAuthData(res.payload));
 
                     setEditingSocials(false);
                     setTempSocials(normalized);
