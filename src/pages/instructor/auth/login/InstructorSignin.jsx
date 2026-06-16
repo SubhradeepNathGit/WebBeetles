@@ -25,7 +25,8 @@ const InstructorSignin = () => {
     user_type = 'instructor';
 
   useEffect(() => {
-    if (isUserAuth && userAuthData) {
+    const token = sessionStorage.getItem(`${user_type}_token`);
+    if (isUserAuth && userAuthData && token) {
       if (userAuthData.role === user_type) {
         if (userAuthData.application_status == 'pending' && !userAuthData.application_complete) {
           navigate(`/instructor/profile-form`, { replace: true, state: { instructorData: userAuthData } });
