@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import getSweetAlert from '../../../../util/alert/sweetAlert';
 import { formatDate } from '../../../../util/dateFormat/dateFormat';
 import hotToast from '../../../../util/alert/hot-toast';
-import { updateInstructor } from '../../../../redux/slice/instructorSlice';
-import { checkLoggedInUser } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
+import supabase from '../../../../util/supabase/supabase';
+import { setUserAuthData } from '../../../../redux/slice/authSlice/checkUserAuthSlice';
 import toastifyAlert from '../../../../util/alert/toastify';
 
 const InstructorDashboardHeader = ({ instructorDetails }) => {
@@ -73,61 +73,75 @@ const InstructorDashboardHeader = ({ instructorDetails }) => {
             URL.revokeObjectURL(photo);
         }
         setPhoto(previewUrl);
-        // console.log("Photo updated successfully!", previewUrl);
 
-        const formData = new FormData();
-        formData.append('profileImage', file);
-        instructorDetails = { ...instructorDetails, profileImage: file };
+        try {
+            const id = instructorDetails?.id;
 
+            // Delete old image from bucket
+            if (instructorDetails?.profile_image) {
+                await supabase.storage.from("instructor").remove([`image/${instructorDetails.profile_image}`]);
+            }
 
-        dispatch(updateInstructor({ data: instructorDetails, id: instructorDetails?.id }))
-            .then(res => {
-                // console.log('Response from photo update', res);
+            // Upload new file
+            const newFileName = `${id}_${Date.now()}.${file.name.split(".").pop()}`;
+            const { data: uploadData, error: uploadError } = await supabase.storage.from("instructor/image").upload(newFileName, file, { upsert: true });
+            if (uploadError) throw uploadError;
 
-                if (res.meta.requestStatus === "fulfilled") {
-                    const freshUrl = res.payload.profile_image_url;
-                    setPhoto(freshUrl);
-                    dispatch(checkLoggedInUser());
-                    hotToast('Profile updated successfully', "success");
-                }
-                else {
-                    hotToast('Something went wrong!', "error");
-                }
-            })
-            .catch(() => {
-                getSweetAlert("Oops...", "Something went wrong!", "error");
-            })
-            .finally(() => {
-                setUpdatingPhoto(false);
-            });
+            const image_name = uploadData?.path;
+
+            // Get public URL
+            const { data: publicUrlData } = supabase.storage.from("instructor/image").getPublicUrl(newFileName);
+            const publicUrl = publicUrlData.publicUrl;
+
+            // Update ONLY image fields in DB — don't touch expertise/social_links/bio
+            const { data: updatedData, error: updateError } = await supabase
+                .from("instructors")
+                .update({ profile_image_url: publicUrl, profile_image: image_name })
+                .eq("id", id)
+                .select()
+                .single();
+
+            if (updateError) throw updateError;
+
+            setPhoto(updatedData.profile_image_url);
+            dispatch(setUserAuthData(updatedData));
+            hotToast('Profile updated successfully', "success");
+        }
+        catch (err) {
+            console.error("Error updating profile photo:", err);
+            hotToast('Something went wrong!', "error");
+        }
+        finally {
+            setUpdatingPhoto(false);
+        }
     };
 
     // handle bio 
     const handleBioSave = async () => {
-        instructorDetails = { ...instructorDetails, bio: tempBio };
-
         if (!tempBio.trim()) {
             toastifyAlert.warn("Bio cannot be empty!");
             return;
         }
-        else {
-            dispatch(updateInstructor({ data: instructorDetails, id: instructorDetails?.id }))
-                .then(res => {
-                    // console.log('Response from bio update', res);
 
-                    if (res.meta.requestStatus === "fulfilled") {
+        try {
+            // Update ONLY the bio field — don't touch expertise/social_links
+            const { data: updatedData, error } = await supabase
+                .from("instructors")
+                .update({ bio: tempBio })
+                .eq("id", instructorDetails?.id)
+                .select()
+                .single();
 
-                        hotToast('Profile updated successfully', "success");
-                        setBio(tempBio);
-                        setEditingBio(false);
-                    }
-                    else {
-                        hotToast('Something went wrong!', "error");
-                    }
-                })
-                .catch(() => {
-                    getSweetAlert("Oops...", "Something went wrong!", "error");
-                })
+            if (error) throw error;
+
+            dispatch(setUserAuthData(updatedData));
+            setBio(tempBio);
+            setEditingBio(false);
+            hotToast('Profile updated successfully', "success");
+        }
+        catch (err) {
+            console.error("Error updating bio:", err);
+            hotToast('Something went wrong!', "error");
         }
     };
 
