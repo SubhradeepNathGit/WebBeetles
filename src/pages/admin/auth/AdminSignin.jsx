@@ -22,7 +22,8 @@ const AdminSignin = () => {
     user_type = 'admin';
 
   useEffect(() => {
-    if (isUserAuth && userAuthData) {
+    const token = sessionStorage.getItem(`${user_type}_token`);
+    if (isUserAuth && userAuthData && token) {
       if (userAuthData.role === user_type) {
         navigate(`/admin/dashboard`, { replace: true });
       } else {
