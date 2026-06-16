@@ -5,17 +5,17 @@ import InstructorDashboardCourseCard from './InstructorDashboardCourseCard';
 const InstructorMyCourse = ({ courses }) => {
 
     return (
-        <div className="bg-[#111] border border-white/8 rounded-xl p-4 sm:p-5 lg:p-6 shadow-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 lg:mb-6 gap-2">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white flex items-center gap-2">
-                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-blue-500/30 flex items-center justify-center border border-blue-400/30"><Video className="text-blue-300" size={18} /></div>
+        <div className="relative overflow-hidden rounded-2xl bg-zinc-900/40 border border-zinc-800/80 p-5 sm:p-6 lg:p-8 shadow-2xl backdrop-blur-md">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 lg:mb-8 gap-3">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white flex items-center gap-3">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-inner"><Video className="text-blue-400" size={20} /></div>
                     My Courses
                 </h2>
-                <button onClick={() => window.dispatchEvent(new CustomEvent("open-instructor-course"))} className="inline-flex items-center gap-1 text-rose-200 hover:text-white font-semibold text-xs sm:text-sm bg-white/10 hover:bg-white/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all border border-white/20 active:scale-95 cursor-pointer">
-                    View All<ChevronRight size={14} />
+                <button onClick={() => window.dispatchEvent(new CustomEvent("open-instructor-course"))} className="inline-flex items-center gap-1.5 text-zinc-300 hover:text-white font-bold text-xs sm:text-sm bg-zinc-800/50 hover:bg-zinc-800 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all border border-zinc-700/50 hover:border-zinc-600 shadow-sm hover:shadow-md active:scale-95 cursor-pointer">
+                    View All<ChevronRight size={16} className="text-zinc-400" />
                 </button>
             </div>
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4 sm:space-y-5">
                 {courses?.slice(0, 5)?.map(course => (
                     <InstructorDashboardCourseCard key={course?.id} course={course} />
                 ))}

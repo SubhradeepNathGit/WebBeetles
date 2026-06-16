@@ -109,48 +109,93 @@ const InstructorSocialLinks = ({ instructorDetails }) => {
     };
 
     return (
-        <div className="bg-[#111] border border-white/8 rounded-xl p-4 sm:p-5 lg:p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-4 lg:mb-6">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white flex items-center gap-2">
-                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-blue-500/30 flex items-center justify-center border border-blue-400/30"><LinkIcon size={18} className="text-blue-300" /></div>
+        <div className="relative overflow-hidden rounded-2xl bg-zinc-900/40 border border-zinc-800/80 p-5 sm:p-6 shadow-2xl backdrop-blur-md">
+            <div className="flex items-center justify-between mb-5 sm:mb-6">
+                <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-md">
+                        <LinkIcon size={18} className="text-blue-400" />
+                    </div>
                     Social Links
                 </h2>
-                {!editingSocials && <button onClick={() => { setTempSocials([...socialLinks]); setEditingSocials(true); }} className="text-xs sm:text-sm text-rose-200 hover:text-white font-semibold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all border border-white/20 cursor-pointer"><Edit3 size={14} className="inline mr-1" /> Edit</button>}
+                {!editingSocials && (
+                    <button
+                        onClick={() => { setTempSocials([...socialLinks]); setEditingSocials(true); }}
+                        className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-100 bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-850 hover:border-zinc-700 px-3 py-1.5 rounded-lg transition-all duration-300 font-medium cursor-pointer"
+                    >
+                        <Edit3 size={12} /> Edit
+                    </button>
+                )}
             </div>
 
             {!editingSocials ? (
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 gap-3">
                     {socialLinks?.length > 0 ? socialLinks?.map((link, idx) => (
-                        <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/15 px-4 py-3 rounded-lg border border-white/10 hover:border-white/30 transition-all group">
-                            <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center border border-white/20 text-blue-300 group-hover:scale-110 transition-transform">{getSocialIcon(link?.platform)}</div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-white font-semibold text-sm capitalize">{link?.platform ?? 'N/A'}</p>
-                                <p className="text-rose-200 text-xs truncate">{link?.url ?? 'N/A'}</p>
+                        <a
+                            key={idx}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3.5 bg-zinc-900/20 hover:bg-zinc-900/40 px-4 py-3 rounded-xl border border-zinc-800/50 hover:border-zinc-750 transition-all duration-300 group cursor-pointer"
+                        >
+                            <div className="w-9 h-9 rounded-lg bg-zinc-950 flex items-center justify-center border border-zinc-850 group-hover:scale-105 group-hover:border-zinc-700 transition-all duration-300">
+                                {getSocialIcon(link?.platform)}
                             </div>
-                            <ExternalLink size={16} className="text-rose-300 group-hover:text-white" />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-zinc-200 font-semibold text-xs sm:text-sm capitalize leading-tight group-hover:text-white transition-colors">{link?.platform ?? 'N/A'}</p>
+                                <p className="text-zinc-500 text-[10px] sm:text-xs truncate mt-0.5 group-hover:text-zinc-400 transition-colors">{link?.url ?? 'N/A'}</p>
+                            </div>
+                            <ExternalLink size={14} className="text-zinc-500 group-hover:text-zinc-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                         </a>
-                    )) : <p className="text-rose-200 text-sm">No social links.</p>}
+                    )) : <p className="text-zinc-500 text-xs sm:text-sm italic">No social links added yet.</p>}
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {tempSocials?.map(link => (
-                        <div key={link._id} className="flex flex-col sm:flex-row gap-2">
-                            <input type="text" value={link?.platform} onChange={(e) => updateSocialLink(link._id, 'platform', e.target.value)}
-                                placeholder="Platform" className="w-full sm:w-1/3 bg-white/10 text-rose-100 placeholder:text-rose-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50" />
-                            <input type="url" value={link?.url} onChange={(e) => updateSocialLink(link._id, 'url', e.target.value)}
-                                placeholder="URL" className="flex-1 w-full bg-white/10 text-rose-100 placeholder:text-rose-300/50 rounded-lg px-3 py-2 text-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400/50" />
-                            <button onClick={() => removeSocialLink(link?._id)} className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-3 py-2 rounded-lg border border-red-400/30 w-full sm:w-auto flex items-center justify-center"><X size={16} /></button>
+                        <div key={link._id} className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center bg-zinc-900/10 p-3 rounded-xl border border-zinc-850/60">
+                            <input
+                                type="text"
+                                value={link?.platform}
+                                onChange={(e) => updateSocialLink(link._id, 'platform', e.target.value)}
+                                placeholder="Platform"
+                                className="w-full sm:w-1/3 bg-zinc-900/30 text-zinc-200 placeholder:text-zinc-650 rounded-lg px-3 py-2 text-xs border border-zinc-800 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                            />
+                            <input
+                                type="url"
+                                value={link?.url}
+                                onChange={(e) => updateSocialLink(link._id, 'url', e.target.value)}
+                                placeholder="URL"
+                                className="flex-1 w-full bg-zinc-900/30 text-zinc-200 placeholder:text-zinc-650 rounded-lg px-3 py-2 text-xs border border-zinc-800 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                            />
+                            <button
+                                onClick={() => removeSocialLink(link?._id)}
+                                className="bg-red-500/10 hover:bg-red-500/25 text-red-400 hover:text-red-300 px-3.5 py-2 rounded-lg border border-red-500/20 hover:border-red-500/40 w-full sm:w-auto flex items-center justify-center transition-colors cursor-pointer"
+                                title="Remove link"
+                            >
+                                <X size={14} />
+                            </button>
                         </div>
                     ))}
-                    <button onClick={addSocialLink}
-                        className="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold border border-white/20 flex items-center justify-center gap-2">
-                        <Plus size={16} /> Add Link
+                    <button
+                        onClick={addSocialLink}
+                        className="w-full bg-zinc-900/30 hover:bg-zinc-900/60 text-zinc-300 hover:text-white px-4 py-2.5 rounded-lg text-xs font-semibold border border-zinc-800 hover:border-zinc-700/80 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        <Plus size={14} /> Add Social Link
                     </button>
-                    <div className="flex gap-2">
-                        <button onClick={handleSocialsSave} disabled={updatingSocials} className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50">
-                            {updatingSocials ? <><Loader2 size={14} className="inline animate-spin mr-2" />Saving...</> : 'Save'}
+                    <div className="flex gap-2 pt-1">
+                        <button
+                            onClick={handleSocialsSave}
+                            disabled={updatingSocials}
+                            className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white px-4 py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-emerald-950/20 active:scale-95 cursor-pointer"
+                        >
+                            {updatingSocials ? <><Loader2 size={12} className="inline animate-spin mr-1.5" />Saving...</> : 'Save'}
                         </button>
-                        <button onClick={() => setEditingSocials(false)} disabled={updatingSocials} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold border border-white/20">Cancel</button>
+                        <button
+                            onClick={() => setEditingSocials(false)}
+                            disabled={updatingSocials}
+                            className="bg-zinc-900 hover:bg-zinc-850 text-zinc-300 border border-zinc-800 px-4 py-2.5 rounded-lg text-xs font-semibold transition-all active:scale-95 cursor-pointer"
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             )}
