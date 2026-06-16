@@ -116,9 +116,16 @@ const DashboardSidebar = ({
   };
 
   const userLogout = async () => {
-    await dispatch(logoutUser({ user_type, status: true }))
-      .then(() => navigate(isStudent ? "/" : "/instructor/"))
-      .catch(() => getSweetAlert({ title: "Logout Failed!", text: "Something went wrong.", icon: "error" }));
+    try {
+      // Navigate first to escape ProtectedRoute before clearing auth state
+      // This prevents the jitter caused by ProtectedRoute's <Navigate> racing with this navigate()
+      const targetPath = isStudent ? "/" : "/instructor/";
+      navigate(targetPath, { replace: true });
+      sessionStorage.removeItem(isStudent ? 'student_token' : 'instructor_token');
+      await dispatch(logoutUser({ user_type, status: true }));
+    } catch (err) {
+      getSweetAlert({ title: "Logout Failed!", text: "Something went wrong.", icon: "error" });
+    }
   };
 
   const SidebarInner = ({ isCollapsed, isMobile = false }) => (
