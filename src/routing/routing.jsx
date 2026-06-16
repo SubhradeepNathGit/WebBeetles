@@ -1,5 +1,6 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import ScrollToTop from "../layout/scrollonTop";
 
@@ -70,6 +71,28 @@ const DashboardProtectedRoute = () => {
   return <ProtectedRoute role={user_type} />;
 };
 
+// Restricts student-facing routes for instructor/admin users
+// If an instructor or admin is logged in, they are redirected to their own dashboard
+const RestrictedForRoles = ({ children }) => {
+  const { userAuthData } = useSelector((state) => state.checkAuth);
+
+  // Check tokens first (immediate, synchronous check)
+  const hasInstructorToken = sessionStorage.getItem('instructor_token');
+  const hasAdminToken = sessionStorage.getItem('admin_token');
+
+  // If admin is logged in, redirect to admin dashboard
+  if (hasAdminToken && userAuthData?.role === 'admin') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  // If instructor is logged in, redirect to instructor dashboard
+  if (hasInstructorToken && userAuthData?.role === 'instructor') {
+    return <Navigate to="/instructor/dashboard" replace />;
+  }
+
+  return children;
+};
+
 // Student Layout wrapper (must be used inside Router!)
 const StudentLayout = ({ children }) => {
   const location = useLocation();
@@ -133,15 +156,15 @@ const Routing = () => {
         {/* student  */}
 
         {/* Pages with Layout */}
-        <Route path="/" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout><Home /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/about" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <AboutUs /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/course" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <Course /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/course/course-details/:courseId" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <CourseDetails /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/category" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <Category /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/category/category-details/:categoryId" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <CategoryDetails /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/contact" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <ContactUs /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/terms" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <TermsOfService /></StudentLayout></MaintenanceGuard>} />
-        <Route path="/privacy" element={<MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <PrivacyPolicy /></StudentLayout></MaintenanceGuard>} />
+        <Route path="/" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout><Home /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/about" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <AboutUs /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/course" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <Course /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/course/course-details/:courseId" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <CourseDetails /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/category" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <Category /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/category/category-details/:categoryId" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <CategoryDetails /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/contact" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <ContactUs /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/terms" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <TermsOfService /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
+        <Route path="/privacy" element={<RestrictedForRoles><MaintenanceGuard isMaintenance={isMaintenance}><StudentLayout> <PrivacyPolicy /></StudentLayout></MaintenanceGuard></RestrictedForRoles>} />
 
         {/* Pages (no navbar/footer) */}
         <Route path="/signin" element={<MaintenanceGuard isMaintenance={isMaintenance}><Signin /></MaintenanceGuard>} />
