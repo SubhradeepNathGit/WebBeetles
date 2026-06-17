@@ -9,33 +9,33 @@ import { fetchNotifications, markNotificationRead, markAllNotificationsRead, add
 import supabase from "../../util/supabase/supabase";
 
 const formatRelativeTime = (dateString) => {
-    if (!dateString) return "";
-    try {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-        if (diffMins < 1) return "Just now";
-        if (diffMins < 60) return `${diffMins} min ago`;
-        const diffHours = Math.floor(diffMins / 60);
-        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-        const diffDays = Math.floor(diffHours / 24);
-        if (diffDays === 1) return "Yesterday";
-        if (diffDays < 7) return `${diffDays} days ago`;
-        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    } catch (e) {
-        return "";
-    }
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  } catch (e) {
+    return "";
+  }
 };
 
 const getIconForType = (type) => {
-    switch (type) {
-        case 'success': return <CheckCircle2 className="w-5 h-5 text-gray-300" />;
-        case 'warning': return <AlertTriangle className="w-5 h-5 text-gray-400" />;
-        case 'error': return <XCircle className="w-5 h-5 text-gray-400" />;
-        case 'info':
-        default: return <Info className="w-5 h-5 text-gray-300" />;
-    }
+  switch (type) {
+    case 'success': return <CheckCircle2 className="w-5 h-5 text-gray-300" />;
+    case 'warning': return <AlertTriangle className="w-5 h-5 text-gray-400" />;
+    case 'error': return <XCircle className="w-5 h-5 text-gray-400" />;
+    case 'info':
+    default: return <Info className="w-5 h-5 text-gray-300" />;
+  }
 };
 
 const StudentNavbar = () => {
@@ -62,7 +62,7 @@ const StudentNavbar = () => {
 
   const userLogout = async () => {
 
-    await dispatch(logoutUser({ user_type: 'student',status:true }))
+    await dispatch(logoutUser({ user_type: 'student', status: true }))
       .then(res => {
         // console.log('Response for logout', res);
         navigate("/");
@@ -96,57 +96,57 @@ const StudentNavbar = () => {
 
   useEffect(() => {
     if (getStudentData?.id) {
-        const studentId = getStudentData.id;
+      const studentId = getStudentData.id;
 
+      dispatch(fetchNotifications({ user_type: 'student', user_id: studentId }));
+
+      // Poll every 30s as a robust fallback in case Supabase Realtime is not enabled
+      const pollInterval = setInterval(() => {
         dispatch(fetchNotifications({ user_type: 'student', user_id: studentId }));
+      }, 30000);
 
-        // Poll every 30s as a robust fallback in case Supabase Realtime is not enabled
-        const pollInterval = setInterval(() => {
-            dispatch(fetchNotifications({ user_type: 'student', user_id: studentId }));
-        }, 30000);
+      const channel = supabase
+        .channel(`realtime-notifications-student-${studentId}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'notifications', filter: "user_type=eq.student" },
+          (payload) => {
+            const row = payload.eventType === 'DELETE' ? payload.old : payload.new;
+            if (row?.user_id && row.user_id !== studentId) return;
 
-        const channel = supabase
-            .channel(`realtime-notifications-student-${studentId}`)
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'notifications', filter: "user_type=eq.student" },
-                (payload) => {
-                    const row = payload.eventType === 'DELETE' ? payload.old : payload.new;
-                    if (row?.user_id && row.user_id !== studentId) return;
+            if (payload.eventType === 'DELETE') {
+              dispatch(removeRealtimeNotification(row.id));
+              return;
+            }
+            dispatch(addRealtimeNotification(payload.new));
+          }
+        )
+        .subscribe();
 
-                    if (payload.eventType === 'DELETE') {
-                        dispatch(removeRealtimeNotification(row.id));
-                        return;
-                    }
-                    dispatch(addRealtimeNotification(payload.new));
-                }
-            )
-            .subscribe();
-
-        return () => {
-            clearInterval(pollInterval);
-            supabase.removeChannel(channel);
-            dispatch(resetNotifications());
-        };
+      return () => {
+        clearInterval(pollInterval);
+        supabase.removeChannel(channel);
+        dispatch(resetNotifications());
+      };
     }
   }, [getStudentData?.id, dispatch]);
 
   // Re-fetch every time the notification drawer opens
   useEffect(() => {
     if (showNotificationDrawer && getStudentData?.id) {
-        dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
+      dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
     }
   }, [showNotificationDrawer, getStudentData, dispatch]);
 
   const handleNotificationClick = (notification) => {
-      if (!notification.is_read) {
-          dispatch(markNotificationRead(notification.id));
-      }
-      setShowNotificationDrawer(false);
-      setIsOpen(false);
-      if (notification.link) {
-          navigate(notification.link);
-      }
+    if (!notification.is_read) {
+      dispatch(markNotificationRead(notification.id));
+    }
+    setShowNotificationDrawer(false);
+    setIsOpen(false);
+    if (notification.link) {
+      navigate(notification.link);
+    }
   };
 
   const handleNavClick = () => {
@@ -166,7 +166,7 @@ const StudentNavbar = () => {
             <div className="flex-shrink-0 flex items-center gap-2 sm:gap-3">
               <div className="w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl lg:rounded-xl flex items-center justify-center">
                 <span className="text-white text-sm sm:text-lg lg:text-2xl font-bold">
-                   <img src="/logo.png" alt="WebBeetles" className="h-10 w-10 animate-spin object-contain" />
+                  <img src="/logo.png" alt="WebBeetles" className="h-10 w-10 animate-spin object-contain" />
                 </span>
               </div>
               <span className="text-lg sm:text-xl lg:text-2xl font-bold">
@@ -224,7 +224,7 @@ const StudentNavbar = () => {
 
               {/* Notification Button (Only visible after login) */}
               {isAuthChecked && getStudentData && (
-                <button 
+                <button
                   onClick={() => setShowNotificationDrawer(true)}
                   className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center transition-all duration-300 relative group"
                   title="Notifications"
@@ -240,7 +240,7 @@ const StudentNavbar = () => {
 
               {/* Cart Button (Only visible after login) */}
               {isAuthChecked && getStudentData && (
-                <Link 
+                <Link
                   to="/cart"
                   className="w-10 h-10 lg:w-11 lg:h-11  flex items-center justify-center transition-all duration-300 group relative "
                   title="Your Cart"
@@ -269,7 +269,7 @@ const StudentNavbar = () => {
                   <span className="text-white/90 font-medium text-sm lg:text-base hidden sm:block cursor-default">
                     Welcome back, <span className="text-white font-bold">{getStudentData?.name?.split(" ")[0] || "Student"}</span>
                   </span>
-                  
+
                   {/* Round Profile Button */}
                   <div className="w-10 h-10 lg:w-11 lg:h-11 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center shadow-md ring-2 ring-white/20 group-hover:ring-purple-400/50 group-hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden">
                     {getStudentData ? (
@@ -350,8 +350,8 @@ const StudentNavbar = () => {
             {/* Drawer Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white text-lg font-bold">W</span>
+                <div className="flex items-center justify-center p-1 ">
+                   <img src="/logo.png" alt="WebBeetles Logo" className="w-8 h-8 object-contain" />
                 </div>
                 <span className="text-xl font-bold">WebBeetles</span>
               </div>
@@ -448,7 +448,7 @@ const StudentNavbar = () => {
                     >
                       Dashboard
                     </Link>
-                    
+
                     <Link
                       to="/cart"
                       className="block text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg mb-3"
@@ -529,64 +529,64 @@ const StudentNavbar = () => {
             </div>
 
             <div className="px-6 py-3 flex justify-between items-center bg-transparent">
-                <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.12] backdrop-blur-2xl border border-white/20 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_10px_24px_rgba(0,0,0,0.18)]">
-                        <span className={`w-1.5 h-1.5 rounded-full ${unreadCount > 0 ? 'bg-sky-200 shadow-[0_0_12px_rgba(186,230,253,0.9)] animate-pulse' : 'bg-slate-500'}`}></span>
-                        <span className="text-white font-bold">{unreadCount}</span> Unread
-                    </span>
-                </div>
-                {unreadCount > 0 && (
-                    <button
-                        onClick={() => getStudentData?.id && dispatch(markAllNotificationsRead({ user_type: 'student', user_id: getStudentData.id }))}
-                        className="text-xs font-semibold text-slate-100 hover:text-white transition-colors cursor-pointer bg-white/10 px-4 py-2 rounded-full border border-white/15 hover:bg-white/[0.18] backdrop-blur-xl"
-                    >
-                        Mark all as read
-                    </button>
-                )}
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.12] backdrop-blur-2xl border border-white/20 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_10px_24px_rgba(0,0,0,0.18)]">
+                  <span className={`w-1.5 h-1.5 rounded-full ${unreadCount > 0 ? 'bg-sky-200 shadow-[0_0_12px_rgba(186,230,253,0.9)] animate-pulse' : 'bg-slate-500'}`}></span>
+                  <span className="text-white font-bold">{unreadCount}</span> Unread
+                </span>
+              </div>
+              {unreadCount > 0 && (
+                <button
+                  onClick={() => getStudentData?.id && dispatch(markAllNotificationsRead({ user_type: 'student', user_id: getStudentData.id }))}
+                  className="text-xs font-semibold text-slate-100 hover:text-white transition-colors cursor-pointer bg-white/10 px-4 py-2 rounded-full border border-white/15 hover:bg-white/[0.18] backdrop-blur-xl"
+                >
+                  Mark all as read
+                </button>
+              )}
             </div>
 
             <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent px-5 pb-6 pt-4 space-y-4">
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-8 text-center opacity-70">
-                    <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl">
-                        <Bell className="w-8 h-8 text-sky-100" />
-                    </div>
-                    <h3 className="text-lg font-medium text-white mb-2">You're all caught up!</h3>
-                    <p className="text-slate-300 text-sm">No new notifications right now.</p>
+                  <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl">
+                    <Bell className="w-8 h-8 text-sky-100" />
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-2">You're all caught up!</h3>
+                  <p className="text-slate-300 text-sm">No new notifications right now.</p>
                 </div>
               ) : (
                 <AnimatePresence>
-                    {notifications.map((notification) => (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, height: 0 }}
-                            key={notification.id}
-                            onClick={() => handleNotificationClick(notification)}
-                            className={`group p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_18px_34px_rgba(0,0,0,0.22)] ${!notification.is_read ? 'bg-white/[0.14] border-white/25 hover:bg-white/[0.18]' : 'bg-white/[0.07] border-white/[0.12] hover:bg-white/[0.12]'}`}
-                        >
-                            {!notification.is_read && (
-                                <div className="absolute left-0 top-4 bottom-4 w-1 bg-sky-200 rounded-r-full shadow-[0_0_16px_rgba(186,230,253,0.45)]"></div>
-                            )}
-                            <div className="flex gap-4">
-                                <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] ${!notification.is_read ? 'bg-white/[0.14] text-white border border-white/20' : 'bg-white/[0.08] text-slate-300 border border-white/10'}`}>
-                                    {getIconForType(notification.type)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h4 className={`text-sm pr-4 ${!notification.is_read ? 'text-white font-semibold' : 'text-slate-200 font-medium'}`}>
-                                        {notification.title}
-                                    </h4>
-                                    <p className={`text-xs mt-1 leading-relaxed ${!notification.is_read ? 'text-slate-200' : 'text-slate-400'} line-clamp-2`}>
-                                        {notification.message}
-                                    </p>
-                                    <span className={`flex items-center gap-1.5 text-[10px] mt-2.5 font-medium ${!notification.is_read ? 'text-slate-300' : 'text-slate-500'}`}>
-                                        <Clock className="w-3 h-3" />
-                                        {formatRelativeTime(notification.created_at)}
-                                    </span>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                  {notifications.map((notification) => (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      key={notification.id}
+                      onClick={() => handleNotificationClick(notification)}
+                      className={`group p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_18px_34px_rgba(0,0,0,0.22)] ${!notification.is_read ? 'bg-white/[0.14] border-white/25 hover:bg-white/[0.18]' : 'bg-white/[0.07] border-white/[0.12] hover:bg-white/[0.12]'}`}
+                    >
+                      {!notification.is_read && (
+                        <div className="absolute left-0 top-4 bottom-4 w-1 bg-sky-200 rounded-r-full shadow-[0_0_16px_rgba(186,230,253,0.45)]"></div>
+                      )}
+                      <div className="flex gap-4">
+                        <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] ${!notification.is_read ? 'bg-white/[0.14] text-white border border-white/20' : 'bg-white/[0.08] text-slate-300 border border-white/10'}`}>
+                          {getIconForType(notification.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className={`text-sm pr-4 ${!notification.is_read ? 'text-white font-semibold' : 'text-slate-200 font-medium'}`}>
+                            {notification.title}
+                          </h4>
+                          <p className={`text-xs mt-1 leading-relaxed ${!notification.is_read ? 'text-slate-200' : 'text-slate-400'} line-clamp-2`}>
+                            {notification.message}
+                          </p>
+                          <span className={`flex items-center gap-1.5 text-[10px] mt-2.5 font-medium ${!notification.is_read ? 'text-slate-300' : 'text-slate-500'}`}>
+                            <Clock className="w-3 h-3" />
+                            {formatRelativeTime(notification.created_at)}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </AnimatePresence>
               )}
             </div>

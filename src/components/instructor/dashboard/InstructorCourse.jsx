@@ -94,7 +94,7 @@ const InstructorCourse = ({ initialSelectedCourse }) => {
           <InstructorCourseListHeader />
         </div>
 
-        <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <StatsCard courses={courses} getCourseData={getCourseData} studentCount={studentCount} totalRevenue={totalRevenue} avgRating={avgRating} />
         </div>
 
@@ -113,7 +113,7 @@ const InstructorCourse = ({ initialSelectedCourse }) => {
             ))}
           </div>
         ) :
-          (<div className="grid grid-cols-3 gap-6">
+          (<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {getCourseData?.map(course => <CourseCard key={course.id} course={course} setDeletedData={setDeletedData} setSelectedCourse={setSelectedCourse} setExpandedSections={setExpandedSections} setEditForm={setEditForm} setShowEditModal={setShowEditModal} setShowDeleteModal={setShowDeleteModal} />)}
           </div>
           )}

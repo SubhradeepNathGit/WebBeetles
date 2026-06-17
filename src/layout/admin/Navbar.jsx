@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Bell, LogOut, Settings, ChevronDown, Menu, X, Clock, Info } from "lucide-react";
-import Sidebar from "./Sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { checkLoggedInUser, logoutUser } from "../../redux/slice/authSlice/checkUserAuthSlice";
 import toastifyAlert from "../../util/alert/toastify";
@@ -31,7 +30,7 @@ const formatRelativeTime = (dateString) => {
     }
 };
 
-export default function Navbar() {
+export default function Navbar({ isMobileOpen = false, setIsMobileOpen }) {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -39,7 +38,6 @@ export default function Navbar() {
     const [searchQuery, setSearchQuery] = useState("");
     const [showNotifications, setShowNotifications] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
-    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
    
     const [isMobile, setIsMobile] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -111,24 +109,13 @@ export default function Navbar() {
             if (e.key === "Escape") {
                 setShowNotifications(false);
                 setShowUserMenu(false);
-                setShowMobileSidebar(false);
+                setIsMobileOpen?.(false);
             }
         };
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
-
-    useEffect(() => {
-        if (showMobileSidebar) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
-        }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [showMobileSidebar]);
+    }, [setIsMobileOpen]);
 
     useEffect(() => {
         dispatch(fetchNotifications({ user_type: 'admin' }));
@@ -211,15 +198,14 @@ export default function Navbar() {
             <header className="sticky top-0 z-50 w-full bg-black border-b border-white/5">
                 <div className="flex items-center justify-between px-4 md:h-18 lg:h-18 md:px-6 py-3 md:py-4">
                     <div className="flex items-center gap-3 md:gap-4">
-                        {isMobile && (
-                            <button
-                                onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-                                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all"
-                                aria-label="Toggle menu"
-                            >
-                                {showMobileSidebar ? <X size={20} /> : <Menu size={20} />}
-                            </button>
-                        )}
+                        <button
+                            type="button"
+                            onClick={() => setIsMobileOpen?.((open) => !open)}
+                            className="rounded-lg bg-white/5 p-2 text-gray-300 transition-all hover:bg-white/10 hover:text-white md:hidden"
+                            aria-label="Toggle menu"
+                        >
+                            {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
+                        </button>
 
                         <div className="flex items-center gap-2">
                             <div className="">
@@ -450,21 +436,6 @@ export default function Navbar() {
                     </div>
                 )}
             </header>
-
-            {isMobile && showMobileSidebar && (
-                <>
-                    <div
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-                        onClick={() => setShowMobileSidebar(false)}
-                    />
-                    <div
-                        className={`fixed top-0 left-0 h-full w-64 z-50 transform transition-transform duration-300 ease-in-out ${showMobileSidebar ? "translate-x-0" : "-translate-x-full"
-                            }`}
-                    >
-                        <Sidebar onNavigate={() => setShowMobileSidebar(false)} />
-                    </div>
-                </>
-            )}
         </>
     );
 }

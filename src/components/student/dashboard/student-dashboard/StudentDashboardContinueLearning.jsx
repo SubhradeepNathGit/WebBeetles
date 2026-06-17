@@ -23,14 +23,14 @@ const StudentDashboardContinueLearning = () => {
   }, [userAuthData]);
 
   return (
-    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
+    <div className="relative w-full max-w-full min-w-0 rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
             <Play size={14} className="text-purple-400" fill="currentColor" />
           </div>
-          <h2 className="text-sm font-semibold text-white">Continue Learning</h2>
+          <h2 className="truncate text-sm font-semibold text-white">Continue Learning</h2>
         </div>
         <button
           onClick={() => window.dispatchEvent(new CustomEvent("open-user-course"))}
@@ -41,11 +41,11 @@ const StudentDashboardContinueLearning = () => {
       </div>
 
       {/* Course List */}
-      <div className="p-5 space-y-3">
+      <div className="space-y-3 p-4 sm:p-5">
         {isPurchaseLoading ? (
           <div className="space-y-3 animate-pulse">
             {[1, 2].map((n) => (
-              <div key={n} className="flex gap-4 p-4 border border-white/5 rounded-lg bg-transparent">
+              <div key={n} className="flex min-w-0 flex-col gap-4 p-3 sm:flex-row sm:p-4 border border-white/5 rounded-lg bg-transparent">
                 {/* Thumbnail skeleton */}
                 <div className="w-full sm:w-36 h-28 sm:h-24 rounded-md bg-white/5 flex-shrink-0" />
                 {/* Text lines skeletons */}

@@ -1,21 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
 export default function AdminLayout() {
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
+
     return (
         <div className="h-screen flex bg-black text-white overflow-hidden">
-            {/* Sidebar - Fixed on the left, full height */}
-            <div className="hidden md:flex flex-shrink-0">
-                <Sidebar />
-            </div>
+            <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
 
             {/* Right side: Navbar fixed at top + scrollable content below */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Navbar is sticky within this column */}
                 <div className="flex-shrink-0">
-                    <Navbar />
+                    <Navbar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
                 </div>
 
                 {/* Scrollable main content */}

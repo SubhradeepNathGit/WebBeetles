@@ -60,7 +60,7 @@ const StudentDashboardStats = () => {
   }, [purchaseItems, courseProgressMap]);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+    <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
       {statConfig.map(({ icon: Icon, label, key, iconColor, bg, border }) => (
         <div
           key={key}

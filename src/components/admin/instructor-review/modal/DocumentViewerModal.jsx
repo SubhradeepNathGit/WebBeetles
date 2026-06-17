@@ -17,21 +17,28 @@ const DocumentViewerModal = ({ app, onClose }) =>{
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 flex-shrink-0">
-                    <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 py-4 border-b border-white/5 flex-shrink-0">
+                    <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
                         <button
                             onClick={onClose}
-                            className="p-1.5 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+                            className="p-1.5 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer mt-1 sm:mt-0"
                         >
                             <ChevronLeft size={18} />
                         </button>
-                        <FileText size={18} className="text-emerald-400" />
-                        <div>
-                            <p className="text-sm font-semibold text-white">{app.documentName || "Qualification Document"}</p>
-                            <p className="text-xs text-gray-500">Submitted by {app.name}</p>
+                        <FileText size={18} className="text-emerald-400 mt-1 sm:mt-0" />
+                        <div className="flex-1 truncate">
+                            <p className="text-sm font-semibold text-white truncate">{app.documentName || "Qualification Document"}</p>
+                            <p className="text-xs text-gray-500 truncate">Submitted by {app.name}</p>
                         </div>
+                        {/* Mobile close button at the top right */}
+                        <button
+                            onClick={onClose}
+                            className="p-1.5 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer sm:hidden"
+                        >
+                            <X size={18} />
+                        </button>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto sm:justify-end">
                         {docUrl && (
                             <>
                                 <a
@@ -39,7 +46,7 @@ const DocumentViewerModal = ({ app, onClose }) =>{
                                     download={app.documentName}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 rounded-lg transition-colors text-xs font-medium"
+                                    className="flex items-center justify-center flex-1 sm:flex-none gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 rounded-lg transition-colors text-xs font-medium"
                                 >
                                     <Download size={13} /> Download
                                 </a>
@@ -47,15 +54,16 @@ const DocumentViewerModal = ({ app, onClose }) =>{
                                     href={docUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg transition-colors text-xs font-medium"
+                                    className="flex items-center justify-center flex-1 sm:flex-none gap-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-lg transition-colors text-xs font-medium"
                                 >
                                     <ExternalLink size={13} /> Open in Tab
                                 </a>
                             </>
                         )}
+                        {/* Desktop close button */}
                         <button
                             onClick={onClose}
-                            className="p-1.5 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-all ml-2 cursor-pointer"
+                            className="hidden sm:block p-1.5 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-all ml-2 cursor-pointer"
                         >
                             <X size={18} />
                         </button>

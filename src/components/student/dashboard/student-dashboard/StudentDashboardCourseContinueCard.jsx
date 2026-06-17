@@ -36,11 +36,11 @@ const StudentDashboardCourseContinueCard = ({ course, userAuthData }) => {
   return (
     <div 
       onClick={handleOpenCourse}
-      className="group relative rounded-lg bg-transparent border border-white/8 hover:bg-white/4 p-4 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col sm:flex-row gap-4"
+      className="group relative flex w-full max-w-full min-w-0 cursor-pointer flex-col gap-3 overflow-hidden rounded-lg border border-white/8 bg-transparent p-3 transition-all duration-200 hover:bg-white/4 sm:flex-row sm:gap-4 sm:p-4"
     >
       
       {/* Thumbnail */}
-      <div className="relative w-full sm:w-36 aspect-video sm:aspect-none sm:h-24 rounded-md overflow-hidden border border-white/10 flex-shrink-0">
+      <div className="relative w-full flex-shrink-0 overflow-hidden rounded-md border border-white/10 aspect-video sm:w-36 sm:aspect-none sm:h-24">
         <img
           src={course?.thumbnail}
           alt={course?.title}
@@ -59,25 +59,25 @@ const StudentDashboardCourseContinueCard = ({ course, userAuthData }) => {
       </div>
 
       {/* Info */}
-      <div className="flex-1 min-w-0 flex flex-col justify-center">
-        <h3 className="font-semibold text-white text-sm mb-1 line-clamp-1 group-hover:text-purple-300 transition-colors">
+      <div className="flex min-w-0 flex-1 flex-col justify-center">
+        <h3 className="mb-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold text-white transition-colors group-hover:text-purple-300">
           {course?.title ?? 'N/A'}
         </h3>
-        <p className="text-xs text-white/40 mb-3">
+        <p className="mb-3 truncate text-xs text-white/40">
           by {courseDetails?.instructor?.name ?? 'N/A'}
         </p>
 
         {/* Meta row */}
-        <div className="flex flex-wrap items-center gap-2 text-xs mb-3">
-          <span className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-white/60">
+        <div className="mb-3 flex max-w-full flex-wrap items-center gap-2 text-xs">
+          <span className="flex min-w-0 items-center gap-1 rounded border border-white/10 bg-white/5 px-2 py-1 text-white/60">
             <Star size={12} className="text-amber-400" fill="#fbbf24" />
             <CourseRating courseId={courseDetails?.id} />
           </span>
-          <span className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-white/60">
+          <span className="flex min-w-0 items-center gap-1 rounded border border-white/10 bg-white/5 px-2 py-1 text-white/60">
             <Users size={12} className="text-purple-400" />
             {students?.length ?? 0}
           </span>
-          <span className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-white/60">
+          <span className="flex min-w-0 items-center gap-1 rounded border border-white/10 bg-white/5 px-2 py-1 text-white/60">
             <Clock size={12} className="text-blue-400" />
             {totalLectureTiming}
           </span>

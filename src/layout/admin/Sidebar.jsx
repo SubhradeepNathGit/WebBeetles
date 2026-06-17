@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useSidebarStore } from "../../store/useSidebarStore";
 import {
     Home, Users, Settings, BarChart2, Menu, LogOut, X, ChevronLeft, ChevronRight, User, ClipboardCheck, BookOpenCheck,
@@ -45,7 +45,7 @@ const NavItem = ({ to, icon: Icon, children, collapsed, onClick, badge }) => (
     </NavLink>
 );
 
-export default function Sidebar({ onNavigate }) {
+export default function Sidebar({ onNavigate, isMobileOpen, setIsMobileOpen }) {
 
     const dispatch = useDispatch(),
         { isInstructorLoading, getInstructorData, isInstructorError } = useSelector(state => state?.instructor),
@@ -60,26 +60,34 @@ export default function Sidebar({ onNavigate }) {
     const collapsed = useSidebarStore((s) => s.collapsed);
     const toggle = useSidebarStore((s) => s.toggle);
     const navigate = useNavigate();
+    const location = useLocation();
     const sidebarRef = useRef(null);
+    const hasMountedRef = useRef(false);
 
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const mobileDrawerOpen = isMobileOpen ?? mobileOpen;
+    const effectiveCollapsed = collapsed && !mobileDrawerOpen;
+    const closeMobileDrawer = useCallback(() => {
+        setMobileOpen(false);
+        setIsMobileOpen?.(false);
+        if (onNavigate) onNavigate();
+    }, [onNavigate, setIsMobileOpen]);
 
     // Removed redundant checkLoggedInUser dispatch as ProtectedRoute handles it
 
     useEffect(() => {
         const handleEscape = (e) => {
-            if (e.key === "Escape" && mobileOpen) {
-                setMobileOpen(false);
-                if (onNavigate) onNavigate();
+            if (e.key === "Escape" && mobileDrawerOpen) {
+                closeMobileDrawer();
             }
         };
         document.addEventListener("keydown", handleEscape);
         return () => document.removeEventListener("keydown", handleEscape);
-    }, [mobileOpen, onNavigate]);
+    }, [mobileDrawerOpen, closeMobileDrawer]);
 
     useEffect(() => {
-        if (mobileOpen) {
+        if (mobileDrawerOpen) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "";
@@ -87,12 +95,15 @@ export default function Sidebar({ onNavigate }) {
         return () => {
             document.body.style.overflow = "";
         };
-    }, [mobileOpen]);
+    }, [mobileDrawerOpen]);
 
     useEffect(() => {
-        setMobileOpen(false);
-        if (onNavigate) onNavigate();
-    }, [navigate, onNavigate]);
+        if (!hasMountedRef.current) {
+            hasMountedRef.current = true;
+            return;
+        }
+        closeMobileDrawer();
+    }, [location.pathname, closeMobileDrawer]);
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
@@ -149,10 +160,10 @@ export default function Sidebar({ onNavigate }) {
 
     return (
         <>
-            {mobileOpen && (
+            {mobileDrawerOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity"
-                    onClick={() => { setMobileOpen(false); if (onNavigate) onNavigate() }}
+                    className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm transition-opacity md:hidden"
+                    onClick={closeMobileDrawer}
                     aria-hidden="true"
                 />
             )}
@@ -162,10 +173,10 @@ export default function Sidebar({ onNavigate }) {
                 role="navigation"
                 aria-label="Main navigation"
                 className={`
-          fixed top-0 left-0 h-screen z-50 flex flex-col transition-all duration-300 
+          fixed top-0 left-0 h-screen z-[60] flex flex-col transition-all duration-300 
           bg-black border-r border-white/5
-          ${collapsed ? "w-20" : "w-64"}
-          ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          w-64 ${collapsed ? "md:w-20" : "md:w-64"}
+          ${mobileDrawerOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
         `}
                 style={{ boxShadow: "inset 0 0 40px rgba(255,255,255,0.02)" }}
             >
@@ -177,7 +188,7 @@ export default function Sidebar({ onNavigate }) {
                         >
                             <img src="/logo.png" alt="WebBeetles" className="h-10 w-10 animate-spin object-contain" />
                         </div>
-                        {!collapsed && (
+                        {!effectiveCollapsed && (
                             <div className="min-w-0">
                                 <h1 className="text-white font-semibold text-base truncate">
                                     WebBeetles
@@ -187,7 +198,7 @@ export default function Sidebar({ onNavigate }) {
                         )}
                     </div>
 
-                    {!collapsed && (
+                    {!effectiveCollapsed && (
                         <button
                             onClick={toggle}
                             className="hidden md:flex p-2 rounded-lg hover:bg-white/5 transition-colors text-gray-300 hover:text-white cursor-pointer"
@@ -199,7 +210,7 @@ export default function Sidebar({ onNavigate }) {
                     )}
 
                     <button
-                        onClick={() => { setMobileOpen(false); if (onNavigate) onNavigate() }}
+                        onClick={closeMobileDrawer}
                         className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors text-gray-300 hover:text-white"
                         aria-label="Close sidebar"
                     >
@@ -207,7 +218,7 @@ export default function Sidebar({ onNavigate }) {
                     </button>
                 </div>
 
-                {!collapsed && (
+                {!effectiveCollapsed && (
                     <div className="p-4">
                         <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
                             <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white font-semibold flex-shrink-0 shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent">
@@ -222,7 +233,7 @@ export default function Sidebar({ onNavigate }) {
                 )}
 
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                    {collapsed && (
+                    {effectiveCollapsed && (
                         <button
                             onClick={toggle}
                             className="w-full flex items-center justify-center p-3 rounded-lg hover:bg-white/5 transition-colors text-gray-300 hover:text-white mb-2 cursor-pointer"
@@ -238,8 +249,8 @@ export default function Sidebar({ onNavigate }) {
                             key={item.to}
                             to={item.to}
                             icon={item.icon}
-                            collapsed={collapsed}
-                            onClick={() => { setMobileOpen(false); if (onNavigate) onNavigate() }}
+                            collapsed={effectiveCollapsed}
+                            onClick={closeMobileDrawer}
                             badge={item.badge}
                         >
                             {item.label}
@@ -258,12 +269,12 @@ export default function Sidebar({ onNavigate }) {
                         aria-label="Logout"
                     >
                         <LogOut size={18} className={isLoggingOut ? "animate-spin" : ""} />
-                        {!collapsed && (
+                        {!effectiveCollapsed && (
                             <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
                         )}
                     </button>
 
-                    {!collapsed && (
+                    {!effectiveCollapsed && (
                         <div className="text-xs text-gray-500 text-center pt-2">
                             © {new Date().getFullYear()} WebBeetles Admin
                         </div>
@@ -271,13 +282,15 @@ export default function Sidebar({ onNavigate }) {
                 </div>
             </aside>
 
-            <button
-                onClick={() => setMobileOpen(true)}
-                className="fixed top-4 left-4 z-30 p-3 rounded-lg bg-black text-white hover:bg-gray-900 transition-colors shadow-lg md:hidden shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent"
-                aria-label="Open sidebar"
-            >
-                <Menu size={20} />
-            </button>
+            {!onNavigate && !setIsMobileOpen && (
+                <button
+                    onClick={() => setMobileOpen(true)}
+                    className="fixed top-4 left-4 z-30 p-3 rounded-lg bg-black text-white hover:bg-gray-900 transition-colors shadow-lg md:hidden shadow-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] border-transparent"
+                    aria-label="Open sidebar"
+                >
+                    <Menu size={20} />
+                </button>
+            )}
 
             <div
                 className={`hidden md:block transition-all duration-300 ${collapsed ? "md:w-20" : "md:w-64"

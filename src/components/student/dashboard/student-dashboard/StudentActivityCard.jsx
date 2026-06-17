@@ -27,20 +27,20 @@ const StudentActivityCard = ({ activity }) => {
   const Icon = cfg.icon;
 
   return (
-    <div className="group flex items-center gap-3 p-2.5 rounded-lg border border-transparent hover:bg-white/4 hover:border-white/8 transition-all duration-200 cursor-default">
+    <div className="group grid min-w-0 grid-cols-[36px_minmax(0,1fr)] gap-3 rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:bg-white/4 hover:border-white/8 sm:flex sm:items-center sm:cursor-default">
       {/* Icon */}
       <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 border transition-transform group-hover:scale-105 ${cfg.bg} ${cfg.border}`}>
         <Icon size={15} className={cfg.text} />
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-white truncate mb-0.5">{activity?.message ?? 'N/A'}</p>
-        <p className="text-[10px] text-white/40 truncate">{data?.title ?? ''}</p>
+      <div className="min-w-0 sm:flex-1">
+        <p className="mb-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-white">{activity?.message ?? 'N/A'}</p>
+        <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[10px] text-white/40">{data?.title ?? ''}</p>
       </div>
 
       {/* Timestamp */}
-      <span className="text-[10px] text-white/30 whitespace-nowrap flex-shrink-0">
+      <span className="col-start-2 text-[10px] text-white/30 sm:col-start-auto sm:flex-shrink-0 sm:whitespace-nowrap">
         {formatDateByHHAndDay(activity?.created_at)}
       </span>
     </div>

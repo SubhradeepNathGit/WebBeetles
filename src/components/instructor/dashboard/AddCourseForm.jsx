@@ -427,7 +427,7 @@ const AddCourseForm = () => {
         {/* Page Title */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Add New Course</h1>
+            <h1 className="text-2xl sm:text-4xl font-bold mb-2">Add New Course</h1>
             <p className="text-gray-400">Fill in the details below to publish your course</p>
           </div>
         </div>
@@ -459,7 +459,7 @@ const AddCourseForm = () => {
                 <ErrorMsg msg={errors.description?.message} />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-white/90 text-sm font-medium mb-2">Price (₹) *</label>
                   <input type="number" step="0.01" {...register("price", { required: "Price is required", min: { value: 0, message: "Price must be positive" } })} placeholder="4999" className={inputClass(errors.price)} />

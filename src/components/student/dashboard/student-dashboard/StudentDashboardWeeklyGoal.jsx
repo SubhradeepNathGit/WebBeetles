@@ -46,18 +46,18 @@ const StudentDashboardWeeklyGoal = () => {
   const dash = circ * (1 - pct / 100);
 
   return (
-    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
+    <div className="relative w-full max-w-full min-w-0 rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4">
-        <div className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
+      <div className="flex min-w-0 items-center gap-3 px-4 py-4 sm:px-5">
+        <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
           <Target size={14} className="text-purple-400" />
         </div>
-        <h2 className="text-sm font-semibold text-white">Weekly Goal</h2>
+        <h2 className="truncate text-sm font-semibold text-white">Weekly Goal</h2>
       </div>
 
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         {/* Circular progress + stats */}
-        <div className="flex items-center gap-5 mb-4">
+        <div className="mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
           <div className="relative flex-shrink-0">
             <svg width="88" height="88" viewBox="0 0 88 88">
               {/* Track */}
@@ -80,7 +80,7 @@ const StudentDashboardWeeklyGoal = () => {
             </div>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <p className="text-xs text-white/40 mb-0.5">Learning Time</p>
             <p className="text-2xl font-bold text-white">
               {weeklyGoal.current}
@@ -105,9 +105,9 @@ const StudentDashboardWeeklyGoal = () => {
         </div>
 
         {/* Message */}
-        <div className="flex items-center gap-2 bg-white/3 border border-white/6 rounded-lg px-3 py-2">
-          <Flame size={13} className={isDone ? "text-emerald-400" : "text-orange-400"} />
-          <p className="text-xs text-white/50">
+        <div className="flex items-start gap-2 rounded-lg border border-white/6 bg-white/3 px-3 py-2">
+          <Flame size={13} className={`mt-0.5 flex-shrink-0 ${isDone ? "text-emerald-400" : "text-orange-400"}`} />
+          <p className="min-w-0 text-xs leading-relaxed text-white/50">
             {isDone
               ? "Congratulations! You've hit your weekly goal!"
               : `You're doing great! Just ${remaining} more hour${remaining !== 1 ? "s" : ""} to go!`}

@@ -34,15 +34,15 @@ const StudentDashboardSubscriptionCard = ({ userDetails }) => {
 
   if (!currentPlan) {
     return (
-      <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group flex flex-col justify-between">
+      <div className="relative flex w-full max-w-full min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-black border border-white/[0.08] hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
         {/* Card Content */}
-        <div className="p-5 flex-1 flex flex-col">
+        <div className="flex flex-1 flex-col p-4 sm:p-5">
           {/* Top Row with Premium Recommended Badge */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-10 h-10 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-purple-600/20 border border-purple-500/25 flex items-center justify-center">
               <Rocket size={18} className="text-purple-400" />
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/25 text-purple-300 uppercase tracking-wider">
+            <span className="max-w-full truncate rounded-full border border-purple-500/25 bg-purple-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-purple-300">
               Recommended
             </span>
           </div>
@@ -55,16 +55,16 @@ const StudentDashboardSubscriptionCard = ({ userDetails }) => {
             </p>
 
             {/* List of high-value perks to make it look even more premium */}
-            <div className="space-y-2 mb-6">
+            <div className="mb-6 space-y-2">
               {[
                 "Unlimited Course Access",
                 "Verified Certificates",
                 "Priority Live Support",
                 "Weekly Live Webinars"
               ].map((perk, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-xs text-white/40">
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-500/60" />
-                  <span>{perk}</span>
+                <div key={idx} className="flex min-w-0 items-center gap-2 text-xs text-white/40">
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-500/60" />
+                  <span className="min-w-0">{perk}</span>
                 </div>
               ))}
             </div>
@@ -72,10 +72,10 @@ const StudentDashboardSubscriptionCard = ({ userDetails }) => {
         </div>
 
         {/* Action Button */}
-        <div className="px-5 pb-5">
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5">
           <button
             onClick={handleGoToPricing}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] text-white text-sm font-semibold transition-all duration-300 cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] cursor-pointer"
           >
             <span>Choose a Plan</span>
             <ArrowUpRight size={14} />
@@ -89,30 +89,30 @@ const StudentDashboardSubscriptionCard = ({ userDetails }) => {
   const PlanIcon = cfg.Icon;
 
   return (
-    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 flex flex-col justify-between">
-      <div className="p-5 flex-1 flex flex-col">
+    <div className="relative flex w-full max-w-full min-w-0 flex-col justify-between overflow-hidden rounded-2xl bg-black border border-white/[0.08] hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
         {/* Plan Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
             <Shield size={18} style={{ color: cfg.iconColor }} />
           </div>
-          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider ${cfg.tag}`}>
+          <span className={`max-w-full truncate rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${cfg.tag}`}>
             {cfg.label} Plan
           </span>
         </div>
 
         {/* Plan Info */}
         <div className="flex-1">
-          <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
+          <h3 className="mb-3 flex min-w-0 items-center gap-2 text-base font-semibold text-white">
             <PlanIcon size={16} style={{ color: cfg.iconColor }} />
             Active Plan
           </h3>
 
           <div className="space-y-2.5 mb-6">
             {cfg.benefits.map((b, i) => (
-              <div key={i} className="flex items-start gap-2.5 text-xs text-white/50 leading-relaxed">
+              <div key={i} className="flex min-w-0 items-start gap-2.5 text-xs leading-relaxed text-white/50">
                 <CheckCircle2 size={14} className="text-emerald-500 mt-0.5 flex-shrink-0" />
-                <span>{b}</span>
+                <span className="min-w-0">{b}</span>
               </div>
             ))}
           </div>
@@ -121,10 +121,10 @@ const StudentDashboardSubscriptionCard = ({ userDetails }) => {
 
       {/* Action Button for non-EXPERT */}
       {currentPlan !== 'EXPERT' && (
-        <div className="px-5 pb-5">
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5">
           <button
             onClick={handleGoToPricing}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white text-sm font-semibold transition-all duration-300 cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:border-white/20 cursor-pointer"
           >
             <span>Upgrade Plan</span>
             <ArrowUpRight size={14} />

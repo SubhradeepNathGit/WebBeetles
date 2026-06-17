@@ -16,20 +16,20 @@ const StudentDashboardRecentActivity = ({ studentDetails }) => {
   }, [dispatch]);
 
   return (
-    <div className="relative rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
+    <div className="relative w-full max-w-full min-w-0 rounded-2xl bg-black border border-white/[0.08] overflow-hidden hover:border-purple-500/30 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all duration-300 group">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4">
-        <div className="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/25 flex items-center justify-center">
+      <div className="flex min-w-0 items-center gap-3 px-4 py-4 sm:px-5">
+        <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-blue-600/20 border border-blue-500/25 flex items-center justify-center">
           <BarChart3 size={14} className="text-blue-400" />
         </div>
-        <h2 className="text-sm font-semibold text-white">Recent Activity</h2>
+        <h2 className="truncate text-sm font-semibold text-white">Recent Activity</h2>
       </div>
 
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         {isActivityLoading ? (
           <div className="space-y-2.5 animate-pulse">
             {[1, 2, 3].map((n) => (
-              <div key={n} className="flex items-center gap-3 p-2.5 rounded-lg border border-transparent bg-transparent">
+              <div key={n} className="flex min-w-0 items-center gap-3 p-2.5 rounded-lg border border-transparent bg-transparent">
                 {/* Icon skeleton */}
                 <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/5 flex-shrink-0" />
                 {/* Text lines skeletons */}
@@ -43,7 +43,7 @@ const StudentDashboardRecentActivity = ({ studentDetails }) => {
             ))}
           </div>
         ) : activityList?.length > 0 ? (
-          <div className="space-y-1">
+          <div className="min-w-0 space-y-1">
             {activityList.slice(0, 6).map(activity => (
               <StudentActivityCard key={activity?.id} activity={activity} />
             ))}
