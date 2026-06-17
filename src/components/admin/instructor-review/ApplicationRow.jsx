@@ -58,7 +58,7 @@ const ApplicationRow = ({ app, setModal, setDocViewer, setOpenMarkModal, setInst
                         className={`flex items-center gap-2 px-3 py-1.5 border ${app?.application_complete ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/20 cursor-pointer' :
                             'bg-emerald-300/20 text-emerald-300 border-emerald-300/20 cursor-not-allowed'} rounded-lg transition-colors text-xs font-semibold`}
                     >
-                        <FileText size={13} /> View Document
+                        <FileText size={13} /> View
                     </button>
                 </td>
 

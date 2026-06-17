@@ -266,10 +266,10 @@ export default function Navbar({ isMobileOpen = false, setIsMobileOpen }) {
                             </button>
 
                             {showNotifications && (
-                                <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] bg-[linear-gradient(145deg,rgba(255,255,255,0.16),rgba(15,23,42,0.82)_44%,rgba(3,7,18,0.92))] border border-white/20 rounded-2xl shadow-[0_24px_70px_rgba(0,0,0,0.42)] overflow-hidden backdrop-blur-3xl">
-                                    <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/[0.04]">
+                                <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] bg-black/20 rounded-2xl overflow-hidden backdrop-blur-xl">
+                                    <div className="flex items-center justify-between p-4 bg-white/[0.04]">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
+                                            <div className="w-9 h-9 rounded-xl  flex items-center justify-center ">
                                                 <Bell size={17} className="text-sky-100" />
                                             </div>
                                             <h3 className="text-white font-semibold text-sm">Notifications</h3>
@@ -293,7 +293,7 @@ export default function Navbar({ isMobileOpen = false, setIsMobileOpen }) {
                                                 <button
                                                     key={notification.id}
                                                     onClick={() => handleNotificationClick(notification)}
-                                                    className={`w-full p-4 text-left transition-all rounded-2xl border backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_14px_28px_rgba(0,0,0,0.2)] cursor-pointer ${!notification.is_read ? "bg-white/[0.14] border-white/25 hover:bg-white/[0.18]" : "bg-white/[0.07] border-white/[0.12] hover:bg-white/[0.12]"}`}
+                                                    className={`w-full p-4 text-left transition-all rounded-2xl backdrop-blur-2xl cursor-pointer ${!notification.is_read ? "bg-white/[0.14] hover:bg-white/[0.18]" : "bg-white/[0.07] hover:bg-white/[0.12]"}`}
                                                 >
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
@@ -302,7 +302,7 @@ export default function Navbar({ isMobileOpen = false, setIsMobileOpen }) {
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2">
                                                                 {!notification.is_read && (
-                                                                    <span className="w-1.5 h-1.5 bg-sky-200 rounded-full flex-shrink-0 shadow-[0_0_10px_rgba(186,230,253,0.7)]" />
+                                                                    <span className="w-1.5 h-1.5 bg-sky-200 rounded-full flex-shrink-0" />
                                                                 )}
                                                                 <p className="text-white text-sm font-semibold truncate">
                                                                     {notification.title}
@@ -323,7 +323,7 @@ export default function Navbar({ isMobileOpen = false, setIsMobileOpen }) {
                                             ))
                                         )}
                                     </div>
-                                    <div className="p-3 border-t border-white/10 bg-white/[0.03]">
+                                    <div className="p-3 bg-white/[0.03]">
                                         <button
                                             onClick={() => {
                                                 navigate("/admin/notification");

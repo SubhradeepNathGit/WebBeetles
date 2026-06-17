@@ -57,10 +57,10 @@ const TableRow = ({ inst,setOpenMarkModal, setInstructorId, setChangeStatus }) =
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${APPROVAL_STATUS_COLORS[inst?.application_status] ?? "bg-gray-500/10 text-gray-400 border-gray-500/20"}`}>{inst?.application_status?.charAt(0)?.toUpperCase() + inst?.application_status?.slice(1)?.toLowerCase()}</span>
                 </td>
                 <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${STATUS_COLORS[inst?.application_status === "approved" ? inst?.is_blocked ? 'Suspended' : 'Active' : 'NA']}`}>{inst?.application_status === "approved" ? inst?.is_blocked ? 'Suspended' : 'Active' : 'N/A'}</span>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${STATUS_COLORS[inst?.application_status === "approved" ? inst?.is_blocked ? 'Suspended' : 'Active' : 'NA']}`}>{inst?.application_status === "approved" ? inst?.is_blocked ? 'Suspended' : 'Active' : 'Waiting'}</span>
                 </td>
                 <td className="px-6 py-4">
-                    <button disabled={inst?.application_status !== "approved"} className={`py-1 rounded-xl ${inst?.application_status === "approved" ? inst?.is_blocked ? 'px-4 bg-green-500/10 text-green-500 border-green-500/20 hover:text-green-200 hover:bg-green-500/40 hover:border-green-500/50 cursor-pointer' :
+                    <button disabled={inst?.application_status !== "approved"} className={`py-1 text-xs rounded-lg ${inst?.application_status === "approved" ? inst?.is_blocked ? 'px-4 bg-green-500/10 text-green-500 border-green-500/20 hover:text-green-200 hover:bg-green-500/40 hover:border-green-500/50 cursor-pointer' :
                         'px-5 bg-red-500/10 text-red-500 border-red-500/20 hover:text-red-200 hover:bg-red-500/40 hover:border-red-500/50 cursor-pointer' : 'px-2 bg-gray-500/10 text-gray-500 border-gray-500/20 cursor-not-allowed'}`} onClick={() => { if (inst?.application_status !== "approved") return; setOpenMarkModal(true); setInstructorId(inst?.id); setChangeStatus(!inst?.is_blocked); }}>
                         {inst?.application_status === "approved" ? !inst?.is_blocked ? 'Block' : 'Active' : 'Disabled'}</button>
                 </td>
