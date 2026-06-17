@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../../util/supabase/supabase";
 import supabaseAdmin from "../../../util/supabase/supabaseAdmin";
 import { generateOTP, sendOTPEmail, sendForgetPasswordEmail } from "../../../util/email/emailService";
+import { createNotification } from "../../../util/notification/notificationHelper";
 
 // register action
 export const registerSlice = createAsyncThunk('authSlice/registerSlice',
@@ -155,6 +156,18 @@ export const emailVerifySlice = createAsyncThunk('authSlice/emailVerifySlice',
             // Mark user as verified
             await supabaseAdmin.from(table).update({ is_verified: 'fulfilled' }).eq('email', verificationData?.email);
 
+            // Notify Admin
+            if (userType === 'student' || userType === 'instructor') {
+                await createNotification({
+                    title: userType === 'student' ? 'New Student Registration' : 'New Instructor Application',
+                    message: `A new ${userType} (${verificationData?.email}) has verified their email and joined WebBeetles.`,
+                    type: 'success',
+                    user_type: 'admin',
+                    user_id: null,
+                    link: userType === 'student' ? '/admin/students' : '/admin/instructors',
+                });
+            }
+
             return { email: verificationData?.email };
         } catch (err) {
             return rejectWithValue({ message: err.message });
@@ -203,6 +216,16 @@ export const loginSlice = createAsyncThunk('authSlice/loginSlice',
                 await supabase.auth.signOut();
                 return rejectWithValue({ message: "Please verify your email first" });
             }
+
+            // Notification for new sign in
+            await createNotification({
+                title: 'New Sign In',
+                message: `You recently signed in to your account.`,
+                type: 'info',
+                user_type: role,
+                user_id: userData.id,
+                link: role === 'student' ? '/student/dashboard' : '/instructor/dashboard',
+            });
 
             return { ...res.data, userData: userData };
 

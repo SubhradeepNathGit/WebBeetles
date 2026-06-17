@@ -11,9 +11,9 @@ if (!document.getElementById(styleId)) {
       backdrop-filter: blur(24px) saturate(1.5) !important;
       -webkit-backdrop-filter: blur(24px) saturate(1.5) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      border-radius: 1rem !important;
+      border-radius: 0.3rem !important;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
-      max-width: 22rem !important;
+      max-width: 28rem !important;
       padding: 2rem 1.5rem !important;
     }
     .swal-custom-popup .swal2-icon {
@@ -28,14 +28,14 @@ if (!document.getElementById(styleId)) {
     }
     .swal-custom-popup .swal2-html-container {
       color: rgba(255, 255, 255, 0.6) !important;
-      font-size: 0.9rem !important;
+      font-size: 0.95rem !important;
       line-height: 1.5 !important;
     }
     .swal-custom-popup .swal2-confirm {
       background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
       border: none !important;
-      border-radius: 0.65rem !important;
-      padding: 0.6rem 2rem !important;
+      border-radius: 0.3rem !important;
+      padding: 0.6rem 2.5rem !important;
       font-weight: 600 !important;
       font-size: 0.875rem !important;
       box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35) !important;
@@ -51,7 +51,7 @@ if (!document.getElementById(styleId)) {
     .swal-custom-popup .swal2-cancel {
       background: rgba(255, 255, 255, 0.08) !important;
       border: 1px solid rgba(255, 255, 255, 0.1) !important;
-      border-radius: 0.65rem !important;
+      border-radius: 0.3rem !important;
       padding: 0.6rem 2rem !important;
       color: #fff !important;
       font-weight: 600 !important;

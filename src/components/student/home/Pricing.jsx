@@ -4,7 +4,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { loadRazorpay } from "../../../util/razorpay/razorpayLoader";
 import getSweetAlert from "../../../util/alert/sweetAlert";
 import { checkLoggedInUser } from "../../../redux/slice/authSlice/checkUserAuthSlice";
+import { fetchNotifications } from "../../../redux/slice/notificationSlice";
 import { Loader2 } from "lucide-react";
+import { createNotification } from "../../../util/notification/notificationHelper";
 import supabase from "../../../util/supabase/supabase";
 
 const PricingSection = () => {
@@ -218,6 +220,29 @@ const PricingSection = () => {
 
             // Refresh user session & data
             await dispatch(checkLoggedInUser());
+
+            // 1. Notify Student
+            await createNotification({
+                title: 'Subscription Confirmed',
+                message: `You have successfully subscribed to the ${plan.name} plan.`,
+                type: 'success',
+                user_type: 'student',
+                user_id: userAuthData.id,
+                link: '/student/dashboard',
+            });
+
+            // 2. Notify Admin
+            await createNotification({
+                title: 'New Subscription Purchase',
+                message: `${userAuthData?.name || 'A student'} purchased the ${plan.name} plan.`,
+                type: 'info',
+                user_type: 'admin',
+                user_id: null,
+                link: '/admin/dashboard',
+            });
+
+            // Force-refresh notifications in Redux so they appear instantly
+            dispatch(fetchNotifications({ user_type: 'student', user_id: userAuthData.id }));
 
             getSweetAlert("Success!", `Successfully subscribed to the ${plan.name} plan!`, "success");
             navigate("/student/dashboard");

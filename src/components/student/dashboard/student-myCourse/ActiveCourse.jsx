@@ -13,6 +13,7 @@ import { useLectureProgress } from '../../../../tanstack/query/fetchVideoProgres
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserPurchase } from '../../../../redux/slice/purchaseSlice';
 import supabase from '../../../../util/supabase/supabase';
+import { createNotification } from '../../../../util/notification/notificationHelper';
 
 const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) => {
 
@@ -22,6 +23,19 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
     const [reviewFilter, setReviewFilter] = useState('all');
     const [reviewFormData, setReviewFormData] = useState({ id: null, rating: 0, comment: null });
     const [showCertModal, setShowCertModal] = useState(false);
+
+    const handleViewCertificate = async () => {
+        setShowCertModal(true);
+        // Add certificate generated notification
+        await createNotification({
+            title: 'Certificate Generated',
+            message: `Your certificate for ${courseDetails?.title} has been generated.`,
+            type: 'success',
+            user_type: 'student',
+            user_id: userAuthData?.id,
+            link: `/student/dashboard`,
+        });
+    };
 
     const dispatch = useDispatch();
     const { userAuthData } = useSelector(state => state.checkAuth);
@@ -53,6 +67,32 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
             progressData.some(p => p.lesson_id === l.id && p.completed)
         );
     }, [lectureData, progressData]);
+
+    // Send Course Completed notification exactly once
+    useEffect(() => {
+        if (isCompleted && userAuthData?.id && courseDetails?.title) {
+            const checkAndNotifyCompletion = async () => {
+                const { data } = await supabase.from('notifications')
+                    .select('id')
+                    .eq('user_id', userAuthData.id)
+                    .eq('title', 'Course Completed')
+                    .like('message', `%${courseDetails?.title}%`)
+                    .maybeSingle();
+                
+                if (!data) {
+                    await createNotification({
+                        title: 'Course Completed',
+                        message: `Congratulations! You have completed the course ${courseDetails?.title}.`,
+                        type: 'success',
+                        user_type: 'student',
+                        user_id: userAuthData.id,
+                        link: '/student/dashboard',
+                    });
+                }
+            };
+            checkAndNotifyCompletion();
+        }
+    }, [isCompleted, userAuthData?.id, courseDetails?.title]);
 
 
 
@@ -93,7 +133,7 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
                         lectureData={lectureData} 
                         userAuthData={userAuthData} 
                         isCompleted={isCompleted}
-                        onViewCertificate={() => setShowCertModal(true)}
+                        onViewCertificate={handleViewCertificate}
                     />
                 </div>
 
@@ -138,7 +178,7 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
                                 <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-2 relative z-10">Congratulations! Course Completed</h3>
                                 <p className="text-gray-400 mb-8 max-w-md relative z-10">You've successfully finished all the modules in this course. Your verified certificate of completion is now ready.</p>
                                 <button 
-                                    onClick={() => setShowCertModal(true)}
+                                    onClick={handleViewCertificate}
                                     className="px-8 py-3.5 bg-black text-white border border-gray-600 hover:bg-[#111] hover:border-gray-400 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] rounded-xl font-bold flex items-center gap-2 cursor-pointer transition-all duration-300 hover:-translate-y-0.5 active:scale-95 relative z-10 text-sm tracking-wide"
                                 >
                                     Claim & View Certificate

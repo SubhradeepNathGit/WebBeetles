@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../util/supabase/supabase";
+import { createNotification } from "../../util/notification/notificationHelper";
 
 // all course action
 export const allCourse = createAsyncThunk('courseSlice/allCourse',
@@ -63,6 +64,16 @@ export const createCourse = createAsyncThunk('courseSlice/createCourse',
         if (res.error) return res?.error;
 
         const courseId = res?.data?.[0]?.id;
+
+        // Notify admin about the new course
+        await createNotification({
+            title: 'New Course Added',
+            message: `A new course "${data?.title}" has been created.`,
+            type: 'info',
+            user_type: 'admin',
+            user_id: null,
+            link: '/admin/courses',
+        });
 
         return {
             course: res?.data?.[0],

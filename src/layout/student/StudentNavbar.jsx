@@ -1,19 +1,51 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, Bot, ShoppingCart } from "lucide-react";
+import { Menu, X, ChevronDown, Bot, ShoppingCart, Bell, CheckCircle2, Clock, Info, AlertTriangle, XCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import getSweetAlert from "../../util/alert/sweetAlert";
 import { checkLoggedInUser, logoutUser } from "../../redux/slice/authSlice/checkUserAuthSlice";
-import Chatbot from "../../components/student/contact/Chatbot";
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead, addRealtimeNotification } from "../../redux/slice/notificationSlice";
+import supabase from "../../util/supabase/supabase";
+
+const formatRelativeTime = (dateString) => {
+    if (!dateString) return "";
+    try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return `${diffMins} min ago`;
+        const diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+        const diffDays = Math.floor(diffHours / 24);
+        if (diffDays === 1) return "Yesterday";
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    } catch (e) {
+        return "";
+    }
+};
+
+const getIconForType = (type) => {
+    switch (type) {
+        case 'success': return <CheckCircle2 className="w-5 h-5 text-gray-300" />;
+        case 'warning': return <AlertTriangle className="w-5 h-5 text-gray-400" />;
+        case 'error': return <XCircle className="w-5 h-5 text-gray-400" />;
+        case 'info':
+        default: return <Info className="w-5 h-5 text-gray-300" />;
+    }
+};
 
 const StudentNavbar = () => {
   const [isOpen, setIsOpen] = useState(false),
     [activeDropdown, setActiveDropdown] = useState(null),
     [scrolled, setScrolled] = useState(false),
-    [chatbotOpen, setChatbotOpen] = useState(false),
+    [showNotificationDrawer, setShowNotificationDrawer] = useState(false),
     { isUserLoading, userAuthData: getStudentData, userError, isAuthChecked } = useSelector(state => state.checkAuth),
     { cartItems } = useSelector(state => state.cart),
+    { notifications, unreadCount } = useSelector(state => state.notification),
     dispatch = useDispatch(),
     navigate = useNavigate();
 
@@ -60,6 +92,58 @@ const StudentNavbar = () => {
 
   const toggleDropdown = (dropdown) => {
     setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
+  };
+
+  useEffect(() => {
+    if (getStudentData?.id) {
+        dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
+
+        // Poll every 30s as a robust fallback in case Supabase Realtime is not enabled
+        const pollInterval = setInterval(() => {
+            dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
+        }, 30000);
+
+        const channel = supabase
+            .channel('realtime-notifications-student')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${getStudentData.id}` },
+                (payload) => {
+                    dispatch(addRealtimeNotification(payload.new));
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${getStudentData.id}` },
+                (payload) => {
+                    dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
+                }
+            )
+            .subscribe();
+
+        return () => {
+            clearInterval(pollInterval);
+            supabase.removeChannel(channel);
+        };
+    }
+  }, [getStudentData, dispatch]);
+
+  // Re-fetch every time the notification drawer opens
+  useEffect(() => {
+    if (showNotificationDrawer && getStudentData?.id) {
+        dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
+    }
+  }, [showNotificationDrawer, getStudentData, dispatch]);
+
+  const handleNotificationClick = (notification) => {
+      if (!notification.is_read) {
+          dispatch(markNotificationRead(notification.id));
+      }
+      setShowNotificationDrawer(false);
+      setIsOpen(false);
+      if (notification.link) {
+          navigate(notification.link);
+      }
   };
 
   const handleNavClick = () => {
@@ -134,15 +218,22 @@ const StudentNavbar = () => {
 
             {/* Get Started Button & AI Chatbot (Desktop + Tablet) */}
             <div className="hidden md:flex items-center gap-4">
-              
-              {/* Chatbot Toggle Button */}
-              <button 
-                onClick={() => setChatbotOpen(true)}
-                className="w-8 h-8 lg:w-9 lg:h-9  flex items-center justify-center transition-all duration-300"
-                title="WebBeetles AI Assistant"
-              >
-                <Bot className="text-white w-5 h-5 lg:w-6 lg:h-6 group-hover:scale-110 transition-transform duration-300" />
-              </button>
+
+              {/* Notification Button (Only visible after login) */}
+              {isAuthChecked && getStudentData && (
+                <button 
+                  onClick={() => setShowNotificationDrawer(true)}
+                  className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center transition-all duration-300 relative group"
+                  title="Notifications"
+                >
+                  <Bell className="text-white w-5 h-5 lg:w-[22px] lg:h-[22px] group-hover:scale-110 transition-transform duration-300" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-[18px] h-[18px] lg:w-5 lg:h-5 rounded-full flex items-center justify-center border border-black shadow-lg transform group-hover:scale-110 transition-transform duration-300 animate-pulse">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+              )}
 
               {/* Cart Button (Only visible after login) */}
               {isAuthChecked && getStudentData && (
@@ -363,6 +454,19 @@ const StudentNavbar = () => {
                       Cart
                     </Link>
 
+                    {/* Notification link in mobile drawer */}
+                    <button
+                      onClick={() => { setIsOpen(false); setShowNotificationDrawer(true); }}
+                      className="flex items-center justify-between w-full text-white hover:text-purple-300 hover:bg-white/5 transition-all duration-200 font-medium py-4 px-4 rounded-lg mb-3"
+                    >
+                      <span>Notifications</span>
+                      {unreadCount > 0 && (
+                        <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                    </button>
+
                     <button
                       onClick={() => {
                         userLogout();
@@ -380,8 +484,112 @@ const StudentNavbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Global AI Chatbot Drawer */}
-      <Chatbot isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
+      {/* Global AI Chatbot Drawer has been moved to global App.jsx */}
+
+      {/* Notification Drawer Overlay */}
+      <AnimatePresence>
+        {showNotificationDrawer && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+            onClick={() => setShowNotificationDrawer(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Notification Drawer (Sliding from Left) */}
+      <AnimatePresence>
+        {showNotificationDrawer && (
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed top-0 left-0 h-full w-full xs:w-[360px] sm:w-[360px] bg-[#0a0a0a]/80 backdrop-blur-3xl border-r border-white/10 text-white z-[60] shadow-[20px_0_40px_rgba(0,0,0,0.7)] flex flex-col"
+          >
+            <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gradient-to-b from-white/5 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 shadow-lg backdrop-blur-md">
+                  <Bell className="w-5 h-5 text-gray-300" />
+                </div>
+                <h2 className="text-xl font-bold tracking-wide text-white">Notifications</h2>
+              </div>
+              <button
+                onClick={() => setShowNotificationDrawer(false)}
+                className="text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all backdrop-blur-sm"
+                aria-label="Close notifications"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="px-6 py-3 flex justify-between items-center bg-transparent">
+                <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(255,255,255,0.05)]">
+                        <span className={`w-1.5 h-1.5 rounded-full ${unreadCount > 0 ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-gray-600'}`}></span>
+                        <span className="text-white font-bold">{unreadCount}</span> Unread
+                    </span>
+                </div>
+                {unreadCount > 0 && (
+                    <button
+                        onClick={() => dispatch(markAllNotificationsRead({ user_type: 'student', user_id: getStudentData?.id }))}
+                        className="text-xs font-medium text-gray-300 hover:text-white transition-colors cursor-pointer bg-white/5 px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/10"
+                    >
+                        Mark all as read
+                    </button>
+                )}
+            </div>
+
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent p-4 space-y-3">
+              {notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center opacity-70">
+                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10 shadow-inner backdrop-blur-xl">
+                        <Bell className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-white mb-2">You're all caught up!</h3>
+                    <p className="text-gray-400 text-sm">No new notifications right now.</p>
+                </div>
+              ) : (
+                <AnimatePresence>
+                    {notifications.map((notification) => (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, height: 0 }}
+                            key={notification.id}
+                            onClick={() => handleNotificationClick(notification)}
+                            className={`group p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden backdrop-blur-md ${!notification.is_read ? 'bg-white/10 border-white/20 hover:bg-white/15 shadow-sm' : 'bg-transparent border-white/5 hover:bg-white/5'}`}
+                        >
+                            {!notification.is_read && (
+                                <div className="absolute -left-1 top-1/2 -translate-y-1/2 h-1/2 w-1.5 bg-white rounded-r-full shadow-[0_0_10px_rgba(255,255,255,0.3)]"></div>
+                            )}
+                            <div className="flex gap-4">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${!notification.is_read ? 'bg-white/10 text-white shadow-inner border border-white/10' : 'bg-white/5 text-gray-400 border border-transparent'}`}>
+                                    {getIconForType(notification.type)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className={`text-sm pr-4 ${!notification.is_read ? 'text-white font-semibold' : 'text-gray-400 font-medium'}`}>
+                                        {notification.title}
+                                    </h4>
+                                    <p className={`text-xs mt-1 leading-relaxed ${!notification.is_read ? 'text-gray-300' : 'text-gray-500'} line-clamp-2`}>
+                                        {notification.message}
+                                    </p>
+                                    <span className={`flex items-center gap-1.5 text-[10px] mt-2.5 font-medium ${!notification.is_read ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <Clock className="w-3 h-3" />
+                                        {formatRelativeTime(notification.created_at)}
+                                    </span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

@@ -46,9 +46,13 @@ const ProfileModal = ({ setModal, modal, setDocViewer }) => {
                     {/* Modal Header */}
                     <div className="flex items-center justify-between p-6 border-b border-white/5">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white font-bold text-2xl border border-white/10">
-                                {modal?.name?.charAt(0)}
-                            </div>
+                            {modal?.profile_image_url ? (
+                                <img src={modal.profile_image_url} alt={modal?.name} className="w-14 h-14 rounded-full object-cover border border-white/10" />
+                            ) : (
+                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white font-bold text-2xl border border-white/10">
+                                    {modal?.name?.charAt(0)}
+                                </div>
+                            )}
                             <div>
                                 <h3 className="text-xl font-bold text-white">{modal?.name ?? 'N/A'}</h3>
                                 <p className="text-sm text-gray-400">{modal?.email ?? 'N/A'}</p>

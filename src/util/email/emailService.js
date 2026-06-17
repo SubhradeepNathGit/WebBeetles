@@ -10,10 +10,10 @@ const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 const EMAILJS_FORGET_PASSWORD_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_FORGET_PASSWORD_TEMPLATE_ID || EMAILJS_TEMPLATE_ID;
 
 /**
- * Generates a cryptographically random 8-digit OTP.
+ * Generates a cryptographically random 6-digit OTP.
  */
 export function generateOTP() {
-  return Math.floor(10000000 + Math.random() * 90000000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 /**

@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bot, Send, User, X, Loader2 } from 'lucide-react';
+import Lottie from 'lottie-react';
+import AIBotAnimation from '../../../assets/AI bot.json';
 
-const Chatbot = ({ isOpen, onClose }) => {
+const Chatbot = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
         { role: 'assistant', content: 'Hello! I am the WebBeetles Assistant. I am here to help you navigate our premium online learning platform, answer any questions about our courses, or assist you with any issues. How can I help you today?' }
     ]);
@@ -96,7 +99,7 @@ const Chatbot = ({ isOpen, onClose }) => {
             {isOpen && (
                 <div 
                     className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-500"
-                    onClick={onClose}
+                    onClick={() => setIsOpen(false)}
                 />
             )}
 
@@ -106,18 +109,15 @@ const Chatbot = ({ isOpen, onClose }) => {
                 {/* Header */}
                 <div className="relative p-6 flex justify-between items-center text-white z-10">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.15)]">
-                            <Bot size={20} className="text-white" />
-                        </div>
                         <div className="flex flex-col">
-                            <span className="font-semibold text-sm tracking-wide text-white">WebBeetles AI</span>
-                            <span className="text-[10px] text-green-400 font-medium flex items-center gap-1.5 uppercase tracking-wider">
-                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                            <span className="font-bold text-lg tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-white">WebBeetles AI</span>
+                            <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1.5 uppercase tracking-wider mt-0.5 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
                                 Online
                             </span>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/5 transition-all duration-300">
+                    <button onClick={() => setIsOpen(false)} className="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/5 transition-all duration-300">
                         <X size={20} />
                     </button>
                 </div>
@@ -182,6 +182,17 @@ const Chatbot = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Floating Toggle Button */}
+            {!isOpen && (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="fixed bottom-6 right-6 flex items-center justify-center transition-all duration-300 hover:scale-110 z-[55] animate-bounce-slow drop-shadow-[0_0_15px_rgba(147,51,234,0.4)] hover:drop-shadow-[0_0_25px_rgba(147,51,234,0.6)] cursor-pointer"
+                    aria-label="Open AI Assistant"
+                >
+                    <Lottie animationData={AIBotAnimation} loop={true} className="w-32 h-32" />
+                </button>
+            )}
         </>
     );
 };

@@ -9,6 +9,8 @@ import { updateCoursePurchaseStatus } from '../../../redux/slice/studentSlice';
 import { loadRazorpay } from '../../../util/razorpay/razorpayLoader';
 import { useDispatch } from 'react-redux';
 import { addActivityRequest } from '../../../redux/slice/activitySlice';
+import { fetchNotifications } from '../../../redux/slice/notificationSlice';
+import { createNotification } from '../../../util/notification/notificationHelper';
 import supabase from '../../../util/supabase/supabase';
 
 const PaymentSummaryCard = ({
@@ -81,6 +83,36 @@ const PaymentSummaryCard = ({
 
             await dispatch(deleteCart(cartId));
             await dispatch(updateCoursePurchaseStatus({ id: userAuthData.id }));
+
+            // Build a descriptive course list for the notification messages
+            const courseNames = cartItems.map(i => i.courses?.title).filter(Boolean);
+            const courseSummary = courseNames.length === 1
+                ? courseNames[0]
+                : `${courseNames.slice(0, 2).join(', ')}${courseNames.length > 2 ? ` +${courseNames.length - 2} more` : ''}`;
+            const totalPaid = `₹${Number(total).toLocaleString('en-IN')}`;
+
+            // 1. Notify the student
+            await createNotification({
+                title: 'Enrollment Confirmed',
+                message: `You have successfully enrolled in ${courseSummary}. Amount paid: ${totalPaid}. Start learning now!`,
+                type: 'success',
+                user_type: 'student',
+                user_id: userAuthData.id,
+                link: '/student/dashboard',
+            });
+
+            // 2. Notify the admin
+            await createNotification({
+                title: 'New Course Purchase',
+                message: `${userAuthData?.name || 'A student'} purchased ${courseSummary} for ${totalPaid}.`,
+                type: 'info',
+                user_type: 'admin',
+                user_id: null,
+                link: '/admin/purchase',
+            });
+
+            // Force-refresh notifications in Redux so they appear instantly
+            dispatch(fetchNotifications({ user_type: 'student', user_id: userAuthData.id }));
 
             for (const item of cartItems) {
                 await dispatch(addActivityRequest({

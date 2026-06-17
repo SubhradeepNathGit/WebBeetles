@@ -6,13 +6,30 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkLoggedInUser, logoutUser } from "../../redux/slice/authSlice/checkUserAuthSlice";
 import toastifyAlert from "../../util/alert/toastify";
 import getSweetAlert from "../../util/alert/sweetAlert";
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead, addRealtimeNotification } from "../../redux/slice/notificationSlice";
+import supabase from "../../util/supabase/supabase";
 
-// Constants
-const NOTIFICATIONS = [
-    { id: 1, title: "New user registered", time: "2 min ago", unread: true },
-    { id: 2, title: "Payment received", time: "1 hour ago", unread: true },
-    { id: 3, title: "Course updated", time: "3 hours ago", unread: false },
-];
+const formatRelativeTime = (dateString) => {
+    if (!dateString) return "";
+    try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return `${diffMins} min ago`;
+        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+        if (diffDays === 1) return "Yesterday";
+        if (diffDays < 7) return `${diffDays} days ago`;
+        
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    } catch (e) {
+        return "";
+    }
+};
 
 export default function Navbar() {
 
@@ -23,7 +40,6 @@ export default function Navbar() {
     const [showNotifications, setShowNotifications] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(2);
    
     const [isMobile, setIsMobile] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -33,8 +49,34 @@ export default function Navbar() {
     const searchInputRef = useRef(null);
 
     const { isUserLoading, userAuthData: getAdminData, userError } = useSelector(state => state.checkAuth);
+    const { notifications, unreadCount } = useSelector(state => state.notification);
     
     // Removed redundant checkLoggedInUser dispatch as ProtectedRoute handles it
+
+    const [gravatarUrl, setGravatarUrl] = useState("");
+
+    useEffect(() => {
+        async function generateGravatarUrl() {
+            const email = getAdminData?.email;
+            if (!email) {
+                setGravatarUrl("");
+                return;
+            }
+            try {
+                const formattedEmail = email.trim().toLowerCase();
+                const msgBuffer = new TextEncoder().encode(formattedEmail);
+                const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                setGravatarUrl(`https://gravatar.com/avatar/${hashHex}?d=identicon`);
+            } catch (error) {
+                console.error("Error generating Gravatar URL:", error);
+                setGravatarUrl("");
+            }
+        }
+        generateGravatarUrl();
+    }, [getAdminData?.email]);
+
 
     useEffect(() => {
         const checkMobile = () => {
@@ -88,6 +130,45 @@ export default function Navbar() {
         };
     }, [showMobileSidebar]);
 
+    useEffect(() => {
+        dispatch(fetchNotifications({ user_type: 'admin' }));
+
+        // Poll every 30s as a robust fallback in case Supabase Realtime is not enabled
+        const pollInterval = setInterval(() => {
+            dispatch(fetchNotifications({ user_type: 'admin' }));
+        }, 30000);
+
+        const channel = supabase
+            .channel('realtime-notifications-admin')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'notifications', filter: "user_type=eq.admin" },
+                (payload) => {
+                    dispatch(addRealtimeNotification(payload.new));
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'notifications', filter: "user_type=eq.admin" },
+                (payload) => {
+                    dispatch(fetchNotifications({ user_type: 'admin' }));
+                }
+            )
+            .subscribe();
+
+        return () => {
+            clearInterval(pollInterval);
+            supabase.removeChannel(channel);
+        };
+    }, [dispatch]);
+
+    // Re-fetch every time admin opens the notifications dropdown
+    useEffect(() => {
+        if (showNotifications) {
+            dispatch(fetchNotifications({ user_type: 'admin' }));
+        }
+    }, [showNotifications, dispatch]);
+
     const handleSearch = useCallback((e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
@@ -96,10 +177,13 @@ export default function Navbar() {
         }
     }, [searchQuery, navigate]);
 
-    const handleNotificationClick = useCallback((notificationId) => {
-        console.log("Notification clicked:", notificationId);
+    const handleNotificationClick = useCallback((notification) => {
+        dispatch(markNotificationRead(notification.id));
         setShowNotifications(false);
-    }, []);
+        if (notification.link) {
+            navigate(notification.link);
+        }
+    }, [dispatch, navigate]);
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
@@ -121,9 +205,8 @@ export default function Navbar() {
  
 
     const markAllAsRead = useCallback(() => {
-        setUnreadCount(0);
-        console.log("Marked all notifications as read");
-    }, []);
+        dispatch(markAllNotificationsRead({ user_type: 'admin' }));
+    }, [dispatch]);
 
     return (
         <>
@@ -192,8 +275,8 @@ export default function Navbar() {
                             >
                                 <Bell size={18} />
                                 {unreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 bg-white/20 text-white text-xs font-semibold rounded-full flex items-center justify-center">
-                                        {unreadCount}
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center border-2 border-[#121212] shadow-sm">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
                                     </span>
                                 )}
                             </button>
@@ -212,28 +295,39 @@ export default function Navbar() {
                                         )}
                                     </div>
                                     <div className="max-h-96 overflow-y-auto">
-                                        {NOTIFICATIONS.map((notification) => (
-                                            <button
-                                                key={notification.id}
-                                                onClick={() => handleNotificationClick(notification.id)}
-                                                className={`w-full p-4 text-left hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 ${notification.unread ? "bg-emerald-500/5" : ""
-                                                    }`}
-                                            >
-                                                <div className="flex items-start gap-3">
-                                                    {notification.unread && (
-                                                        <span className="w-2 h-2 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
-                                                    )}
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-white text-sm font-medium truncate">
-                                                            {notification.title}
-                                                        </p>
-                                                        <p className="text-gray-400 text-xs mt-1">
-                                                            {notification.time}
-                                                        </p>
+                                        {notifications.length === 0 ? (
+                                            <div className="p-8 text-center text-gray-500 text-sm">
+                                                No new notifications
+                                            </div>
+                                        ) : (
+                                            notifications.map((notification) => (
+                                                <button
+                                                    key={notification.id}
+                                                    onClick={() => handleNotificationClick(notification)}
+                                                    className={`w-full p-4 text-left hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 ${!notification.is_read ? "bg-emerald-500/5" : ""
+                                                        }`}
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        {!notification.is_read && (
+                                                            <span className="w-2 h-2 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
+                                                        )}
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-white text-sm font-medium truncate">
+                                                                {notification.title}
+                                                            </p>
+                                                            {notification.message && (
+                                                                <p className="text-gray-400 text-xs mt-0.5 truncate">
+                                                                    {notification.message}
+                                                                </p>
+                                                            )}
+                                                            <p className="text-gray-500 text-[10px] mt-1">
+                                                                {formatRelativeTime(notification.created_at)}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </button>
-                                        ))}
+                                                </button>
+                                            ))
+                                        )}
                                     </div>
                                     <div className="p-3 border-t border-white/5">
                                         <button
@@ -251,16 +345,25 @@ export default function Navbar() {
                         </div>
 
                         <div className="relative" ref={userMenuRef}>
-                            <button
+                             <button
                                 onClick={() => setShowUserMenu(!showUserMenu)}
                                 className="flex items-center gap-2 md:gap-3 p-1.5 md:p-2 pr-2 md:pr-3 rounded-lg bg-transparent hover:bg-white/10 transition-all group cursor-pointer"
                                 aria-label="User menu"
                             >
-                                <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-white/20 to-white/50 flex items-center justify-center text-white font-semibold text-xs md:text-xs shadow-sm border-white">
-                                    A
-                                </div>
+                                {gravatarUrl ? (
+                                    <img 
+                                        src={gravatarUrl} 
+                                        alt={getAdminData?.name ?? 'Admin'} 
+                                        className="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover shadow-sm border border-white/20"
+                                        onError={() => setGravatarUrl("")}
+                                    />
+                                ) : (
+                                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-white/20 to-white/50 flex items-center justify-center text-white font-semibold text-xs md:text-xs shadow-sm border-white">
+                                        {(getAdminData?.name || getAdminData?.email || 'A').charAt(0).toUpperCase()}
+                                    </div>
+                                )}
                                 <div className="hidden lg:block text-left">
-                                    <p className="text-white text-sm font-medium">Admin</p>
+                                    <p className="text-white text-sm font-medium">{getAdminData?.name ?? 'Admin'}</p>
                                     <p className="text-gray-400 text-xs">{getAdminData?.email ?? 'admin@webbeetles.com'}</p>
                                 </div>
                                 <ChevronDown
@@ -269,9 +372,23 @@ export default function Navbar() {
 
                             {showUserMenu && (
                                 <div className="absolute right-0 mt-2 w-56 bg-[#111] border border-white/5 rounded-xl shadow-2xl overflow-hidden">
-                                    <div className="p-4 border-b border-white/5">
-                                        <p className="text-white text-sm font-medium">WebBeetles Admin</p>
-                                        <p className="text-gray-400 text-xs mt-0.5">{getAdminData?.email ?? 'admin@webbeetles.com'}</p>
+                                    <div className="p-4 border-b border-white/5 flex items-center gap-3">
+                                        {gravatarUrl ? (
+                                            <img 
+                                                src={gravatarUrl} 
+                                                alt={getAdminData?.name ?? 'Admin'} 
+                                                className="w-9 h-9 rounded-full object-cover border border-white/10"
+                                                onError={() => setGravatarUrl("")}
+                                            />
+                                        ) : (
+                                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-white/20 to-white/50 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                                                {(getAdminData?.name || getAdminData?.email || 'A').charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
+                                        <div>
+                                            <p className="text-white text-sm font-medium">{getAdminData?.name ?? 'Admin'}</p>
+                                            <p className="text-gray-400 text-xs mt-0.5">{getAdminData?.email ?? 'admin@webbeetles.com'}</p>
+                                        </div>
                                     </div>
 
                                     <div className="p-2">

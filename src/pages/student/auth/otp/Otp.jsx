@@ -58,8 +58,8 @@ const Otp = () => {
 
                 reset({
                     otpField: {
-                        0: "", 1: "", 2: "", 3: "",
-                        4: "", 5: "", 6: "", 7: ""
+                        0: "", 1: "", 2: "",
+                        3: "", 4: "", 5: ""
                     }
                 });
 
@@ -83,8 +83,8 @@ const Otp = () => {
         const otpCode = Object.values(data.otpField).join("");
         // console.log("Entered OTP:", otpCode);
 
-        if (otpCode.length !== 8) {
-            getSweetAlert("Oops...", "Please enter all 8 digits!", "error");
+        if (otpCode.length !== 6) {
+            getSweetAlert("Oops...", "Please enter all 6 digits!", "error");
             return;
         }
 
@@ -152,84 +152,85 @@ const Otp = () => {
                             {showMail(email)}
                         </p>
 
-                        <div className="flex justify-center gap-2">
-                            {[...Array(8)].map((_, index) => (
-                                <Controller
-                                    key={index}
-                                    name={`otpField.${index}`}
-                                    control={control}
-                                    defaultValue=""
-                                    rules={{ required: true }}
-                                    render={({ field }) => (
-                                        <input
-                                            {...field}
-                                            id={`otp-input-${index}`}
-                                            type="text"
-                                            inputMode="numeric"
-                                            maxLength={1}
-                                            className="md:w-12 md:h-12 w-9 h-9 text-center rounded-xl border border-white/20 text-lg font-bold text-white bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                            onChange={(e) => {
-                                                const value = e.target.value.replace(/[^0-9]/g, "");
-                                                if (value.length > 1) return;
-                                                field.onChange(value);
+                        <div className="w-fit mx-auto flex flex-col items-center">
+                            <div className="flex justify-center gap-3">
+                                {[...Array(6)].map((_, index) => (
+                                    <Controller
+                                        key={index}
+                                        name={`otpField.${index}`}
+                                        control={control}
+                                        defaultValue=""
+                                        rules={{ required: true }}
+                                        render={({ field }) => (
+                                            <input
+                                                {...field}
+                                                id={`otp-input-${index}`}
+                                                type="text"
+                                                inputMode="numeric"
+                                                maxLength={1}
+                                                className="w-11 h-12 sm:w-13 sm:h-14 md:w-14 md:h-16 text-center rounded-xl border border-white/20 text-xl font-bold text-white bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:bg-white/10 transition-all duration-200 shadow-inner"
+                                                onChange={(e) => {
+                                                    const value = e.target.value.replace(/[^0-9]/g, "");
+                                                    if (value.length > 1) return;
+                                                    field.onChange(value);
 
-                                                if (value && index < 7) {
-                                                    document
-                                                        .getElementById(`otp-input-${index + 1}`)
-                                                        .focus();
-                                                }
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Backspace" && !field.value && index > 0) {
-                                                    document
-                                                        .getElementById(`otp-input-${index - 1}`)
-                                                        .focus();
-                                                }
-                                            }}
-                                            onPaste={(e) => {
-                                                e.preventDefault();
-                                                const pastedData = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, 8);
-                                                if (pastedData) {
-                                                    const otpArray = pastedData.split("");
-                                                    otpArray.forEach((char, idx) => {
-                                                        setValue(`otpField.${idx}`, char);
-                                                    });
-                                                    // Focus the last filled input
-                                                    const focusIndex = Math.min(otpArray.length - 1, 7);
-                                                    document.getElementById(`otp-input-${focusIndex}`)?.focus();
-                                                }
-                                            }}
-                                        />
-                                    )}
-                                />
-                            ))}
+                                                    if (value && index < 5) {
+                                                        document
+                                                            .getElementById(`otp-input-${index + 1}`)
+                                                            .focus();
+                                                    }
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Backspace" && !field.value && index > 0) {
+                                                        document
+                                                            .getElementById(`otp-input-${index - 1}`)
+                                                            .focus();
+                                                    }
+                                                }}
+                                                onPaste={(e) => {
+                                                    e.preventDefault();
+                                                    const pastedData = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, 6);
+                                                    if (pastedData) {
+                                                        const otpArray = pastedData.split("");
+                                                        otpArray.forEach((char, idx) => {
+                                                            setValue(`otpField.${idx}`, char);
+                                                        });
+                                                        const focusIndex = Math.min(otpArray.length - 1, 5);
+                                                        document.getElementById(`otp-input-${focusIndex}`)?.focus();
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Resend */}
+                            <div className="flex flex-col items-center mt-5">
+                                {disabled ? (
+                                    <p className="text-white/70 text-sm tracking-wide">
+                                        Resend OTP in{" "}
+                                        <span className={counter < 20 ? "text-red-400 font-semibold" : "text-white font-semibold"}>
+                                            {String(Math.floor(counter / 60)).padStart(2, "0")}:
+                                            {String(counter % 60).padStart(2, "0")}
+                                        </span>
+                                    </p>
+                                ) : (
+                                    <button type="button" disabled={isUserAuthLoading} onClick={() => handleResend(email)} className="text-purple-300 text-sm font-medium hover:text-white cursor-pointer transition-colors duration-200">
+                                        Resend OTP
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Submit */}
+                            <button
+                                type="submit"
+                                disabled={isUserAuthLoading}
+                                className={`w-full mt-6 py-3.5 rounded-xl text-base font-semibold text-white tracking-wide transition-all duration-300 ${isUserAuthLoading ? 'bg-purple-500/40 cursor-not-allowed opacity-70' : 'cursor-pointer bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 hover:from-purple-500 hover:via-purple-400 hover:to-indigo-500 shadow-lg shadow-purple-600/20 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]'}`}
+                            >
+                                {isUserAuthLoading ? <Loader2 className='text-white animate-spin w-4 h-4 inline mr-2' /> : ''}{isUserAuthLoading ? 'Verifying...' : 'Verify OTP'}
+                            </button>
                         </div>
-
-                        {/* Resend */}
-                        <div className="flex flex-col items-center mt-4">
-                            {disabled ? (
-                                <p className="text-white text-sm">
-                                    Resend OTP in{" "}
-                                    <span className={counter < 20 ? "text-red-400" : ""}>
-                                        {String(Math.floor(counter / 60)).padStart(2, "0")}:
-                                        {String(counter % 60).padStart(2, "0")}
-                                    </span>
-                                </p>
-
-                            ) : (
-                                <button type="button" disabled={isUserAuthLoading} onClick={() => handleResend(email)} className="text-white text-sm font-medium hover:text-blue-300 cursor-pointer">
-                                    Resend OTP
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Submit */}
-                        <button
-                            type="submit"
-                            className={`w-full mt-6 py-3 rounded-xl text-base font-semibold text-white transition-all duration-300 ${isUserAuthLoading ? 'bg-purple-500/50 cursor-not-allowed opacity-70' : 'cursor-pointer bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg hover:shadow-purple-500/25'}`}
-                        >
-                            {isUserAuthLoading ? <Loader2 className='text-white animate-spin m-0 p-0 w-4 h-4 inline' /> : ''} {isUserAuthLoading ? 'Verifying...' : 'Verify OTP'}
-                        </button>
                     </form>
                 </div>
             </div>

@@ -424,6 +424,14 @@ const AddCourseForm = () => {
       )}
 
       <div className="max-w-full mx-auto">
+        {/* Page Title */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Add New Course</h1>
+            <p className="text-gray-400">Fill in the details below to publish your course</p>
+          </div>
+        </div>
+
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-black rounded-2xl overflow-hidden"

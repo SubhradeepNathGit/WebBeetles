@@ -15,9 +15,13 @@ const ApplicationRow = ({ app, setModal, setDocViewer, setOpenMarkModal, setInst
             <tr className="hover:bg-white/[0.02] transition-colors group text-center">
                 <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
-                            {app?.name?.charAt(0)}
-                        </div>
+                        {app?.profile_image_url ? (
+                            <img src={app.profile_image_url} alt={app?.name} className="w-9 h-9 rounded-full object-cover border border-white/10 flex-shrink-0" />
+                        ) : (
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-900 flex items-center justify-center text-white font-bold text-sm border border-white/10 flex-shrink-0">
+                                {app?.name?.charAt(0)}
+                            </div>
+                        )}
                         <div>
                             <p className="text-sm font-semibold text-white group-hover:text-yellow-400 transition-colors text-left">{app?.name ?? 'N/A'}</p>
                             <p className="text-xs text-gray-500 flex items-center gap-1 text-left">

@@ -50,7 +50,8 @@ export default function Sidebar({ onNavigate }) {
     const dispatch = useDispatch(),
         { isInstructorLoading, getInstructorData, isInstructorError } = useSelector(state => state?.instructor),
         { isCourseLoading, getCourseData, isCourseError } = useSelector(state => state?.course),
-        { isUserLoading, userAuthData: getAdminData, userError } = useSelector(state => state.checkAuth);
+        { isUserLoading, userAuthData: getAdminData, userError } = useSelector(state => state.checkAuth),
+        { unreadCount } = useSelector(state => state.notification);
 
     const { data: contactMessages, isLoading: isMessagesLoading } = useFetchContactMessages();
 
@@ -140,6 +141,7 @@ export default function Sidebar({ onNavigate }) {
         { to: "/admin/charge", label: "Charge", icon: IndianRupee },
         { to: "/admin/subscriptions", label: "Subscriptions", icon: ShieldCheck },
         { to: "/admin/contact", label: "Message", icon: MessageSquareText, badge: isMessagesLoading ? <Loader2 className="inline h-3 w-3 mb-1 animate-spin" /> : contactMessages?.length ?? 0 },
+        { to: "/admin/notification", label: "Notification", icon: BellRing, badge: unreadCount > 0 ? unreadCount : 0 },
         { to: "/admin/settings", label: "Settings", icon: Settings },
     ];
 

@@ -14,7 +14,7 @@ const fallbackReviews = [
         id: 'fb1',
         student_id: null,
         course_id: null,
-        mockName: 'John Doe',
+        mockName: 'Aarav Patel',
         rating_count: 5,
         review: 'This platform completely changed my perspective. The concepts were explained clearly and the hands-on projects were incredible!',
         created_at: new Date().toISOString(),
@@ -23,7 +23,7 @@ const fallbackReviews = [
         id: 'fb2',
         student_id: null,
         course_id: null,
-        mockName: 'Sarah Smith',
+        mockName: 'Priya Sharma',
         rating_count: 5,
         review: 'Amazing experience! The instructors were very knowledgeable and the materials provided were top-notch. Highly recommended.',
         created_at: new Date().toISOString(),
@@ -32,7 +32,7 @@ const fallbackReviews = [
         id: 'fb3',
         student_id: null,
         course_id: null,
-        mockName: 'Michael Johnson',
+        mockName: 'Rohan Singh',
         rating_count: 4,
         review: 'Great courses overall. I learned a lot of practical skills that I can apply immediately to my job. The pace was just right.',
         created_at: new Date().toISOString(),
@@ -41,7 +41,7 @@ const fallbackReviews = [
         id: 'fb4',
         student_id: null,
         course_id: null,
-        mockName: 'Emily Davis',
+        mockName: 'Ananya Gupta',
         rating_count: 5,
         review: 'Absolutely loved it. The community support and the interactive sessions made it so much better than standard online learning.',
         created_at: new Date().toISOString(),
@@ -50,7 +50,7 @@ const fallbackReviews = [
         id: 'fb5',
         student_id: null,
         course_id: null,
-        mockName: 'David Wilson',
+        mockName: 'Karan Mehta',
         rating_count: 4,
         review: 'Very informative and well structured. I just wish there were more advanced topics covered at the end. Still worth every penny.',
         created_at: new Date().toISOString(),
@@ -79,7 +79,7 @@ const TestimonialSection = () => {
     const { isLoading, data, error } = useStudentDetails(testimonial?.student_id || null);
     const { isLoading: isCourseLoading, data: courseData, error: hasCourseError } = useCourseDetails(testimonial?.course_id || null);
 
-    const studentName = testimonial?.mockName || data?.name || 'User';
+    const studentName = testimonial?.mockName || data?.name || '';
     const initials = studentName.split(" ").map(n => n.charAt(0).toUpperCase()).join("");
 
     return (
@@ -107,10 +107,8 @@ const TestimonialSection = () => {
               {initials}
             </div>
             <div>
-              <h4 className="text-white font-semibold text-base">
-                {studentName} <span className="text-purple-400 text-sm font-normal">({data?.role ? (data.role.charAt(0).toUpperCase() + data.role.slice(1)) : 'User'})</span>
-              </h4>
-              <p className="text-gray-400 text-sm">{courseData?.title ?? 'N/A'}</p>
+              <h4 className="text-white font-semibold text-base">{studentName}</h4>
+                <p className="text-gray-400 text-sm">{courseData?.title || ''}</p>
             </div>
           </div>
 
