@@ -103,21 +103,21 @@
 
 ## 🏗️ System Architecture
 
-```
+```mermaid
 graph TD
     User((User)) -->|Browser| Frontend[React Single Page Application]
 
-    subgraph Client_Side
-        Frontend -->|Auth & DB Queries| SupabaseSDK[Supabase JS Client]
-        Frontend -->|Payment & Subscription Intent| EdgeFunctions[Supabase Edge Functions]
-        Frontend -->|Prompt/Context| GeminiAPI[Google Gemini API]
+    subgraph ClientSide[Client Side]
+        Frontend -->|Auth and DB Queries| SupabaseSDK[Supabase JS Client]
+        Frontend -->|Payment and Subscription Intent| EdgeFunctions[Supabase Edge Functions]
+        Frontend -->|Prompt and Context| GeminiAPI[Google Gemini API]
         Frontend <-->|Live Events| WSClient[WebSocket Client]
     end
 
-    subgraph Cloud_Infrastructure
-        SupabaseSDK -->|REST/Realtime| SupabaseREST[PostgreSQL + PostgREST]
-        EdgeFunctions -->|Execute Order/Subscription| RazorpayAPI[Razorpay API]
-        EdgeFunctions -->|Update Status| SupabaseDB[(PostgreSQL)]
+    subgraph CloudInfra[Cloud Infrastructure]
+        SupabaseSDK -->|REST and Realtime| SupabaseREST[PostgreSQL plus PostgREST]
+        EdgeFunctions -->|Execute Order or Subscription| RazorpayAPI[Razorpay API]
+        EdgeFunctions -->|Update Status| SupabaseDB[PostgreSQL Database]
         GeminiAPI -->|AI Response| Frontend
         WSClient <-->|Bidirectional| WSServer[Custom WebSocket Server]
         WSServer -->|Broadcast Events| SupabaseDB
@@ -125,7 +125,7 @@ graph TD
 
     Admin((Admin)) -->|Manage| Frontend
     Instructor((Instructor)) -->|Upload| Frontend
-    Verifier((Third-Party Verifier)) -->|Scan QR / Visit Link| CertVerify[Certificate Verification Endpoint]
+    Verifier((Third Party Verifier)) -->|Scan QR or Visit Link| CertVerify[Certificate Verification Endpoint]
     CertVerify -->|Lookup| SupabaseDB
 ```
 
