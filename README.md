@@ -199,6 +199,15 @@ WebBeetles implements strict data segregation and routing based on user roles:
 - **Instructor:** Access dedicated management tools to build courses, track revenue, receive live notifications on enrollments/reviews/approvals, and monitor student progress.
 - **Administrator:** Full, unrestricted access to system analytics, financial controls (platform fees, coupons, subscription tiers), and content moderation pipelines.
 
+### Accessing the Instructor and Administrator Portals
+
+The Instructor and Administrator dashboards are not exposed through the regular site navigation — they are accessed by visiting their dedicated routes directly, and require signing in with an account that holds the corresponding role.
+
+- **Instructor Portal:** Navigate to `/instructor` (e.g. `https://webbeetles.vercel.app/instructor`). You must be logged in with an account that has the **Instructor** role; otherwise the route redirects to login or shows an access-denied state.
+- **Administrator Portal:** Navigate to `/admin` (e.g. `https://webbeetles.vercel.app/admin`). You must be logged in with an account that has the **Administrator** role; otherwise the route redirects to login or shows an access-denied state.
+
+Role assignment is managed at the database level (Supabase) — a user's role determines which of these protected routes they can enter, and route guards in the frontend enforce this on every navigation.
+
 ---
 
 ## 🎓 Certificate Verification
@@ -210,6 +219,10 @@ Every certificate issued by WebBeetles includes a unique, scannable QR code and 
 - Authenticity status (valid / revoked)
 
 This makes every WebBeetles certificate independently verifiable by third parties without requiring platform login.
+
+**Live Example:** [webbeetles.vercel.app/certificate/50dc5939-77ed-4312-bb7b-b3ab094442db](https://webbeetles.vercel.app/certificate/50dc5939-77ed-4312-bb7b-b3ab094442db)
+
+Each certificate URL follows the pattern `webbeetles.vercel.app/certificate/{certificate_id}`, where `{certificate_id}` is the unique identifier (UUID) assigned at the time of issuance. Anyone with the link — or anyone scanning the QR code on the printed/PDF certificate — can open it directly to verify the certificate is genuine.
 
 ---
 
