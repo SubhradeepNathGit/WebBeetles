@@ -12,8 +12,8 @@ import { useCourseReviews } from '../../../../tanstack/query/fetchSpecificCourse
 import { useLectureProgress } from '../../../../tanstack/query/fetchVideoProgressDetails';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUserPurchase } from '../../../../redux/slice/purchaseSlice';
-import supabase from '../../../../util/supabase/supabase';
-import { createNotification } from '../../../../util/notification/notificationHelper';
+import supabaseAdmin from '../../../../util/supabase/supabaseAdmin';
+import { createAudienceNotifications } from '../../../../util/notification/notificationHelper';
 
 const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) => {
 
@@ -26,14 +26,23 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
 
     const handleViewCertificate = async () => {
         setShowCertModal(true);
-        // Add certificate generated notification
-        await createNotification({
-            title: 'Certificate Generated',
-            message: `Your certificate for ${courseDetails?.title} has been generated.`,
-            type: 'success',
-            user_type: 'student',
-            user_id: userAuthData?.id,
-            link: `/student/dashboard`,
+        await createAudienceNotifications({
+            student: {
+                title: 'Certificate Generated',
+                message: `Your certificate for ${courseDetails?.title} has been generated.`,
+                type: 'success',
+                user_type: 'student',
+                user_id: userAuthData?.id,
+                link: `/student/dashboard`,
+            },
+            admin: {
+                title: 'Certificate Generated',
+                message: `${userAuthData?.name || 'A student'} generated a certificate for ${courseDetails?.title}.`,
+                type: 'success',
+                user_type: 'admin',
+                user_id: null,
+                link: '/admin/students',
+            },
         });
     };
 
@@ -72,7 +81,7 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
     useEffect(() => {
         if (isCompleted && userAuthData?.id && courseDetails?.title) {
             const checkAndNotifyCompletion = async () => {
-                const { data } = await supabase.from('notifications')
+                const { data } = await supabaseAdmin.from('notifications')
                     .select('id')
                     .eq('user_id', userAuthData.id)
                     .eq('title', 'Course Completed')
@@ -80,13 +89,23 @@ const ActiveCourse = ({ setSelectedCourse, selectedCourse, getPurchaseData }) =>
                     .maybeSingle();
                 
                 if (!data) {
-                    await createNotification({
-                        title: 'Course Completed',
-                        message: `Congratulations! You have completed the course ${courseDetails?.title}.`,
-                        type: 'success',
-                        user_type: 'student',
-                        user_id: userAuthData.id,
-                        link: '/student/dashboard',
+                    await createAudienceNotifications({
+                        student: {
+                            title: 'Course Completed',
+                            message: `Congratulations! You have completed the course ${courseDetails?.title}.`,
+                            type: 'success',
+                            user_type: 'student',
+                            user_id: userAuthData.id,
+                            link: '/student/dashboard',
+                        },
+                        admin: {
+                            title: 'Course Completed',
+                            message: `${userAuthData?.name || 'A student'} completed ${courseDetails?.title}.`,
+                            type: 'success',
+                            user_type: 'admin',
+                            user_id: null,
+                            link: '/admin/students',
+                        },
                     });
                 }
             };

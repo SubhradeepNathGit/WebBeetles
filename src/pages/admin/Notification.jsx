@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { markNotificationRead, markAllNotificationsRead } from "../../redux/slice/notificationSlice";
-import { BellRing, CheckCircle2, ChevronRight, Clock, Info, AlertTriangle, XCircle, Search } from "lucide-react";
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from "../../redux/slice/notificationSlice";
+import { BellRing, CheckCircle2, ChevronRight, Clock, Info, AlertTriangle, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -43,6 +43,10 @@ const Notification = () => {
     const { notifications, unreadCount } = useSelector(state => state.notification);
     const [filter, setFilter] = useState("all"); // "all" or "unread"
 
+    useEffect(() => {
+        dispatch(fetchNotifications({ user_type: 'admin' }));
+    }, [dispatch]);
+
     const filteredNotifications = notifications.filter(n => filter === "all" ? true : !n.is_read);
 
     const handleMarkAllRead = () => {
@@ -59,7 +63,7 @@ const Notification = () => {
     };
 
     return (
-        <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+        <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -165,3 +169,4 @@ const Notification = () => {
 };
 
 export default Notification;
+

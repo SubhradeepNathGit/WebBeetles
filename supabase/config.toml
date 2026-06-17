@@ -21,3 +21,9 @@ enabled = true
 verify_jwt = true
 import_map = "./functions/verify-payment/deno.json"
 entrypoint = "./functions/cancel-payment/index.ts"
+
+[functions.create-notification]
+enabled = true
+verify_jwt = true
+import_map = "./functions/create-notification/deno.json"
+entrypoint = "./functions/create-notification/index.ts"

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../../util/supabase/supabase";
 import supabaseAdmin from "../../../util/supabase/supabaseAdmin";
 import { generateOTP, sendOTPEmail, sendForgetPasswordEmail } from "../../../util/email/emailService";
-import { createNotification } from "../../../util/notification/notificationHelper";
+import { createAudienceNotifications, createNotification } from "../../../util/notification/notificationHelper";
 
 // register action
 export const registerSlice = createAsyncThunk('authSlice/registerSlice',
@@ -155,16 +155,33 @@ export const emailVerifySlice = createAsyncThunk('authSlice/emailVerifySlice',
 
             // Mark user as verified
             await supabaseAdmin.from(table).update({ is_verified: 'fulfilled' }).eq('email', verificationData?.email);
+            const { data: verifiedUser } = await supabaseAdmin
+                .from(table)
+                .select('id, name')
+                .eq('email', verificationData?.email)
+                .single();
 
             // Notify Admin
             if (userType === 'student' || userType === 'instructor') {
-                await createNotification({
-                    title: userType === 'student' ? 'New Student Registration' : 'New Instructor Application',
-                    message: `A new ${userType} (${verificationData?.email}) has verified their email and joined WebBeetles.`,
-                    type: 'success',
-                    user_type: 'admin',
-                    user_id: null,
-                    link: userType === 'student' ? '/admin/students' : '/admin/instructors',
+                await createAudienceNotifications({
+                    student: {
+                        title: userType === 'student' ? 'Welcome to WebBeetles' : 'Application Submitted',
+                        message: userType === 'student'
+                            ? 'Your email is verified. You can now start learning on WebBeetles.'
+                            : 'Your instructor application is verified and ready for admin review.',
+                        type: 'success',
+                        user_type: userType,
+                        user_id: verifiedUser?.id || null,
+                        link: userType === 'student' ? '/student/dashboard' : '/instructor/request/status',
+                    },
+                    admin: {
+                        title: userType === 'student' ? 'New Student Registration' : 'New Instructor Application',
+                        message: `A new ${userType} (${verificationData?.email}) has verified their email and joined WebBeetles.`,
+                        type: 'success',
+                        user_type: 'admin',
+                        user_id: null,
+                        link: userType === 'student' ? '/admin/students' : '/admin/instructors',
+                    },
                 });
             }
 
@@ -217,14 +234,15 @@ export const loginSlice = createAsyncThunk('authSlice/loginSlice',
                 return rejectWithValue({ message: "Please verify your email first" });
             }
 
-            // Notification for new sign in
+            const dashboardLink = role === 'admin' ? '/admin/dashboard' : `/${role}/dashboard`;
+
             await createNotification({
                 title: 'New Sign In',
                 message: `You recently signed in to your account.`,
                 type: 'info',
                 user_type: role,
                 user_id: userData.id,
-                link: role === 'student' ? '/student/dashboard' : '/instructor/dashboard',
+                link: dashboardLink,
             });
 
             return { ...res.data, userData: userData };

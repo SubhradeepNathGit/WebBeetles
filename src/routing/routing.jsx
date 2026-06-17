@@ -32,6 +32,7 @@ import TermsOfService from "../pages/common/terms&policy/TermsOfService";
 import PrivacyPolicy from "../pages/common/terms&policy/PrivacyPolicy";
 import DashboardLayout from "../pages/common/dashboard/DashboardLayout";
 import CertificateVerification from "../pages/student/certificate/CertificateVerification";
+import Chatbot from "../components/student/contact/Chatbot";
 
 // Pages - instructor (no layout — /instructor goes directly to login)
 import InstructorSignup from "../pages/instructor/auth/register/InstructorSignup";
@@ -115,6 +116,27 @@ const Routing = () => {
   const { settings, loading } = useAppSettings();
   const location = useLocation();
 
+  const studentChatbotExactRoutes = [
+    "/",
+    "/about",
+    "/course",
+    "/category",
+    "/contact",
+    "/terms",
+    "/privacy",
+    "/cart",
+    "/student/dashboard",
+  ];
+
+  const studentChatbotPrefixes = [
+    "/course/course-details/",
+    "/category/category-details/",
+    "/certificate/",
+  ];
+
+  const showStudentChatbot = studentChatbotExactRoutes.includes(location.pathname)
+    || studentChatbotPrefixes.some(prefix => location.pathname.startsWith(prefix));
+
   const isAuthRoute = [
     "/signin",
     "/signup",
@@ -152,6 +174,7 @@ const Routing = () => {
   return (
     <>
       <ScrollToTop />
+      {showStudentChatbot && <Chatbot />}
       <Routes>
 
         {/* student  */}

@@ -1,35 +1,61 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import supabase from "../../util/supabase/supabase";
+import supabaseAdmin from "../../util/supabase/supabaseAdmin";
 
-// Fetch latest 20 notifications
+const buildNotificationQuery = ({ user_type = 'admin', user_id = null, limit = 50 } = {}) => {
+    let query = supabaseAdmin
+        .from('notifications')
+        .select('*')
+        .eq('user_type', user_type)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+    if (user_id) {
+        query = query.or(`user_id.eq.${user_id},user_id.is.null`);
+    }
+
+    return query;
+};
+
+const getNotificationContext = ({ user_type = 'admin', user_id = null } = {}) => ({
+    user_type,
+    user_id: user_id || null,
+});
+
+const belongsToContext = (notification, context) => {
+    if (!notification || !context) return false;
+    if (notification.user_type !== context.user_type) return false;
+    if (!context.user_id) return true;
+    return !notification.user_id || notification.user_id === context.user_id;
+};
+
+const sortNotifications = (notifications) => (
+    [...notifications].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+);
+
+const recalculateUnreadCount = (notifications) => notifications.filter(n => !n.is_read).length;
+
+// Fetch latest notifications for the active notification audience.
 export const fetchNotifications = createAsyncThunk('notificationSlice/fetchNotifications',
-    async ({ user_type = 'admin', user_id = null } = {}, { rejectWithValue }) => {
-        let query = supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_type', user_type)
-            .order('created_at', { ascending: false })
-            .limit(20);
-
-        if (user_id) {
-            query = query.eq('user_id', user_id);
-        }
-
-        const res = await query;
+    async (params = {}, { rejectWithValue }) => {
+        const context = getNotificationContext(params);
+        const res = await buildNotificationQuery(params);
 
         if (res?.error) {
             console.error('Error fetching notifications:', res?.error);
             return rejectWithValue(res?.error?.message || 'Failed to fetch notifications');
         }
 
-        return res?.data || [];
+        return {
+            context,
+            notifications: res?.data || [],
+        };
     }
 );
 
 // Mark a single notification as read
 export const markNotificationRead = createAsyncThunk('notificationSlice/markNotificationRead',
     async (id, { rejectWithValue }) => {
-        const res = await supabase
+        const res = await supabaseAdmin
             .from('notifications')
             .update({ is_read: true })
             .eq('id', id)
@@ -48,14 +74,14 @@ export const markNotificationRead = createAsyncThunk('notificationSlice/markNoti
 // Mark all unread notifications as read
 export const markAllNotificationsRead = createAsyncThunk('notificationSlice/markAllNotificationsRead',
     async ({ user_type = 'admin', user_id = null } = {}, { rejectWithValue }) => {
-        let query = supabase
+        let query = supabaseAdmin
             .from('notifications')
             .update({ is_read: true })
             .eq('is_read', false)
             .eq('user_type', user_type);
 
         if (user_id) {
-            query = query.eq('user_id', user_id);
+            query = query.or(`user_id.eq.${user_id},user_id.is.null`);
         }
 
         const res = await query.select();
@@ -73,7 +99,8 @@ const initialState = {
     isNotificationLoading: false,
     notifications: [],
     unreadCount: 0,
-    notificationError: null
+    notificationError: null,
+    context: null
 };
 
 export const notificationSlice = createSlice({
@@ -81,13 +108,24 @@ export const notificationSlice = createSlice({
     initialState,
     reducers: {
         addRealtimeNotification: (state, action) => {
-            const exists = state.notifications.some(n => n.id === action.payload.id);
-            if (!exists) {
-                state.notifications = [action.payload, ...state.notifications];
-                if (!action.payload.is_read) {
-                    state.unreadCount += 1;
-                }
+            if (!belongsToContext(action.payload, state.context)) return;
+
+            const index = state.notifications.findIndex(n => n.id === action.payload.id);
+            if (index >= 0) {
+                state.notifications[index] = action.payload;
+            } else {
+                state.notifications = [action.payload, ...state.notifications].slice(0, 50);
             }
+            state.notifications = sortNotifications(state.notifications);
+            state.unreadCount = recalculateUnreadCount(state.notifications);
+        },
+        removeRealtimeNotification: (state, action) => {
+            state.notifications = state.notifications.filter(n => n.id !== action.payload);
+            state.unreadCount = recalculateUnreadCount(state.notifications);
+        },
+        resetNotifications: () => initialState,
+        setNotificationContext: (state, action) => {
+            state.context = getNotificationContext(action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -98,8 +136,9 @@ export const notificationSlice = createSlice({
             })
             .addCase(fetchNotifications.fulfilled, (state, action) => {
                 state.isNotificationLoading = false;
-                state.notifications = action.payload;
-                state.unreadCount = action.payload.filter(n => !n.is_read).length;
+                state.context = action.payload.context;
+                state.notifications = sortNotifications(action.payload.notifications);
+                state.unreadCount = recalculateUnreadCount(action.payload.notifications);
                 state.notificationError = null;
             })
             .addCase(fetchNotifications.rejected, (state, action) => {
@@ -120,14 +159,14 @@ export const notificationSlice = createSlice({
 
             // Mark all notifications read
             .addCase(markAllNotificationsRead.fulfilled, (state, action) => {
-                state.notifications = state.notifications.map(n => ({
-                    ...n,
-                    is_read: true
-                }));
-                state.unreadCount = 0;
+                const updatedById = new Map((action.payload || []).map(n => [n.id, n]));
+                state.notifications = state.notifications.map(n => (
+                    updatedById.get(n.id) || { ...n, is_read: true }
+                ));
+                state.unreadCount = recalculateUnreadCount(state.notifications);
             });
     }
 });
 
-export const { addRealtimeNotification } = notificationSlice.actions;
+export const { addRealtimeNotification, removeRealtimeNotification, resetNotifications, setNotificationContext } = notificationSlice.actions;
 export default notificationSlice.reducer;

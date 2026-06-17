@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import supabase from "../../util/supabase/supabase";
-import { createNotification } from "../../util/notification/notificationHelper";
+import { createAudienceNotifications } from "../../util/notification/notificationHelper";
 
 // Helper to handle safe upsert without relying on unique constraints and preventing un-completing
 const safeUpsert = async ({ student_id, course_id, lesson_id, watched_seconds, total_seconds, completed, read_doc, type, forceComplete = false }) => {
@@ -51,13 +51,23 @@ const safeUpsert = async ({ student_id, course_id, lesson_id, watched_seconds, t
     // Check if it just became completed
     const justCompleted = finalCompleted && !wasCompleted;
     if (justCompleted) {
-        await createNotification({
-            title: 'Lesson Completed',
-            message: `You successfully completed a lesson. Keep up the great work!`,
-            type: 'success',
-            user_type: 'student',
-            user_id: student_id,
-            link: '/student/dashboard',
+        await createAudienceNotifications({
+            student: {
+                title: 'Lesson Completed',
+                message: `You successfully completed a lesson. Keep up the great work!`,
+                type: 'success',
+                user_type: 'student',
+                user_id: student_id,
+                link: '/student/dashboard',
+            },
+            admin: {
+                title: 'Lesson Completed',
+                message: `A student completed a lesson in course ${course_id}.`,
+                type: 'success',
+                user_type: 'admin',
+                user_id: null,
+                link: '/admin/students',
+            },
         });
     }
 

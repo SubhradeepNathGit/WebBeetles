@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Bell, LogOut, Settings, ChevronDown, Moon, Sun, Menu, X, } from "lucide-react";
+import { Search, Bell, LogOut, Settings, ChevronDown, Menu, X, Clock, Info } from "lucide-react";
 import Sidebar from "./Sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { checkLoggedInUser, logoutUser } from "../../redux/slice/authSlice/checkUserAuthSlice";
 import toastifyAlert from "../../util/alert/toastify";
 import getSweetAlert from "../../util/alert/sweetAlert";
-import { fetchNotifications, markNotificationRead, markAllNotificationsRead, addRealtimeNotification } from "../../redux/slice/notificationSlice";
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead, addRealtimeNotification, removeRealtimeNotification, resetNotifications } from "../../redux/slice/notificationSlice";
 import supabase from "../../util/supabase/supabase";
 
 const formatRelativeTime = (dateString) => {
@@ -142,16 +142,13 @@ export default function Navbar() {
             .channel('realtime-notifications-admin')
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'notifications', filter: "user_type=eq.admin" },
+                { event: '*', schema: 'public', table: 'notifications', filter: "user_type=eq.admin" },
                 (payload) => {
+                    if (payload.eventType === 'DELETE') {
+                        dispatch(removeRealtimeNotification(payload.old.id));
+                        return;
+                    }
                     dispatch(addRealtimeNotification(payload.new));
-                }
-            )
-            .on(
-                'postgres_changes',
-                { event: 'UPDATE', schema: 'public', table: 'notifications', filter: "user_type=eq.admin" },
-                (payload) => {
-                    dispatch(fetchNotifications({ user_type: 'admin' }));
                 }
             )
             .subscribe();
@@ -159,6 +156,7 @@ export default function Navbar() {
         return () => {
             clearInterval(pollInterval);
             supabase.removeChannel(channel);
+            dispatch(resetNotifications());
         };
     }, [dispatch]);
 
@@ -275,28 +273,33 @@ export default function Navbar() {
                             >
                                 <Bell size={18} />
                                 {unreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center border-2 border-[#121212] shadow-sm">
+                                    <span className="absolute -top-1 -right-1 bg-white text-black text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center border border-white/70 shadow-[0_4px_14px_rgba(255,255,255,0.32)]">
                                         {unreadCount > 9 ? '9+' : unreadCount}
                                     </span>
                                 )}
                             </button>
 
                             {showNotifications && (
-                                <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-[#111] border border-white/5 rounded-xl shadow-2xl overflow-hidden">
-                                    <div className="flex items-center justify-between p-4 border-b border-white/5">
-                                        <h3 className="text-white font-semibold text-sm">Notifications</h3>
+                                <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] bg-[linear-gradient(145deg,rgba(255,255,255,0.16),rgba(15,23,42,0.82)_44%,rgba(3,7,18,0.92))] border border-white/20 rounded-2xl shadow-[0_24px_70px_rgba(0,0,0,0.42)] overflow-hidden backdrop-blur-3xl">
+                                    <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/[0.04]">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
+                                                <Bell size={17} className="text-sky-100" />
+                                            </div>
+                                            <h3 className="text-white font-semibold text-sm">Notifications</h3>
+                                        </div>
                                         {unreadCount > 0 && (
                                             <button
                                                 onClick={markAllAsRead}
-                                                className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
+                                                className="text-xs text-sky-100 hover:text-white bg-white/10 hover:bg-white/15 border border-white/15 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
                                             >
                                                 Mark all read
                                             </button>
                                         )}
                                     </div>
-                                    <div className="max-h-96 overflow-y-auto">
+                                    <div className="max-h-96 overflow-y-auto p-3 space-y-3">
                                         {notifications.length === 0 ? (
-                                            <div className="p-8 text-center text-gray-500 text-sm">
+                                            <div className="p-8 text-center text-slate-300 text-sm">
                                                 No new notifications
                                             </div>
                                         ) : (
@@ -304,23 +307,28 @@ export default function Navbar() {
                                                 <button
                                                     key={notification.id}
                                                     onClick={() => handleNotificationClick(notification)}
-                                                    className={`w-full p-4 text-left hover:bg-white/5 transition-colors border-b border-white/5 last:border-b-0 ${!notification.is_read ? "bg-emerald-500/5" : ""
-                                                        }`}
+                                                    className={`w-full p-4 text-left transition-all rounded-2xl border backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_14px_28px_rgba(0,0,0,0.2)] cursor-pointer ${!notification.is_read ? "bg-white/[0.14] border-white/25 hover:bg-white/[0.18]" : "bg-white/[0.07] border-white/[0.12] hover:bg-white/[0.12]"}`}
                                                 >
                                                     <div className="flex items-start gap-3">
-                                                        {!notification.is_read && (
-                                                            <span className="w-2 h-2 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
-                                                        )}
+                                                        <div className="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
+                                                            <Info size={16} className="text-sky-100" />
+                                                        </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <p className="text-white text-sm font-medium truncate">
-                                                                {notification.title}
-                                                            </p>
+                                                            <div className="flex items-center gap-2">
+                                                                {!notification.is_read && (
+                                                                    <span className="w-1.5 h-1.5 bg-sky-200 rounded-full flex-shrink-0 shadow-[0_0_10px_rgba(186,230,253,0.7)]" />
+                                                                )}
+                                                                <p className="text-white text-sm font-semibold truncate">
+                                                                    {notification.title}
+                                                                </p>
+                                                            </div>
                                                             {notification.message && (
-                                                                <p className="text-gray-400 text-xs mt-0.5 truncate">
+                                                                <p className="text-slate-300 text-xs mt-1 line-clamp-2">
                                                                     {notification.message}
                                                                 </p>
                                                             )}
-                                                            <p className="text-gray-500 text-[10px] mt-1">
+                                                            <p className="text-slate-400 text-[10px] mt-2 flex items-center gap-1.5">
+                                                                <Clock size={12} />
                                                                 {formatRelativeTime(notification.created_at)}
                                                             </p>
                                                         </div>
@@ -329,13 +337,13 @@ export default function Navbar() {
                                             ))
                                         )}
                                     </div>
-                                    <div className="p-3 border-t border-white/5">
+                                    <div className="p-3 border-t border-white/10 bg-white/[0.03]">
                                         <button
                                             onClick={() => {
                                                 navigate("/admin/notification");
                                                 setShowNotifications(false);
                                             }}
-                                            className="w-full text-center text-sm text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
+                                            className="w-full text-center text-sm text-sky-100 hover:text-white bg-white/10 hover:bg-white/15 border border-white/15 rounded-xl py-2.5 transition-colors cursor-pointer"
                                         >
                                             View all notifications
                                         </button>
@@ -460,3 +468,4 @@ export default function Navbar() {
         </>
     );
 }
+

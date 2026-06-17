@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import getSweetAlert from "../../util/alert/sweetAlert";
 import { checkLoggedInUser, logoutUser } from "../../redux/slice/authSlice/checkUserAuthSlice";
-import { fetchNotifications, markNotificationRead, markAllNotificationsRead, addRealtimeNotification } from "../../redux/slice/notificationSlice";
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead, addRealtimeNotification, removeRealtimeNotification, resetNotifications } from "../../redux/slice/notificationSlice";
 import supabase from "../../util/supabase/supabase";
 
 const formatRelativeTime = (dateString) => {
@@ -96,27 +96,29 @@ const StudentNavbar = () => {
 
   useEffect(() => {
     if (getStudentData?.id) {
-        dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
+        const studentId = getStudentData.id;
+
+        dispatch(fetchNotifications({ user_type: 'student', user_id: studentId }));
 
         // Poll every 30s as a robust fallback in case Supabase Realtime is not enabled
         const pollInterval = setInterval(() => {
-            dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
+            dispatch(fetchNotifications({ user_type: 'student', user_id: studentId }));
         }, 30000);
 
         const channel = supabase
-            .channel('realtime-notifications-student')
+            .channel(`realtime-notifications-student-${studentId}`)
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${getStudentData.id}` },
+                { event: '*', schema: 'public', table: 'notifications', filter: "user_type=eq.student" },
                 (payload) => {
+                    const row = payload.eventType === 'DELETE' ? payload.old : payload.new;
+                    if (row?.user_id && row.user_id !== studentId) return;
+
+                    if (payload.eventType === 'DELETE') {
+                        dispatch(removeRealtimeNotification(row.id));
+                        return;
+                    }
                     dispatch(addRealtimeNotification(payload.new));
-                }
-            )
-            .on(
-                'postgres_changes',
-                { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${getStudentData.id}` },
-                (payload) => {
-                    dispatch(fetchNotifications({ user_type: 'student', user_id: getStudentData.id }));
                 }
             )
             .subscribe();
@@ -124,9 +126,10 @@ const StudentNavbar = () => {
         return () => {
             clearInterval(pollInterval);
             supabase.removeChannel(channel);
+            dispatch(resetNotifications());
         };
     }
-  }, [getStudentData, dispatch]);
+  }, [getStudentData?.id, dispatch]);
 
   // Re-fetch every time the notification drawer opens
   useEffect(() => {
@@ -228,7 +231,7 @@ const StudentNavbar = () => {
                 >
                   <Bell className="text-white w-5 h-5 lg:w-[22px] lg:h-[22px] group-hover:scale-110 transition-transform duration-300" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-[18px] h-[18px] lg:w-5 lg:h-5 rounded-full flex items-center justify-center border border-black shadow-lg transform group-hover:scale-110 transition-transform duration-300 animate-pulse">
+                    <span className="absolute -top-1 -right-1 bg-white text-black text-[10px] font-bold w-[18px] h-[18px] lg:w-5 lg:h-5 rounded-full flex items-center justify-center border border-white/70 shadow-[0_4px_14px_rgba(255,255,255,0.35)] transform group-hover:scale-110 transition-transform duration-300">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
@@ -244,7 +247,7 @@ const StudentNavbar = () => {
                 >
                   <ShoppingCart className="text-white w-5 h-5 lg:w-[22px] lg:h-[22px] transition-all duration-300" />
                   {cartItems?.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-transparent text-white bg-white/30 text-[10px] font-bold w-[18px] h-[18px] lg:w-5 lg:h-5 rounded-full flex items-center justify-center border border-pink-600 transform group-hover:scale-110 transition-transform duration-300">
+                    <span className="absolute -top-1 -right-1 bg-white text-black text-[10px] font-bold w-[18px] h-[18px] lg:w-5 lg:h-5 rounded-full flex items-center justify-center border border-white/70 shadow-[0_4px_14px_rgba(255,255,255,0.35)] transform group-hover:scale-110 transition-transform duration-300">
                       {cartItems.length}
                     </span>
                   )}
@@ -461,7 +464,7 @@ const StudentNavbar = () => {
                     >
                       <span>Notifications</span>
                       {unreadCount > 0 && (
-                        <span className="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        <span className="ml-2 bg-white text-black text-xs font-bold px-2 py-0.5 rounded-full border border-white/70 shadow-[0_4px_14px_rgba(255,255,255,0.28)]">
                           {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                       )}
@@ -493,7 +496,7 @@ const StudentNavbar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/35 backdrop-blur-md z-50"
             onClick={() => setShowNotificationDrawer(false)}
           />
         )}
@@ -507,18 +510,18 @@ const StudentNavbar = () => {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 h-full w-full xs:w-[360px] sm:w-[360px] bg-[#0a0a0a]/80 backdrop-blur-3xl border-r border-white/10 text-white z-[60] shadow-[20px_0_40px_rgba(0,0,0,0.7)] flex flex-col"
+            className="fixed top-0 left-0 h-full w-full xs:w-[360px] sm:w-[360px] bg-[rgba(5,7,12,0.94)] backdrop-blur-3xl text-white z-[60] shadow-[18px_0_50px_rgba(0,0,0,0.55)] flex flex-col"
           >
-            <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gradient-to-b from-white/5 to-transparent">
+            <div className="flex items-center justify-between p-6 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0))]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 shadow-lg backdrop-blur-md">
-                  <Bell className="w-5 h-5 text-gray-300" />
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center border border-white/20 bg-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_12px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                  <Bell className="w-5 h-5 text-sky-100" />
                 </div>
-                <h2 className="text-xl font-bold tracking-wide text-white">Notifications</h2>
+                <h2 className="text-2xl font-bold tracking-wide text-white">Notifications</h2>
               </div>
               <button
                 onClick={() => setShowNotificationDrawer(false)}
-                className="text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-all backdrop-blur-sm"
+                className="text-slate-200 hover:text-white hover:bg-white/12 p-2.5 rounded-xl transition-all backdrop-blur-xl cursor-pointer"
                 aria-label="Close notifications"
               >
                 <X size={20} />
@@ -527,29 +530,29 @@ const StudentNavbar = () => {
 
             <div className="px-6 py-3 flex justify-between items-center bg-transparent">
                 <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(255,255,255,0.05)]">
-                        <span className={`w-1.5 h-1.5 rounded-full ${unreadCount > 0 ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse' : 'bg-gray-600'}`}></span>
+                    <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.12] backdrop-blur-2xl border border-white/20 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_10px_24px_rgba(0,0,0,0.18)]">
+                        <span className={`w-1.5 h-1.5 rounded-full ${unreadCount > 0 ? 'bg-sky-200 shadow-[0_0_12px_rgba(186,230,253,0.9)] animate-pulse' : 'bg-slate-500'}`}></span>
                         <span className="text-white font-bold">{unreadCount}</span> Unread
                     </span>
                 </div>
                 {unreadCount > 0 && (
                     <button
-                        onClick={() => dispatch(markAllNotificationsRead({ user_type: 'student', user_id: getStudentData?.id }))}
-                        className="text-xs font-medium text-gray-300 hover:text-white transition-colors cursor-pointer bg-white/5 px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/10"
+                        onClick={() => getStudentData?.id && dispatch(markAllNotificationsRead({ user_type: 'student', user_id: getStudentData.id }))}
+                        className="text-xs font-semibold text-slate-100 hover:text-white transition-colors cursor-pointer bg-white/10 px-4 py-2 rounded-full border border-white/15 hover:bg-white/[0.18] backdrop-blur-xl"
                     >
                         Mark all as read
                     </button>
                 )}
             </div>
 
-            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent px-5 pb-6 pt-4 space-y-4">
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-8 text-center opacity-70">
-                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10 shadow-inner backdrop-blur-xl">
-                        <Bell className="w-8 h-8 text-gray-400" />
+                    <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6 border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl">
+                        <Bell className="w-8 h-8 text-sky-100" />
                     </div>
                     <h3 className="text-lg font-medium text-white mb-2">You're all caught up!</h3>
-                    <p className="text-gray-400 text-sm">No new notifications right now.</p>
+                    <p className="text-slate-300 text-sm">No new notifications right now.</p>
                 </div>
               ) : (
                 <AnimatePresence>
@@ -560,23 +563,23 @@ const StudentNavbar = () => {
                             exit={{ opacity: 0, height: 0 }}
                             key={notification.id}
                             onClick={() => handleNotificationClick(notification)}
-                            className={`group p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden backdrop-blur-md ${!notification.is_read ? 'bg-white/10 border-white/20 hover:bg-white/15 shadow-sm' : 'bg-transparent border-white/5 hover:bg-white/5'}`}
+                            className={`group p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_18px_34px_rgba(0,0,0,0.22)] ${!notification.is_read ? 'bg-white/[0.14] border-white/25 hover:bg-white/[0.18]' : 'bg-white/[0.07] border-white/[0.12] hover:bg-white/[0.12]'}`}
                         >
                             {!notification.is_read && (
-                                <div className="absolute -left-1 top-1/2 -translate-y-1/2 h-1/2 w-1.5 bg-white rounded-r-full shadow-[0_0_10px_rgba(255,255,255,0.3)]"></div>
+                                <div className="absolute left-0 top-4 bottom-4 w-1 bg-sky-200 rounded-r-full shadow-[0_0_16px_rgba(186,230,253,0.45)]"></div>
                             )}
                             <div className="flex gap-4">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${!notification.is_read ? 'bg-white/10 text-white shadow-inner border border-white/10' : 'bg-white/5 text-gray-400 border border-transparent'}`}>
+                                <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] ${!notification.is_read ? 'bg-white/[0.14] text-white border border-white/20' : 'bg-white/[0.08] text-slate-300 border border-white/10'}`}>
                                     {getIconForType(notification.type)}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className={`text-sm pr-4 ${!notification.is_read ? 'text-white font-semibold' : 'text-gray-400 font-medium'}`}>
+                                    <h4 className={`text-sm pr-4 ${!notification.is_read ? 'text-white font-semibold' : 'text-slate-200 font-medium'}`}>
                                         {notification.title}
                                     </h4>
-                                    <p className={`text-xs mt-1 leading-relaxed ${!notification.is_read ? 'text-gray-300' : 'text-gray-500'} line-clamp-2`}>
+                                    <p className={`text-xs mt-1 leading-relaxed ${!notification.is_read ? 'text-slate-200' : 'text-slate-400'} line-clamp-2`}>
                                         {notification.message}
                                     </p>
-                                    <span className={`flex items-center gap-1.5 text-[10px] mt-2.5 font-medium ${!notification.is_read ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <span className={`flex items-center gap-1.5 text-[10px] mt-2.5 font-medium ${!notification.is_read ? 'text-slate-300' : 'text-slate-500'}`}>
                                         <Clock className="w-3 h-3" />
                                         {formatRelativeTime(notification.created_at)}
                                     </span>
@@ -595,3 +598,4 @@ const StudentNavbar = () => {
 };
 
 export default StudentNavbar;
+
