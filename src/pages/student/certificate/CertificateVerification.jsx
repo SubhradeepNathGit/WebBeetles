@@ -179,7 +179,7 @@ const CertificateVerification = () => {
               <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-white">WebBeetles</span>
             </Link>
             
-            <div className="flex items-center gap-3 rounded-full border border-emerald-400/25 bg-emerald-950/20 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:px-4">
+            <div className="flex items-center gap-3 rounded-full bg-[#0a0a0f] px-3 py-2 sm:px-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-400/25 bg-emerald-400/10">
                 <ShieldCheck className="h-4 w-4 text-emerald-300" strokeWidth={2.2} />
               </div>
