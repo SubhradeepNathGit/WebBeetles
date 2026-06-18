@@ -16,7 +16,6 @@ const LiveCourseRow = ({ c, setPreview, setOpenBlockUnblockModal, setBlockUnbloc
                 </p>
                 <p className="text-xs text-gray-500">{c?.instructor?.name ?? 'N/A'} · <IndianRupee className='inline w-2.5 h-2.5 mb-0.5 text-blue-300' />{c?.price ?? 0} · <Users className='inline w-2.5 h-2.5 mb-0.5 mr-0.5 text-red-300' />{studentData?.length} · <Star className='inline w-2.5 h-2.5 mb-1 mr-0.5 text-yellow-400' /><CourseRating courseId={c?.id} /></p>
             </div>
-            {c?.is_exam_scheduled && <span className="text-xs border bg-orange-500/10 text-orange-400 border-orange-500/20 px-2.5 py-1 rounded-md hidden sm:block">Exam Scheduled</span>}
             {c?.is_completed && <span className="text-xs border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-2.5 py-1 rounded-md hidden sm:block">Complete</span>}
             <span className={`text-xs border ${c?.is_admin_block ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'} px-2.5 py-1 rounded-md hidden sm:block`}>{c?.is_admin_block ? 'Block' : 'Active'}</span>
             {/* <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-md hidden sm:block">{c.cat}</span>

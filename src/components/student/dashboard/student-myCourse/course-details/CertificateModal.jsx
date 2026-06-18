@@ -145,19 +145,19 @@ const CertificateModal = ({ purchaseItemId, courseTitle, studentName, instructor
                 
                 {/* Course details & highlights */}
                 <p className="text-[8px] sm:text-[9px] text-gray-500 max-w-md mx-auto mt-2 font-sans leading-relaxed">
-                  This rigorous program of study covers core design principles, software engineering methodologies, practical hands-on implementations, and cumulative performance assessments supervised by WebBeetles Board of Education.
+                  This program of study covers structured course modules, practical learning activities, and guided implementations delivered through WebBeetles.
                 </p>
                 
                 {/* Badges/Info Row */}
                 <div className="flex justify-center items-center gap-4 mt-3 text-[7px] sm:text-[8px] uppercase tracking-wider text-gray-500 font-sans font-semibold">
                   <span className="flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-amber-500"></span> 40 Hours Coursework
+                    <span className="w-1 h-1 rounded-full bg-amber-500"></span> Course Modules
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-amber-500"></span> Graded Assessments
+                    <span className="w-1 h-1 rounded-full bg-amber-500"></span> Practical Learning
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-amber-500"></span> Hands-on Projects
+                    <span className="w-1 h-1 rounded-full bg-amber-500"></span> Verified Completion
                   </span>
                 </div>
               </div>

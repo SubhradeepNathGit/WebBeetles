@@ -234,16 +234,16 @@ export const loginSlice = createAsyncThunk('authSlice/loginSlice',
                 return rejectWithValue({ message: "Please verify your email first" });
             }
 
-            const dashboardLink = role === 'admin' ? '/admin/dashboard' : `/${role}/dashboard`;
-
-            await createNotification({
-                title: 'New Sign In',
-                message: `You recently signed in to your account.`,
-                type: 'info',
-                user_type: role,
-                user_id: userData.id,
-                link: dashboardLink,
-            });
+            if (role !== 'admin' && !userData.last_login) {
+                await createNotification({
+                    title: 'First Sign In',
+                    message: `You signed in to your account for the first time.`,
+                    type: 'info',
+                    user_type: role,
+                    user_id: userData.id,
+                    link: `/${role}/dashboard`,
+                });
+            }
 
             return { ...res.data, userData: userData };
 

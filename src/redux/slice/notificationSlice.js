@@ -11,6 +11,8 @@ const buildNotificationQuery = ({ user_type = 'admin', user_id = null, limit = 5
 
     if (user_id) {
         query = query.or(`user_id.eq.${user_id},user_id.is.null`);
+    } else {
+        query = query.is('user_id', null);
     }
 
     return query;
@@ -24,7 +26,7 @@ const getNotificationContext = ({ user_type = 'admin', user_id = null } = {}) =>
 const belongsToContext = (notification, context) => {
     if (!notification || !context) return false;
     if (notification.user_type !== context.user_type) return false;
-    if (!context.user_id) return true;
+    if (!context.user_id) return !notification.user_id;
     return !notification.user_id || notification.user_id === context.user_id;
 };
 

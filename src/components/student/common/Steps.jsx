@@ -105,7 +105,7 @@ const HowItWorksSection = () => {
                 <p className="text-gray-400 text-sm lg:text-base leading-relaxed max-w-xs mx-auto">
                   Access lessons anytime, anywhere. Enjoy
                   <br />
-                  flexible learning with videos, quizzes,
+                  flexible learning with videos, resources,
                   <br />
                   and assignments.
                 </p>

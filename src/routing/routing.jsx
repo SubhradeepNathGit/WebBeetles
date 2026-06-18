@@ -60,7 +60,6 @@ import Contact from "../pages/admin/Contact";
 import AllCategory from "../pages/admin/AllCategory";
 import Notification from "../pages/admin/Notification";
 import Admin from "../pages/admin/Admin";
-import ExamSet from "../pages/admin/ExamSet";
 import AdminProfile from "../pages/admin/AdminProfile";
 import AdminSubscriptions from "../components/admin/subscriptions/AdminSubscriptions";
 import { Loader2 } from "lucide-react";
@@ -240,7 +239,6 @@ const Routing = () => {
             <Route path="admin" element={<Admin />} />
             <Route path="contact" element={<Contact />} />
             <Route path="notification" element={<Notification />} />
-            <Route path="examset" element={<ExamSet />} />
             <Route path="profile" element={<AdminProfile />} />
             <Route path="settings" element={<Settings />} />
           </Route>

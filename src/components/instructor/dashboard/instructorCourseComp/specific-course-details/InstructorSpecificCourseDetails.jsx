@@ -31,10 +31,6 @@ const InstructorSpecificCourseDetails = ({ selectedCourse, setSelectedCourse, se
         id: 3,
         title: 'Course document',
         type: 'document'
-    }, {
-        id: 4,
-        title: 'Certification question set',
-        type: 'exam'
     }]
 
     return (

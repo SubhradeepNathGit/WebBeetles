@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import supabaseAdmin from '../../../util/supabase/supabaseAdmin';
-import { Award, CheckCircle, AlertTriangle, Calendar, User, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
+import { Award, ShieldCheck, AlertTriangle, Calendar, User, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
 
 const CertificateVerification = () => {
   const { purchaseItemId } = useParams();
@@ -18,7 +18,7 @@ const CertificateVerification = () => {
         // 1. Fetch purchase item and linked course and order
         const { data: purchaseItem, error: piError } = await supabaseAdmin
           .from('purchase_items')
-          .select('id, is_exam_completed, created_at, course_id, purchases(user_id)')
+          .select('id, created_at, course_id, purchases(user_id)')
           .eq('id', purchaseItemId)
           .maybeSingle();
 
@@ -27,11 +27,6 @@ const CertificateVerification = () => {
           setError("Certificate not found.");
           return;
         }
-
-        // if (!purchaseItem.is_exam_completed) {
-        //   setError("This course has not been completed yet.");
-        //   return;
-        // }
 
         // 2. Fetch student details
         const studentId = purchaseItem.purchases?.user_id;
@@ -184,13 +179,18 @@ const CertificateVerification = () => {
               <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-white">WebBeetles</span>
             </Link>
             
-            <div className="flex items-center gap-2.5 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/30 px-5 py-2 rounded-full backdrop-blur-md transition-all">
-              <div className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-full w-full bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+            <div className="flex items-center gap-3 rounded-full border border-emerald-400/25 bg-emerald-950/20 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:px-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-400/25 bg-emerald-400/10">
+                <ShieldCheck className="h-4 w-4 text-emerald-300" strokeWidth={2.2} />
               </div>
-              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
-              <span className="text-xs sm:text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-green-300 uppercase tracking-[0.2em] ml-0.5">Verified</span>
+              <div className="leading-tight">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-200 sm:text-xs">
+                  Verified Credential
+                </div>
+                <div className="mt-0.5 hidden font-mono text-[10px] uppercase tracking-[0.12em] text-slate-400 sm:block">
+                  ID {certData.id?.toUpperCase()?.substring(0, 12)}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -252,19 +252,19 @@ const CertificateVerification = () => {
                   
                   {/* Course details & highlights */}
                   <p className="text-[9px] sm:text-[10px] text-gray-500 max-w-xl mx-auto mt-4 font-sans leading-relaxed">
-                    This rigorous program of study covers core design principles, software engineering methodologies, practical hands-on implementations, and cumulative performance assessments supervised by WebBeetles Board of Education.
+                    This program of study covers structured course modules, practical learning activities, and guided implementations delivered through WebBeetles.
                   </p>
                   
                   {/* Badges/Info Row */}
                   <div className="flex justify-center items-center gap-6 mt-5 text-[8px] sm:text-[9px] uppercase tracking-[0.2em] text-gray-500 font-sans font-semibold">
                     <span className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span> 40 Hours Coursework
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span> Course Modules
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span> Graded Assessments
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span> Practical Learning
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span> Hands-on Projects
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]"></span> Verified Completion
                     </span>
                   </div>
                 </div>

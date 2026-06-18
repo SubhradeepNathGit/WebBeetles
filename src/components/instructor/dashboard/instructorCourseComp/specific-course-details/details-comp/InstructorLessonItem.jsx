@@ -3,7 +3,7 @@ import { Edit2, Eye, EyeIcon, FileText, Play, PlayCircle, Trash2 } from 'lucide-
 import { formatDateDDMMYY } from '../../../../../../util/dateFormat/dateFormat';
 
 const InstructorLessonItem = ({ section, lesson, setUpdateData, setDeletedData, setShowDeleteLectureModal, setShowVideoModal, setShowUploadModal, selectedCourse }) => {
-    const iconMap = { video: PlayCircle, quiz: FileText };
+    const iconMap = { video: PlayCircle, document: FileText };
     const Icon = iconMap[lesson.type] || PlayCircle;
 
     return (
